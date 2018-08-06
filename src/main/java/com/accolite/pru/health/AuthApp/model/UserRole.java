@@ -1,9 +1,9 @@
 package com.accolite.pru.health.AuthApp.model;
 
 /**
- * The enum Authority role.
+ * The enum Role role.
  */
-public enum AuthorityRole {
+public enum UserRole {
 
     /**
      * Role admin authority role.

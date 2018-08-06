@@ -13,10 +13,10 @@ import javax.persistence.SequenceGenerator;
 import java.util.List;
 
 /**
- * The type Authority. Defines the role and the list of users who are associated with that role
+ * The type Role. Defines the role and the list of users who are associated with that role
  */
 @Entity(name = "AUTHORITY")
-public class Authority {
+public class Role {
 
     @Id
 	@Column(name = "AUTHORITY_ID")
@@ -26,9 +26,9 @@ public class Authority {
 
     @Column(name = "AUTHORITY_ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
-    private AuthorityRole role;
+    private UserRole role;
 
-    @ManyToMany(mappedBy = "authorities", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<User> userList;
 
 	public Long getId() {
@@ -39,11 +39,11 @@ public class Authority {
         this.id = id;
     }
 
-    public AuthorityRole getRole() {
+    public UserRole getRole() {
 		return this.role;
     }
 
-    public void setRole(AuthorityRole role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 

@@ -16,6 +16,7 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity(name = "USER")
 public class User {
@@ -63,9 +64,24 @@ public class User {
                 inverseJoinColumns = {
                         @JoinColumn(name = "AUTHORITY_ID", referencedColumnName = "AUTHORITY_ID")
                 })
-    private List<Authority> authorities;
+    private Set<Role> roles;
 
-    public Long getId() {
+	public User(){
+	}
+
+	public User(User user) {
+		this.id = user.getId();
+		this.userName = user.getUserName();
+		this.password = user.getPassword();
+		this.firstName = user.getFirstName();
+		this.lastName = user.getLastName();
+		this.email = user.getEmail();
+		this.active = user.getActive();
+		this.lastIssuedDate = user.getLastIssuedDate();
+		this.roles = user.getRoles();
+	}
+
+	public Long getId() {
         return id;
     }
 
@@ -129,11 +145,11 @@ public class User {
         this.lastIssuedDate = lastIssuedDate;
     }
 
-    public List<Authority> getAuthorities() {
-        return authorities;
+    public Set<Role> getRoles() {
+        return roles;
     }
 
-    public void setAuthorities(List<Authority> authorities) {
-        this.authorities = authorities;
+    public void setRoles(Set<Role> authorities) {
+        this.roles = authorities;
     }
 }
