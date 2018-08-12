@@ -11,7 +11,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The type Role. Defines the role and the list of users who are associated with that role
@@ -25,12 +28,12 @@ public class Role {
     @SequenceGenerator(name = "AUTHORITY_SEQ", initialValue = 1, allocationSize = 1)
     private Long id;
 
-    @Column(name = "AUTHORITY_ROLE", nullable = false)
+    @Column(name = "AUTHORITY_ROLE", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private List<User> userList;
+    private Set<User> userList =  new HashSet<>();
 
 	public Role(UserRole role) {
 		this.role = role;
@@ -56,11 +59,11 @@ public class Role {
         this.role = role;
     }
 
-    public List<User> getUserList() {
-		return this.userList;
-    }
+	public Set<User> getUserList() {
+		return userList;
+	}
 
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
-    }
+	public void setUserList(Set<User> userList) {
+		this.userList = userList;
+	}
 }

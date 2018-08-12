@@ -16,6 +16,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +60,8 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {
     				CascadeType.PERSIST,
-					CascadeType.MERGE})
+					CascadeType.MERGE
+    			})
     @JoinTable(name = "USER_AUTHORITY",
                 joinColumns = {
                         @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
@@ -67,7 +69,21 @@ public class User {
                 inverseJoinColumns = {
                         @JoinColumn(name = "AUTHORITY_ID", referencedColumnName = "AUTHORITY_ID")
                 })
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
+
+    public void addRole(Role role){
+    	this.roles.add(role);
+    	role.getUserList().add(this);
+	}
+
+	public void addRoles(Set<Role> roles){
+    	roles.forEach(this::addRole);
+	}
+
+	public void removeRole(Role role){
+    	this.roles.remove(role);
+    	role.getUserList().remove(this);
+	}
 
 	public User(){
 	}

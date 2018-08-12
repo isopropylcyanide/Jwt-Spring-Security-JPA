@@ -25,6 +25,9 @@ public class UserRestService {
 	private UserRepository userRepository;
 
 	@Autowired
+	private RoleService roleService;
+
+	@Autowired
 	private Logger logger;
 
 	@Autowired
@@ -32,9 +35,8 @@ public class UserRestService {
 
 	/**
 	 * Registers a new user in the database by performing a series of quick checks.
-	 * @param newUser the user details
-	 * @param isAdmin if the given user is an admin
-	 * @return the newly created user
+	 * @param newRegisterUserRequest
+	 * @return A user object if successfully created
 	 */
 	public Optional<User> registerUser(RegisterUserRequest newRegisterUserRequest) {
 		User newUser = newRegisterUserRequest.getUser();
@@ -48,7 +50,7 @@ public class UserRestService {
 		newUser.setActive(true);
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		newUser.setLastIssuedDate(new Date());
-		newUser.setRoles(getRolesForNewUser(isNewUserAsAdmin));
+		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		User registeredNewUser = userRepository.saveAndFlush(newUser);
 		return Optional.ofNullable(registeredNewUser);
 	}
@@ -60,9 +62,9 @@ public class UserRestService {
 	 */
 	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
 		Set<Role> newUserRoles = new HashSet<>();
-		newUserRoles.add(new Role(UserRole.ROLE_USER));
+		newUserRoles.add(roleService.getRoleByUserRole(UserRole.ROLE_USER));
 		if (isAdmin){
-			newUserRoles.add(new Role(UserRole.ROLE_ADMIN));
+			newUserRoles.add(roleService.getRoleByUserRole(UserRole.ROLE_ADMIN));
 		}
 		return newUserRoles;
 	}
@@ -75,4 +77,6 @@ public class UserRestService {
 	private Boolean emailAlreadyExists(String email) {
 		return userRepository.existsByEmail(email);
 	}
+
+
 }
