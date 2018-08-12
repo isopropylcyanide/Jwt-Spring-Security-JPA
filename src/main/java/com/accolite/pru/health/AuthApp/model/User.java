@@ -37,11 +37,11 @@ public class User {
     @NotNull
     private String password;
 
-    @Column(name = "FIRST_NAME", nullable = true)
+    @Column(name = "FIRST_NAME", nullable = false)
     @NotNull
     private String firstName;
 
-    @Column(name = "LAST_NAME",nullable = true)
+    @Column(name = "LAST_NAME",nullable = false)
     @NotNull
     private String lastName;
 
