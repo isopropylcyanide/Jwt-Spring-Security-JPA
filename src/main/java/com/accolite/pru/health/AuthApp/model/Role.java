@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,7 +22,7 @@ public class Role {
     @Id
 	@Column(name = "AUTHORITY_ID")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "AUTHORITY_SEQ")
-    @SequenceGenerator(name = "AUTHORITY_SEQ", allocationSize = 1)
+    @SequenceGenerator(name = "AUTHORITY_SEQ", initialValue = 1, allocationSize = 1)
     private Long id;
 
     @Column(name = "AUTHORITY_ROLE", nullable = false)
@@ -30,6 +31,14 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private List<User> userList;
+
+	public Role(UserRole role) {
+		this.role = role;
+	}
+
+	public Role(){
+
+	}
 
 	public Long getId() {
 		return this.id;

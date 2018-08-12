@@ -1,6 +1,7 @@
 package com.accolite.pru.health.AuthApp.model;
 
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,7 +28,7 @@ public class User {
     @SequenceGenerator(name = "user_seq", initialValue = 1, allocationSize = 1)
     private Long id;
 
-    @Column(name = "USERNAME", nullable = false)
+    @Column(name = "USERNAME", nullable = false, unique = true)
     @NotNull
     private String userName;
 
@@ -35,15 +36,15 @@ public class User {
     @NotNull
     private String password;
 
-    @Column(name = "FIRST_NAME", nullable = false)
+    @Column(name = "FIRST_NAME", nullable = true)
     @NotNull
     private String firstName;
 
-    @Column(name = "LAST_NAME",nullable = false)
+    @Column(name = "LAST_NAME",nullable = true)
     @NotNull
     private String lastName;
 
-    @Column(name = "EMAIL", nullable = false)
+    @Column(name = "EMAIL", nullable = false, unique = true)
     @NotNull
     private String email;
 
@@ -56,7 +57,9 @@ public class User {
     private Date lastIssuedDate;
 
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {
+    				CascadeType.PERSIST,
+					CascadeType.MERGE})
     @JoinTable(name = "USER_AUTHORITY",
                 joinColumns = {
                         @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
