@@ -1,6 +1,7 @@
 package com.accolite.pru.health.AuthApp.controller;
 
 import com.accolite.pru.health.AuthApp.exception.UserAuthenticationException;
+import com.accolite.pru.health.AuthApp.model.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.RegisterUserRequest;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.service.UserRestService;
@@ -31,4 +32,11 @@ public class UserRestController {
 		return ResponseEntity.ok(registeredUser.map(User::getId));
 	}
 
+
+	@PostMapping("/login")
+	public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest){
+		Optional<User> loggedInUser = userRestService.loginUser(loginRequest);
+		logger.info("Logged in User returned [API[: " + loggedInUser);
+		return ResponseEntity.ok(loggedInUser.map(User::getId));
+	}
 }

@@ -1,6 +1,7 @@
 package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.exception.UserAuthenticationException;
+import com.accolite.pru.health.AuthApp.model.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.RegisterUserRequest;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.User;
@@ -79,4 +80,12 @@ public class UserRestService {
 	}
 
 
+	/**
+	 * Tries to log the given user in from the incoming request and return the object if found
+	 * @param loginRequest
+	 * @return Optional<User> indicating that the user might or might not be present
+	 */
+	public Optional<User> loginUser(LoginRequest loginRequest) {
+		return null;
+	}
 }
