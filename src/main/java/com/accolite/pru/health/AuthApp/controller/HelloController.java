@@ -15,6 +15,7 @@ public class HelloController {
 	@Autowired
 	private Logger logger;
 
+	@PreAuthorize("hasAnyRole('ADMIN')")
 	@GetMapping("/secured/all")
 	public ResponseEntity<?> saySecuredHello(){
 		logger.info("Inside secured resource");
@@ -29,7 +30,7 @@ public class HelloController {
 
 	@GetMapping("/secured/alternate")
 	public ResponseEntity<?> sayAlternateHello(){
-		logger.info("Inside unsecured resource");
+		logger.info("Inside unsecured resource which is open for any role");
 		return ResponseEntity.ok("Hello. This is an alternate secured resource");
 	}
 
