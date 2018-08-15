@@ -52,7 +52,7 @@ public class UserRestService {
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		newUser.setLastIssuedDate(new Date());
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
-		User registeredNewUser = userRepository.saveAndFlush(newUser);
+		User registeredNewUser = userRepository.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
 	}
 
