@@ -38,6 +38,7 @@ public class JwtTokenValidator {
 			logger.info("Body username: " + body.get("username"));
 			logger.info("Body firstName: " + body.get("firstName"));
 			logger.info("Body lastName: " + body.get("lastName"));
+			logger.info("Body expiration: " + body.getExpiration());
 
 			tokenEmbeddedUser.setId(Long.parseLong(body.getId()));
 			tokenEmbeddedUser.setEmail(body.getSubject());
