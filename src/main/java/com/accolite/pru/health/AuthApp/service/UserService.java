@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class UserRestService {
+public class UserService {
 
 	@Autowired
 	private UserRepository userRepository;

@@ -1,6 +1,7 @@
 package com.accolite.pru.health.AuthApp.config;
 
-import com.accolite.pru.health.AuthApp.security.JwtAuthTokenFilter;
+import com.accolite.pru.health.AuthApp.security.JwtAuthenticationEntryPoint;
+import com.accolite.pru.health.AuthApp.security.JwtAuthenticationTokenFilter;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationProvider;
 import com.accolite.pru.health.AuthApp.security.JwtSuccessHandler;
 import com.accolite.pru.health.AuthApp.service.CustomUserDetailsService;
@@ -18,12 +19,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,8 +41,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private Logger logger;
 
-
 	private JwtAuthenticationProvider authenticationProvider;
+
+	private JwtAuthenticationEntryPoint jwtEntryPoint;
 
 
 	@Bean
@@ -51,8 +53,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public JwtAuthTokenFilter jwtAuthTokenFilter(){
-		JwtAuthTokenFilter jwtAuthFilter = new JwtAuthTokenFilter();
+	public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter(){
+		JwtAuthenticationTokenFilter jwtAuthFilter = new JwtAuthenticationTokenFilter();
 		jwtAuthFilter.setAuthenticationManager(authenticationManager());
 		jwtAuthFilter.setAuthenticationSuccessHandler(new JwtSuccessHandler());
 		return jwtAuthFilter;
@@ -66,12 +68,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable();
-		http.authorizeRequests()
+		http.csrf().disable()
+				.authorizeRequests()
 				.antMatchers("/**/secured/**").authenticated()
 				.anyRequest().permitAll()
 				.and()
-				.formLogin().permitAll();
+				.exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
+				.and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Bean

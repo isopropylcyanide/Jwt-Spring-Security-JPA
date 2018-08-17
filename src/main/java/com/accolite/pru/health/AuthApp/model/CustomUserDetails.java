@@ -13,6 +13,9 @@ public class CustomUserDetails extends User implements UserDetails {
 		super(user);
 	}
 
+	public CustomUserDetails() {
+	}
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return getRoles().stream()
@@ -49,4 +52,6 @@ public class CustomUserDetails extends User implements UserDetails {
 	public boolean isEnabled() {
 		return super.getActive();
 	}
+
+
 }
