@@ -1,19 +1,11 @@
 package com.accolite.pru.health.AuthApp.exception;
 
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.stereotype.Component;
 
-import java.util.function.Supplier;
+public class UserAuthenticationException extends AuthenticationException {
 
-@Component
-public class UserAuthenticationException extends AuthenticationException{
-
-	@Autowired
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(UserAuthenticationException.class);
 
 	public UserAuthenticationException(String msg, Throwable throwable) {
 		super(msg, throwable);

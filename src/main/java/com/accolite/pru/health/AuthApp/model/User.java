@@ -45,7 +45,8 @@ public class User {
 	@NotNull
 	private String email;
 
-	@Column(name = "IS_ACTIVE")
+	@Column(name = "IS_ACTIVE", nullable = false)
+	@NotNull
 	private Boolean active;
 
 	@Column(name = "LAST_ISSUE_DATE", nullable = false)

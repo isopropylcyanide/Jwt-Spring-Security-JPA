@@ -1,6 +1,6 @@
 package com.accolite.pru.health.AuthApp.security;
 
-import com.accolite.pru.health.AuthApp.exception.JwtTokenMissingException;
+import com.accolite.pru.health.AuthApp.exception.UserAuthenticationException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,7 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
 			HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
 		String header = httpServletRequest.getHeader(tokenHeader);
 		if (null == header || !header.startsWith(tokenHeaderPrefix)) {
-			throw new JwtTokenMissingException("Missing/Null JWT Token for the request header [" + header + "]");
+			throw new UserAuthenticationException("Missing/Null JWT Token for the request header [" + header + "]");
 		}
 		String requestJwtTokenString = header.substring(tokenHeaderPrefix.length() + 1);
 		log.info("Extracted jwt token: " + requestJwtTokenString);
