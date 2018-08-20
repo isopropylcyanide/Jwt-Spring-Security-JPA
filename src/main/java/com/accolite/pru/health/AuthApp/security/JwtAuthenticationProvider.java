@@ -14,7 +14,7 @@ import java.util.Optional;
 public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
 	@Autowired
-	private JwtTokenUtil jwtTokenUtil;
+	private JwtTokenValidator jwtTokenUtil;
 
 	@Override
 	protected void additionalAuthenticationChecks(UserDetails userDetails,
