@@ -4,8 +4,8 @@ import com.accolite.pru.health.AuthApp.exception.UserAuthenticationException;
 import com.accolite.pru.health.AuthApp.model.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.RegisterUserRequest;
 import com.accolite.pru.health.AuthApp.model.Role;
+import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
-import com.accolite.pru.health.AuthApp.model.UserRole;
 import com.accolite.pru.health.AuthApp.repository.UserRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +60,9 @@ public class UserService {
 	 */
 	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
 		Set<Role> newUserRoles = new HashSet<>();
-		newUserRoles.add(roleService.getRoleByUserRole(UserRole.ROLE_USER));
+		newUserRoles.add(roleService.getRoleByUserRole(RoleName.ROLE_USER));
 		if (isAdmin) {
-			newUserRoles.add(roleService.getRoleByUserRole(UserRole.ROLE_ADMIN));
+			newUserRoles.add(roleService.getRoleByUserRole(RoleName.ROLE_ADMIN));
 		}
 		return newUserRoles;
 	}

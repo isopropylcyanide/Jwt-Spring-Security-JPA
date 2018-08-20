@@ -1,5 +1,7 @@
 package com.accolite.pru.health.AuthApp.model;
 
+import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.SequenceGenerator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,18 +22,18 @@ public class Role {
 
 	@Id
 	@Column(name = "ROLE_ID")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ROLE_SEQ")
-	@SequenceGenerator(name = "ROLE_SEQ", initialValue = 1, allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "AUTHORITY_ROLE", nullable = false, unique = true)
+	@Column(name = "ROLE_NAME")
 	@Enumerated(EnumType.STRING)
-	private UserRole role;
+	@NaturalId
+	private RoleName role;
 
 	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
 	private Set<User> userList = new HashSet<>();
 
-	public Role(UserRole role) {
+	public Role(RoleName role) {
 		this.role = role;
 	}
 
@@ -48,11 +49,11 @@ public class Role {
 		this.id = id;
 	}
 
-	public UserRole getRole() {
+	public RoleName getRole() {
 		return role;
 	}
 
-	public void setRole(UserRole role) {
+	public void setRole(RoleName role) {
 		this.role = role;
 	}
 

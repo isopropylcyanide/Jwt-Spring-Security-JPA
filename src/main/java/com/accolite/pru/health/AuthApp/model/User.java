@@ -26,7 +26,7 @@ public class User extends DateAudit {
 	@Id
 	@Column(name = "USER_ID")
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
-	@SequenceGenerator(name = "user_seq", initialValue = 1, allocationSize = 1)
+	@SequenceGenerator(name = "user_seq", allocationSize = 1)
 	private Long id;
 
 	@NaturalId
