@@ -11,13 +11,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Optional;
 
-public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider{
+public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
 	@Autowired
-	private JwtTokenValidator jwtTokenValidator;
+	private JwtTokenUtil jwtTokenUtil;
 
 	@Override
-	protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
+	protected void additionalAuthenticationChecks(UserDetails userDetails,
+			UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
 	}
 
 	@Override
@@ -26,7 +27,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
 		JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) usernamePasswordAuthenticationToken;
 		String jwtToken = jwtAuthenticationToken.getToken();
 
-		Optional<User> tokenEmbeddedUser = jwtTokenValidator.validate(jwtToken);
+		Optional<User> tokenEmbeddedUser = jwtTokenUtil.validate(jwtToken);
 
 		tokenEmbeddedUser.orElseThrow(() -> new UserAuthenticationException("Error de-encapsulating the user object " +
 				"present inside the token [" + jwtToken + "]"));

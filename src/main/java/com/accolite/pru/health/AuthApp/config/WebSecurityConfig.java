@@ -1,8 +1,8 @@
 package com.accolite.pru.health.AuthApp.config;
 
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationEntryPoint;
-import com.accolite.pru.health.AuthApp.security.JwtAuthenticationTokenFilter;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationProvider;
+import com.accolite.pru.health.AuthApp.security.JwtAuthenticationTokenFilter;
 import com.accolite.pru.health.AuthApp.security.JwtSuccessHandler;
 import com.accolite.pru.health.AuthApp.service.CustomUserDetailsService;
 import org.apache.log4j.Logger;
@@ -22,7 +22,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collections;
@@ -46,15 +45,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private JwtAuthenticationEntryPoint jwtEntryPoint;
 
 
+	@Override
 	@Bean
-	public AuthenticationManager authenticationManager(){
+	public AuthenticationManager authenticationManager() {
 		List<AuthenticationProvider> authProviders = Collections.singletonList(authenticationProvider);
 		return new ProviderManager(authProviders);
 	}
 
 	@Bean
-	public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter(){
-		JwtAuthenticationTokenFilter jwtAuthFilter = new JwtAuthenticationTokenFilter();
+	public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() {
+		JwtAuthenticationTokenFilter jwtAuthFilter = new JwtAuthenticationTokenFilter("");
 		jwtAuthFilter.setAuthenticationManager(authenticationManager());
 		jwtAuthFilter.setAuthenticationSuccessHandler(new JwtSuccessHandler());
 		return jwtAuthFilter;
@@ -63,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService)
-			.passwordEncoder(passwordEncoderBean());
+				.passwordEncoder(passwordEncoderBean());
 	}
 
 	@Override

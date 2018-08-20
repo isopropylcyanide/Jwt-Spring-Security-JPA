@@ -27,9 +27,9 @@ public class JwtTokenValidator {
 		try {
 			User tokenEmbeddedUser = new User();
 			Claims body = Jwts.parser()
-							.setSigningKey(jwtSecret)
-							.parseClaimsJws(jwtToken)
-							.getBody();
+					.setSigningKey(jwtSecret)
+					.parseClaimsJws(jwtToken)
+					.getBody();
 			logger.info("Body subject/email: " + body.getSubject());
 			logger.info("Body id : " + body.getId());
 			logger.info("Body last issued: " + body.getIssuedAt());
@@ -49,7 +49,7 @@ public class JwtTokenValidator {
 			tokenEmbeddedUser.setFirstName(body.get("firstName").toString());
 			tokenEmbeddedUser.setLastName(body.get("lastName").toString());
 			return Optional.ofNullable(tokenEmbeddedUser);
-		} catch (Exception e){
+		} catch (Exception e) {
 			logger.error("Exception occured while validating user: " + e);
 		}
 		return Optional.empty();
