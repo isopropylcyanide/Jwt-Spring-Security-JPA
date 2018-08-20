@@ -2,6 +2,7 @@ package com.accolite.pru.health.AuthApp.model;
 
 
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
+import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.CascadeType;
@@ -16,7 +17,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -39,7 +39,6 @@ public class User extends DateAudit {
 	private String userName;
 
 	@Column(name = "PASSWORD")
-	@NotBlank
 	private String password;
 
 	@Column(name = "FIRST_NAME")
@@ -49,7 +48,7 @@ public class User extends DateAudit {
 	private String lastName;
 
 	@Column(name = "IS_ACTIVE", nullable = false)
-	@NotNull
+	@NullOrNotBlank
 	private Boolean active;
 
 
