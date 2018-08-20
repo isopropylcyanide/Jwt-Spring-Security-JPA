@@ -7,10 +7,8 @@ import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserRole;
 import com.accolite.pru.health.AuthApp.repository.UserRepository;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -36,21 +34,21 @@ public class UserService {
 
 	/**
 	 * Registers a new user in the database by performing a series of quick checks.
-	 * @param newRegisterUserRequest
 	 * @return A user object if successfully created
 	 */
 	public Optional<User> registerUser(RegisterUserRequest newRegisterUserRequest) {
 		User newUser = newRegisterUserRequest.getUser();
 		Boolean isNewUserAsAdmin = newRegisterUserRequest.getRegisterAsAdmin();
-		
+
 		Boolean emailAlreadyExists = emailAlreadyExists(newUser.getEmail());
-		if (emailAlreadyExists){
+		if (emailAlreadyExists) {
 			logger.error("Email already exists: " + newUser.getEmail());
 			throw new UserAuthenticationException("Email already exists: " + newUser.getEmail());
 		}
 		newUser.setActive(true);
+		newUser.setUserName(newRegisterUserRequest.getUser().getEmail());
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-		newUser.setLastIssuedDate(new Date());
+		newUser.setCreatedAt(new Date().toInstant());
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		User registeredNewUser = userRepository.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
@@ -58,13 +56,12 @@ public class UserService {
 
 	/**
 	 * Performs a quick check to see what roles the new user could benefit from
-	 * @param isAdmin
 	 * @return list of roles for the new user
 	 */
 	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
 		Set<Role> newUserRoles = new HashSet<>();
 		newUserRoles.add(roleService.getRoleByUserRole(UserRole.ROLE_USER));
-		if (isAdmin){
+		if (isAdmin) {
 			newUserRoles.add(roleService.getRoleByUserRole(UserRole.ROLE_ADMIN));
 		}
 		return newUserRoles;
@@ -72,7 +69,6 @@ public class UserService {
 
 	/**
 	 * Checks if the given email already exists in the database repository or not
-	 * @param email
 	 * @return true if the email exists else false
 	 */
 	private Boolean emailAlreadyExists(String email) {
@@ -82,7 +78,6 @@ public class UserService {
 
 	/**
 	 * Tries to log the given user in from the incoming request and return the object if found
-	 * @param loginRequest
 	 * @return Optional<User> indicating that the user might or might not be present
 	 */
 	public Optional<User> loginUser(LoginRequest loginRequest) {

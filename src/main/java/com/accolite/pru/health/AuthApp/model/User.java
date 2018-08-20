@@ -1,6 +1,9 @@
 package com.accolite.pru.health.AuthApp.model;
 
 
+import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
+import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,15 +15,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "USER")
-public class User {
+public class User extends DateAudit {
 
 	@Id
 	@Column(name = "USER_ID")
@@ -28,11 +29,17 @@ public class User {
 	@SequenceGenerator(name = "user_seq", initialValue = 1, allocationSize = 1)
 	private Long id;
 
-	@Column(name = "USERNAME")
+	@NaturalId
+	@Column(name = "EMAIL", unique = true)
+	@NotBlank
+	private String email;
+
+	@Column(name = "USERNAME", unique = true)
+	@NotBlank
 	private String userName;
 
-	@Column(name = "PASSWORD", nullable = false)
-	@NotNull
+	@Column(name = "PASSWORD")
+	@NotBlank
 	private String password;
 
 	@Column(name = "FIRST_NAME")
@@ -41,17 +48,9 @@ public class User {
 	@Column(name = "LAST_NAME")
 	private String lastName;
 
-	@Column(name = "EMAIL", nullable = false, unique = true)
-	@NotNull
-	private String email;
-
 	@Column(name = "IS_ACTIVE", nullable = false)
 	@NotNull
 	private Boolean active;
-
-	@Column(name = "LAST_ISSUE_DATE", nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date lastIssuedDate;
 
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {
@@ -63,7 +62,7 @@ public class User {
 					@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
 			},
 			inverseJoinColumns = {
-					@JoinColumn(name = "AUTHORITY_ID", referencedColumnName = "AUTHORITY_ID")
+					@JoinColumn(name = "ROLE_ID", referencedColumnName = "ROLE_ID")
 			})
 	private Set<Role> roles = new HashSet<>();
 
@@ -92,7 +91,6 @@ public class User {
 		lastName = user.getLastName();
 		email = user.getEmail();
 		active = user.getActive();
-		lastIssuedDate = user.getLastIssuedDate();
 		roles = user.getRoles();
 	}
 
@@ -152,14 +150,6 @@ public class User {
 		this.active = active;
 	}
 
-	public Date getLastIssuedDate() {
-		return lastIssuedDate;
-	}
-
-	public void setLastIssuedDate(Date lastIssuedDate) {
-		this.lastIssuedDate = lastIssuedDate;
-	}
-
 	public Set<Role> getRoles() {
 		return roles;
 	}
@@ -178,7 +168,6 @@ public class User {
 				", lastName='" + lastName + '\'' +
 				", email='" + email + '\'' +
 				", active=" + active +
-				", lastIssuedDate=" + lastIssuedDate +
 				", roles=" + roles +
 				'}';
 	}

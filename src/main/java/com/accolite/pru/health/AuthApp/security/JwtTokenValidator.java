@@ -45,7 +45,7 @@ public class JwtTokenValidator {
 			tokenEmbeddedUser.setUserName(body.get("username").toString());
 			tokenEmbeddedUser.setRoles((Set<Role>) body.get("role"));
 			tokenEmbeddedUser.setActive(Boolean.getBoolean(body.get("active").toString()));
-			tokenEmbeddedUser.setLastIssuedDate(body.getIssuedAt());
+			tokenEmbeddedUser.setCreatedAt(body.getIssuedAt().toInstant());
 			tokenEmbeddedUser.setFirstName(body.get("firstName").toString());
 			tokenEmbeddedUser.setLastName(body.get("lastName").toString());
 			return Optional.ofNullable(tokenEmbeddedUser);
