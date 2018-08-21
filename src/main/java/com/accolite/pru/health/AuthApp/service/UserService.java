@@ -1,7 +1,9 @@
 package com.accolite.pru.health.AuthApp.service;
 
+import com.accolite.pru.health.AuthApp.exception.AppException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.model.Role;
+import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
@@ -48,7 +50,7 @@ public class UserService {
 			logger.error("Email already exists: " + newRegistrationRequestEmail);
 			throw new ResourceAlreadyInUseException("Email", "Address", newRegistrationRequestEmail);
 		}
-
+		logger.info("Trying to register new user [" + newRegistrationRequestEmail + "]");
 		User newUser = newRegistrationRequest.getUser();
 		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
 		newUser.setActive(true);
@@ -65,12 +67,12 @@ public class UserService {
 	 */
 	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
 		Set<Role> newUserRoles = new HashSet<>();
-//		newUserRoles.add(roleService.findByName(RoleName.ROLE_USER).orElseThrow(() -> new AppException("ROLE_USER " +
-//				" is not set in database.")));
-//		if (isAdmin) {
-//			newUserRoles.add(roleService.findByName(RoleName.ROLE_ADMIN).orElseThrow(() -> new AppException(
-//					"ROLE_ADMIN" + "not set in database.")));
-//		}
+		newUserRoles.add(roleService.findByRole(RoleName.ROLE_USER).orElseThrow(() -> new AppException("ROLE_USER " +
+				" is not set in database.")));
+		if (isAdmin) {
+			newUserRoles.add(roleService.findByRole(RoleName.ROLE_ADMIN).orElseThrow(() -> new AppException(
+					"ROLE_ADMIN" + "not set in database.")));
+		}
 		return newUserRoles;
 	}
 

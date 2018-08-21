@@ -15,7 +15,7 @@ public class RoleService {
 	private RoleRepository roleRepository;
 
 
-	public Optional<Role> findByName(RoleName roleName) {
+	public Optional<Role> findByRole(RoleName roleName) {
 		return roleRepository.findByRole(roleName);
 	}
 }
