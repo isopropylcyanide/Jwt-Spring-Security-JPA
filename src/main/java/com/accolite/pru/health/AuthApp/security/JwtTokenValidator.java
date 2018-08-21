@@ -15,7 +15,7 @@ import java.util.Set;
 @Component
 public class JwtTokenValidator {
 
-	@Value("${jwt.secret}")
+	@Value("${app.jwt.secret}")
 	private String jwtSecret;
 
 

@@ -30,7 +30,7 @@ import java.util.List;
 
 @Profile("!dev")
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity(debug = true)
 @EnableJpaRepositories(basePackages = "com.accolite.pru.health.AuthApp.repository")
 @EnableGlobalMethodSecurity(
 		securedEnabled = true,
