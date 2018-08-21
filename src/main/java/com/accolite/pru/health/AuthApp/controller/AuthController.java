@@ -8,7 +8,7 @@ import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
-import com.accolite.pru.health.AuthApp.service.UserService;
+import com.accolite.pru.health.AuthApp.service.AuthService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,20 +25,20 @@ import java.net.URI;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/user")
-public class UserController {
+@RequestMapping("/api/auth")
+public class AuthController {
 
 	@Autowired
-	private UserService userService;
+	private AuthService authService;
 
-	private static final Logger logger = Logger.getLogger(UserController.class);
+	private static final Logger logger = Logger.getLogger(AuthController.class);
 
 	@Autowired
 	private JwtTokenProvider tokenProvider;
 
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-		Optional<Authentication> authenticationOpt = userService.authenticateUser(loginRequest);
+		Optional<Authentication> authenticationOpt = authService.authenticateUser(loginRequest);
 		authenticationOpt.orElseThrow(() -> new UserLoginException("Couldn't login user [" + loginRequest + "]"));
 		Authentication authentication = authenticationOpt.get();
 
@@ -50,7 +50,7 @@ public class UserController {
 
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
-		Optional<User> registeredUserOpt = userService.registerUser(registrationRequest);
+		Optional<User> registeredUserOpt = authService.registerUser(registrationRequest);
 		registeredUserOpt.orElseThrow(() -> new UserRegistrationException("Couldn't register user [" + registrationRequest +
 				"]"));
 		User registeredUser = registeredUserOpt.get();
