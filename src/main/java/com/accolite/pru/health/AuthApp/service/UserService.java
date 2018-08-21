@@ -1,18 +1,19 @@
 package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
+import com.accolite.pru.health.AuthApp.model.Role;
+import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
-import com.accolite.pru.health.AuthApp.model.Role;
-import com.accolite.pru.health.AuthApp.model.RoleName;
-import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.repository.UserRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -32,23 +33,27 @@ public class UserService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private AuthenticationManager authenticationManager;
+
+
 	/**
 	 * Registers a new user in the database by performing a series of quick checks.
 	 * @return A user object if successfully created
 	 */
 	public Optional<User> registerUser(RegistrationRequest newRegistrationRequest) {
+		String newRegistrationRequestEmail = newRegistrationRequest.getUser().getEmail();
+		Boolean emailAlreadyExists = emailAlreadyExists(newRegistrationRequestEmail);
+		if (emailAlreadyExists) {
+			logger.error("Email already exists: " + newRegistrationRequestEmail);
+			throw new ResourceAlreadyInUseException("Email", "Address", newRegistrationRequestEmail);
+		}
+
 		User newUser = newRegistrationRequest.getUser();
 		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
-
-		Boolean emailAlreadyExists = emailAlreadyExists(newUser.getEmail());
-		if (emailAlreadyExists) {
-			logger.error("Email already exists: " + newUser.getEmail());
-			throw new ResourceAlreadyInUseException("Email", "Address", newUser.getEmail());
-		}
 		newUser.setActive(true);
-		newUser.setUserName(newRegistrationRequest.getUser().getEmail());
+		newUser.setUserName(newRegistrationRequestEmail);
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
-		newUser.setCreatedAt(new Date().toInstant());
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		User registeredNewUser = userRepository.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
@@ -60,10 +65,12 @@ public class UserService {
 	 */
 	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
 		Set<Role> newUserRoles = new HashSet<>();
-		newUserRoles.add(roleService.getRoleByUserRole(RoleName.ROLE_USER));
-		if (isAdmin) {
-			newUserRoles.add(roleService.getRoleByUserRole(RoleName.ROLE_ADMIN));
-		}
+//		newUserRoles.add(roleService.findByName(RoleName.ROLE_USER).orElseThrow(() -> new AppException("ROLE_USER " +
+//				" is not set in database.")));
+//		if (isAdmin) {
+//			newUserRoles.add(roleService.findByName(RoleName.ROLE_ADMIN).orElseThrow(() -> new AppException(
+//					"ROLE_ADMIN" + "not set in database.")));
+//		}
 		return newUserRoles;
 	}
 
@@ -77,10 +84,10 @@ public class UserService {
 
 
 	/**
-	 * Tries to log the given user in from the incoming request and return the object if found
-	 * @return Optional<User> indicating that the user might or might not be present
+	 * Authenticate user and log them in given a loginRequest
 	 */
-	public Optional<User> loginUser(LoginRequest loginRequest) {
-		return null;
+	public Optional<Authentication> authenticateUser(LoginRequest loginRequest) {
+		return Optional.ofNullable(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
+				loginRequest.getPassword())));
 	}
 }
