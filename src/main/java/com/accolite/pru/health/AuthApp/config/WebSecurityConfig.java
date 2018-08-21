@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -43,8 +44,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private Logger logger;
 
+	@Autowired
 	private JwtAuthenticationProvider authenticationProvider;
 
+	@Autowired
 	private JwtAuthenticationEntryPoint jwtEntryPoint;
 
 
@@ -66,24 +69,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService)
-				.passwordEncoder(passwordEncoderBean());
+				.passwordEncoder(passwordEncoder());
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-				.authorizeRequests()
-				.antMatchers("/**/secured/**").authenticated()
-				.anyRequest().permitAll()
+		http.cors()
 				.and()
+				.csrf().disable()
 				.exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
 				.and()
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
+				.authorizeRequests()
+				.antMatchers("/",
+						"/favicon.ico",
+						"/**/*.png",
+						"/**/*.gif",
+						"/**/*.svg",
+						"/**/*.jpg",
+						"/**/*.html",
+						"/**/*.css",
+						"/**/*.js").permitAll()
+				.antMatchers("/api/auth/**").permitAll()
+				.antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability").permitAll()
+				.antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**").permitAll()
+				.anyRequest().authenticated();
+
 		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoderBean() {
+	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
