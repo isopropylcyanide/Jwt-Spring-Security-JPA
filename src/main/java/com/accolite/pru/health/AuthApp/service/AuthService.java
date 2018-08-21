@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -29,7 +30,7 @@ public class AuthService {
 	@Autowired
 	private RoleService roleService;
 
-	private static final Logger logger = Logger.getLogger(CustomUserDetailsService.class);
+	private static final Logger logger = Logger.getLogger(AuthService.class);
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -53,9 +54,11 @@ public class AuthService {
 		User newUser = newRegistrationRequest.getUser();
 		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
 		newUser.setActive(true);
-		newUser.setUserName(newRegistrationRequestEmail);
+		newUser.setUsername(newRegistrationRequestEmail);
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
+		newUser.setCreatedAt(new Date().toInstant());
+		newUser.setUpdatedAt(new Date().toInstant());
 		User registeredNewUser = userRepository.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
 	}

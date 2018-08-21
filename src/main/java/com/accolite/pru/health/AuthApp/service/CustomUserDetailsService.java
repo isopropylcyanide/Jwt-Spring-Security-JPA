@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -30,7 +29,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 						"database for " + email));
 	}
 
-	@Transactional
 	public UserDetails loadUserById(Long id) {
 		Optional<User> dbUser = userRepository.findById(id);
 		logger.info("Got user: " + dbUser + " for " + id);

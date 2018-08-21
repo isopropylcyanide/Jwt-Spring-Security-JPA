@@ -3,7 +3,6 @@ package com.accolite.pru.health.AuthApp.model;
 
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.CascadeType;
@@ -18,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,15 +33,13 @@ public class User extends DateAudit {
 	@NaturalId
 	@Column(name = "EMAIL", unique = true)
 	@NotBlank
-	@JsonIgnore
 	private String email;
 
 	@Column(name = "USERNAME", unique = true)
 	@NullOrNotBlank
-	private String userName;
+	private String username;
 
 	@Column(name = "PASSWORD")
-	@JsonIgnore
 	private String password;
 
 	@Column(name = "FIRST_NAME")
@@ -53,9 +51,8 @@ public class User extends DateAudit {
 	private String lastName;
 
 	@Column(name = "IS_ACTIVE", nullable = false)
-	@NullOrNotBlank
+	@NotNull
 	private Boolean active;
-
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {
 			CascadeType.PERSIST,
@@ -89,7 +86,7 @@ public class User extends DateAudit {
 
 	public User(User user) {
 		id = user.getId();
-		userName = user.getUserName();
+		username = user.getUsername();
 		password = user.getPassword();
 		firstName = user.getFirstName();
 		lastName = user.getLastName();
@@ -106,12 +103,12 @@ public class User extends DateAudit {
 		this.id = id;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getPassword() {
@@ -166,7 +163,7 @@ public class User extends DateAudit {
 	public String toString() {
 		return "User{" +
 				"id=" + id +
-				", userName='" + userName + '\'' +
+				", username='" + username + '\'' +
 				", password='" + password + '\'' +
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +

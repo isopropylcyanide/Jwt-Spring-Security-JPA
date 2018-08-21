@@ -1,6 +1,5 @@
 package com.accolite.pru.health.AuthApp.security;
 
-import com.accolite.pru.health.AuthApp.service.CustomUserDetailsService;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -14,7 +13,7 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-	private static final Logger logger = Logger.getLogger(CustomUserDetailsService.class);
+	private static final Logger logger = Logger.getLogger(JwtAuthenticationEntryPoint.class);
 
 	@Override
 	public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
