@@ -1,11 +1,18 @@
 package com.accolite.pru.health.AuthApp.model;
 
+import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
+
+import javax.validation.constraints.NotBlank;
+
 public class LoginRequest {
 
+	@NullOrNotBlank
 	private String userName;
 
+	@NullOrNotBlank
 	private String email;
 
+	@NotBlank
 	private String password;
 
 	public LoginRequest(String userName, String email, String password) {

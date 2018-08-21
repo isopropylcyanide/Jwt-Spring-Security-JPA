@@ -37,7 +37,7 @@ public class User extends DateAudit {
 	private String email;
 
 	@Column(name = "USERNAME", unique = true)
-	@NotBlank
+	@NullOrNotBlank
 	private String userName;
 
 	@Column(name = "PASSWORD")
@@ -45,9 +45,11 @@ public class User extends DateAudit {
 	private String password;
 
 	@Column(name = "FIRST_NAME")
+	@NullOrNotBlank
 	private String firstName;
 
 	@Column(name = "LAST_NAME")
+	@NullOrNotBlank
 	private String lastName;
 
 	@Column(name = "IS_ACTIVE", nullable = false)

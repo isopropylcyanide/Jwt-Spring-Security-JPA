@@ -2,7 +2,7 @@ package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.exception.UserAuthenticationException;
 import com.accolite.pru.health.AuthApp.model.LoginRequest;
-import com.accolite.pru.health.AuthApp.model.RegisterUserRequest;
+import com.accolite.pru.health.AuthApp.model.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
@@ -36,9 +36,9 @@ public class UserService {
 	 * Registers a new user in the database by performing a series of quick checks.
 	 * @return A user object if successfully created
 	 */
-	public Optional<User> registerUser(RegisterUserRequest newRegisterUserRequest) {
-		User newUser = newRegisterUserRequest.getUser();
-		Boolean isNewUserAsAdmin = newRegisterUserRequest.getRegisterAsAdmin();
+	public Optional<User> registerUser(RegistrationRequest newRegistrationRequest) {
+		User newUser = newRegistrationRequest.getUser();
+		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
 
 		Boolean emailAlreadyExists = emailAlreadyExists(newUser.getEmail());
 		if (emailAlreadyExists) {
@@ -46,7 +46,7 @@ public class UserService {
 			throw new UserAuthenticationException("Email already exists: " + newUser.getEmail());
 		}
 		newUser.setActive(true);
-		newUser.setUserName(newRegisterUserRequest.getUser().getEmail());
+		newUser.setUserName(newRegistrationRequest.getUser().getEmail());
 		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
 		newUser.setCreatedAt(new Date().toInstant());
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));

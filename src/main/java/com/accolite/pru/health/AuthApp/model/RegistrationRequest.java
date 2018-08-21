@@ -1,18 +1,20 @@
 package com.accolite.pru.health.AuthApp.model;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.springframework.lang.NonNull;
 
-public class RegisterUserRequest {
+public class RegistrationRequest {
 
 	private User user;
+
+	@NonNull
 	private Boolean registerAsAdmin;
 
-	public RegisterUserRequest(User user, Boolean registerAsAdmin) {
+	public RegistrationRequest(User user, Boolean registerAsAdmin) {
 		this.user = user;
 		this.registerAsAdmin = registerAsAdmin;
 	}
 
-	public RegisterUserRequest() {
+	public RegistrationRequest() {
 	}
 
 	public User getUser() {
