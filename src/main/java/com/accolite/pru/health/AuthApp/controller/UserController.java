@@ -49,7 +49,7 @@ public class UserController {
 		return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
 	}
 
-	@PostMapping("/signup")
+	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
 		Optional<User> registeredUserOpt = userService.registerUser(registrationRequest);
 		registeredUserOpt.orElseThrow(() -> new UserRegistrationException("Couldn't register user [" + registrationRequest +
