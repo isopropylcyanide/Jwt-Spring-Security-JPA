@@ -1,5 +1,6 @@
-package com.accolite.pru.health.AuthApp.model;
+package com.accolite.pru.health.AuthApp.model.payload;
 
+import com.accolite.pru.health.AuthApp.model.User;
 import org.springframework.lang.NonNull;
 
 public class RegistrationRequest {

@@ -1,7 +1,7 @@
 package com.accolite.pru.health.AuthApp.controller;
 
-import com.accolite.pru.health.AuthApp.model.LoginRequest;
-import com.accolite.pru.health.AuthApp.model.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
+import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.service.UserService;
 import org.apache.log4j.Logger;

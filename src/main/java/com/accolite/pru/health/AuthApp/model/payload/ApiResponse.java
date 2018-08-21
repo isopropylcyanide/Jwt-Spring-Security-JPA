@@ -1,4 +1,4 @@
-package com.accolite.pru.health.AuthApp.model;
+package com.accolite.pru.health.AuthApp.model.payload;
 
 public class ApiResponse {
 

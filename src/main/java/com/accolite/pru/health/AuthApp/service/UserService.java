@@ -1,8 +1,8 @@
 package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
-import com.accolite.pru.health.AuthApp.model.LoginRequest;
-import com.accolite.pru.health.AuthApp.model.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
+import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
@@ -43,7 +43,7 @@ public class UserService {
 		Boolean emailAlreadyExists = emailAlreadyExists(newUser.getEmail());
 		if (emailAlreadyExists) {
 			logger.error("Email already exists: " + newUser.getEmail());
-			throw new ResourceAlreadyInUseException("Email", newUser.getEmail());
+			throw new ResourceAlreadyInUseException("Email", "Address", newUser.getEmail());
 		}
 		newUser.setActive(true);
 		newUser.setUserName(newRegistrationRequest.getUser().getEmail());

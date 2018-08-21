@@ -1,4 +1,4 @@
-package com.accolite.pru.health.AuthApp.model;
+package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 
