@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessingFilter {
+public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
 	@Value("${jwt.header}")
 	private String tokenHeader;
@@ -23,7 +23,7 @@ public class JwtAuthenticationTokenFilter extends AbstractAuthenticationProcessi
 	@Value("${jwt.header.prefix}")
 	private String tokenHeaderPrefix;
 
-	public JwtAuthenticationTokenFilter(String defaultFilterProcessesUrl) {
+	public JwtAuthenticationFilter(String defaultFilterProcessesUrl) {
 		super("**/secured/**");
 	}
 

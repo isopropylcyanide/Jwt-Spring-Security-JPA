@@ -1,8 +1,8 @@
 package com.accolite.pru.health.AuthApp.config;
 
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationEntryPoint;
+import com.accolite.pru.health.AuthApp.security.JwtAuthenticationFilter;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationProvider;
-import com.accolite.pru.health.AuthApp.security.JwtAuthenticationTokenFilter;
 import com.accolite.pru.health.AuthApp.security.JwtSuccessHandler;
 import com.accolite.pru.health.AuthApp.service.CustomUserDetailsService;
 import org.apache.log4j.Logger;
@@ -29,9 +29,12 @@ import java.util.List;
 
 @Profile("!dev")
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity
 @EnableJpaRepositories(basePackages = "com.accolite.pru.health.AuthApp.repository")
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(
+		securedEnabled = true,
+		jsr250Enabled = true,
+		prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
@@ -53,8 +56,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter() {
-		JwtAuthenticationTokenFilter jwtAuthFilter = new JwtAuthenticationTokenFilter("");
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		JwtAuthenticationFilter jwtAuthFilter = new JwtAuthenticationFilter("");
 		jwtAuthFilter.setAuthenticationManager(authenticationManager());
 		jwtAuthFilter.setAuthenticationSuccessHandler(new JwtSuccessHandler());
 		return jwtAuthFilter;
@@ -76,7 +79,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
 				.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 
 	@Bean
