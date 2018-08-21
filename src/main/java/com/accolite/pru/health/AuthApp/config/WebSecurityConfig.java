@@ -3,7 +3,6 @@ package com.accolite.pru.health.AuthApp.config;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationEntryPoint;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationFilter;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationProvider;
-import com.accolite.pru.health.AuthApp.security.JwtSuccessHandler;
 import com.accolite.pru.health.AuthApp.service.CustomUserDetailsService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,10 +59,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		JwtAuthenticationFilter jwtAuthFilter = new JwtAuthenticationFilter("");
-		jwtAuthFilter.setAuthenticationManager(authenticationManager());
-		jwtAuthFilter.setAuthenticationSuccessHandler(new JwtSuccessHandler());
-		return jwtAuthFilter;
+		return new JwtAuthenticationFilter();
 	}
 
 	@Override
