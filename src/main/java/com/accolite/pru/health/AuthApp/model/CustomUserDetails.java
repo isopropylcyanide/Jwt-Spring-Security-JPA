@@ -5,15 +5,13 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails extends User implements UserDetails {
 
 	public CustomUserDetails(final User user) {
 		super(user);
-	}
-
-	public CustomUserDetails() {
 	}
 
 	@Override
@@ -25,7 +23,7 @@ public class CustomUserDetails extends User implements UserDetails {
 
 	@Override
 	public String getPassword() {
-		return  super.getPassword();
+		return super.getPassword();
 	}
 
 	@Override
@@ -53,5 +51,20 @@ public class CustomUserDetails extends User implements UserDetails {
 		return super.getActive();
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(getId());
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+		CustomUserDetails that = (CustomUserDetails) obj;
+		return Objects.equals(getId(), that.getId());
+	}
 }

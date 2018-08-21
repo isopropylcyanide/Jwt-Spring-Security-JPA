@@ -3,6 +3,7 @@ package com.accolite.pru.health.AuthApp.model;
 
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.CascadeType;
@@ -32,6 +33,7 @@ public class User extends DateAudit {
 	@NaturalId
 	@Column(name = "EMAIL", unique = true)
 	@NotBlank
+	@JsonIgnore
 	private String email;
 
 	@Column(name = "USERNAME", unique = true)
@@ -39,6 +41,7 @@ public class User extends DateAudit {
 	private String userName;
 
 	@Column(name = "PASSWORD")
+	@JsonIgnore
 	private String password;
 
 	@Column(name = "FIRST_NAME")

@@ -21,6 +21,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
 			AuthenticationException e) throws IOException, ServletException {
 		logger.error("User is unauthorised. Routing from the entry point");
-		httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+		httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Sorry, you don't have the authorization " +
+				"to access this resource");
+
 	}
 }
