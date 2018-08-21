@@ -34,8 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private CustomUserDetailsService userDetailsService;
 
-	@Autowired
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(WebSecurityConfig.class);
 
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtEntryPoint;

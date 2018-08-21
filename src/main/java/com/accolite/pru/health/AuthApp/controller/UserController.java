@@ -31,8 +31,7 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(UserController.class);
 
 	@Autowired
 	private JwtTokenProvider tokenProvider;

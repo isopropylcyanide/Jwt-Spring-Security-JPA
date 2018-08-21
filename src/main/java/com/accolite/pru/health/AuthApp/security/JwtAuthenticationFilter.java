@@ -26,8 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Value("${app.jwt.header.prefix}")
 	private String tokenRequestHeaderPrefix;
 
-	@Autowired
-	private Logger log;
+	private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class);
 
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;

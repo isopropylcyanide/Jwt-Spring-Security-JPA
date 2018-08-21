@@ -29,8 +29,7 @@ public class UserService {
 	@Autowired
 	private RoleService roleService;
 
-	@Autowired
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(CustomUserDetailsService.class);
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;

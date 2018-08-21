@@ -1,13 +1,15 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.model.User;
-import org.springframework.lang.NonNull;
+
+import javax.validation.constraints.NotNull;
 
 public class RegistrationRequest {
 
+	@NotNull
 	private User user;
 
-	@NonNull
+	@NotNull
 	private Boolean registerAsAdmin;
 
 	public RegistrationRequest(User user, Boolean registerAsAdmin) {

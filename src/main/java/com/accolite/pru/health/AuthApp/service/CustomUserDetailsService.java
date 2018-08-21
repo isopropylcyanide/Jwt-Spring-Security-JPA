@@ -19,8 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private Logger logger;
+	private static final Logger logger = Logger.getLogger(CustomUserDetailsService.class);
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
