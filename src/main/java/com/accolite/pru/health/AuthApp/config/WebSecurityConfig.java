@@ -2,7 +2,6 @@ package com.accolite.pru.health.AuthApp.config;
 
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationEntryPoint;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationFilter;
-import com.accolite.pru.health.AuthApp.security.JwtAuthenticationProvider;
 import com.accolite.pru.health.AuthApp.service.CustomUserDetailsService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,9 +20,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.util.Collections;
-import java.util.List;
 
 @Profile("!dev")
 @Configuration
@@ -44,17 +38,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private Logger logger;
 
 	@Autowired
-	private JwtAuthenticationProvider authenticationProvider;
-
-	@Autowired
 	private JwtAuthenticationEntryPoint jwtEntryPoint;
-
 
 	@Override
 	@Bean
-	public AuthenticationManager authenticationManager() {
-		List<AuthenticationProvider> authProviders = Collections.singletonList(authenticationProvider);
-		return new ProviderManager(authProviders);
+	public AuthenticationManager authenticationManager() throws Exception {
+		return super.authenticationManager();
 	}
 
 	@Bean
