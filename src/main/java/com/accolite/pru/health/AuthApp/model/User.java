@@ -36,7 +36,7 @@ public class User extends DateAudit {
 	private String email;
 
 	@Column(name = "USERNAME", unique = true)
-	@NullOrNotBlank(message = "Username can be null but not blank")
+	@NullOrNotBlank(message = "Username can not be blank")
 	private String username;
 
 	@Column(name = "PASSWORD")
@@ -44,15 +44,14 @@ public class User extends DateAudit {
 	private String password;
 
 	@Column(name = "FIRST_NAME")
-	@NullOrNotBlank(message = "First name can be null but not blank")
+	@NullOrNotBlank(message = "First name can not be blank")
 	private String firstName;
 
 	@Column(name = "LAST_NAME")
-	@NullOrNotBlank(message = "Last name can be null but not blank")
+	@NullOrNotBlank(message = "Last name can not be blank")
 	private String lastName;
 
 	@Column(name = "IS_ACTIVE", nullable = false)
-	@NotNull(message = "User active flag can be null but not blank")
 	private Boolean active;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {

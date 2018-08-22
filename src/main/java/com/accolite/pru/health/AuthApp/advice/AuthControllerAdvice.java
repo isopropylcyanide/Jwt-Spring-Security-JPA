@@ -44,8 +44,7 @@ public class AuthControllerAdvice {
 		List<FieldError> fieldErrors = result.getFieldErrors();
 		ApiResponse response = new ApiResponse();
 		response.setSuccess(false);
-		logger.info("Localized validation error: " + ex.getLocalizedMessage());
-		response.setData(processFieldErrors(fieldErrors).toString());
+		response.setData(processFieldErrors(fieldErrors).stream().collect(Collectors.joining("\n")));
 		return response;
 	}
 
