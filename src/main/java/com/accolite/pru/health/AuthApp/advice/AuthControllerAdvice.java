@@ -71,28 +71,53 @@ public class AuthControllerAdvice {
 	}
 
 	@ExceptionHandler(value = AppException.class)
-	public void handleAppException() {
-
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ResponseBody
+	public ApiResponse handleAppException(AppException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
 	}
 
 	@ExceptionHandler(value = ResourceAlreadyInUseException.class)
-	public void handleResourceAlreadyInUseException() {
-
+	@ResponseStatus(HttpStatus.IM_USED)
+	@ResponseBody
+	public ApiResponse handleResourceAlreadyInUseException(ResourceAlreadyInUseException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
 	}
 
 	@ExceptionHandler(value = ResourceNotFoundException.class)
-	public void handleResourceNotFoundException() {
-
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ApiResponse handleResourceNotFoundException(ResourceNotFoundException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
 	}
 
 	@ExceptionHandler(value = BadRequestException.class)
-	public void handleBadRequestExceptionException() {
-
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	public ApiResponse handleBadRequestExceptionException(BadRequestException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
 	}
 
 	@ExceptionHandler(value = UsernameNotFoundException.class)
-	public void handleUsernameNotFoundExceptionException() {
-
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ApiResponse handleUsernameNotFoundExceptionException(UsernameNotFoundException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
 	}
 
 
