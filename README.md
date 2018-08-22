@@ -5,6 +5,25 @@ A demo project explaining the backend authentication using JWT (Json Web Token) 
 
 ---
 
+## JWT ##
+JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
+![image](https://user-images.githubusercontent.com/12872673/44461592-20470880-a62f-11e8-8597-0a0f79b5ef92.png)
+
+
+## Exception Handling ##
+The app throws custom exceptions wherever necessary which are captured through a controller advice. It then returns the appropriate error response to the caller
+* AppException
+* BadRequestException
+* ResourceAlreadyInUseException
+* ResourceNotFoundException
+* UserLoginException
+* UserRegistrationException
+* MethodArgumentNotValidException
+
+Moreover, entities are validated using JSR-303 Validation constraints. 
+
+---
+
 ## Steps to Setup the Spring Boot Back end app (polling-app-server)
 
 1. **Clone the application**
