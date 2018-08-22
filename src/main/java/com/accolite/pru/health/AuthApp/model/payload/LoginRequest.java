@@ -2,17 +2,17 @@ package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 public class LoginRequest {
 
-	@NullOrNotBlank
+	@NullOrNotBlank(message = "Username can be null but not blank")
 	private String userName;
 
-	@NullOrNotBlank
+	@NullOrNotBlank(message = "Email can be null but not blank")
 	private String email;
 
-	@NotBlank
+	@NotNull(message = "Password cannot be blank")
 	private String password;
 
 	public LoginRequest(String userName, String email, String password) {

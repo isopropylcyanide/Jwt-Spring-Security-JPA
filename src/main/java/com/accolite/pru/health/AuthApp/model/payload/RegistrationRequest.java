@@ -2,14 +2,16 @@ package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.model.User;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class RegistrationRequest {
 
-	@NotNull
+	@NotNull(message = "User details cannot be null")
+	@Valid
 	private User user;
 
-	@NotNull
+	@NotNull(message = "Specify whether the user has to be registered as an admin or not")
 	private Boolean registerAsAdmin;
 
 	public RegistrationRequest(User user, Boolean registerAsAdmin) {

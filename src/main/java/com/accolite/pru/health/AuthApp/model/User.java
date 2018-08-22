@@ -32,26 +32,27 @@ public class User extends DateAudit {
 
 	@NaturalId
 	@Column(name = "EMAIL", unique = true)
-	@NotBlank
+	@NotBlank(message = "User email cannot be null")
 	private String email;
 
 	@Column(name = "USERNAME", unique = true)
-	@NullOrNotBlank
+	@NullOrNotBlank(message = "Username can be null but not blank")
 	private String username;
 
 	@Column(name = "PASSWORD")
+	@NotNull(message = "Password cannot be null")
 	private String password;
 
 	@Column(name = "FIRST_NAME")
-	@NullOrNotBlank
+	@NullOrNotBlank(message = "First name can be null but not blank")
 	private String firstName;
 
 	@Column(name = "LAST_NAME")
-	@NullOrNotBlank
+	@NullOrNotBlank(message = "Last name can be null but not blank")
 	private String lastName;
 
 	@Column(name = "IS_ACTIVE", nullable = false)
-	@NotNull
+	@NotNull(message = "User active flag can be null but not blank")
 	private Boolean active;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {
