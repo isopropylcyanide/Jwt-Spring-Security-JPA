@@ -16,7 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -57,8 +56,6 @@ public class AuthService {
 		newUser.setPassword(passwordEncoder.encode(newRegistrationRequest.getPassword()));
 		newUser.setUsername(newRegistrationRequestEmail);
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
-		newUser.setCreatedAt(new Date().toInstant());
-		newUser.setUpdatedAt(new Date().toInstant());
 		newUser.setActive(true);
 		User registeredNewUser = userRepository.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
