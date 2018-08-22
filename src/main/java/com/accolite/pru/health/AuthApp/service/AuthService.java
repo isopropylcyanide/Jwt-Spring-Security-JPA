@@ -44,18 +44,19 @@ public class AuthService {
 	 * @return A user object if successfully created
 	 */
 	public Optional<User> registerUser(RegistrationRequest newRegistrationRequest) {
-		String newRegistrationRequestEmail = newRegistrationRequest.getUser().getEmail();
+		String newRegistrationRequestEmail = newRegistrationRequest.getEmail();
 		Boolean emailAlreadyExists = emailAlreadyExists(newRegistrationRequestEmail);
 		if (emailAlreadyExists) {
 			logger.error("Email already exists: " + newRegistrationRequestEmail);
 			throw new ResourceAlreadyInUseException("Email", "Address", newRegistrationRequestEmail);
 		}
 		logger.info("Trying to register new user [" + newRegistrationRequestEmail + "]");
-		User newUser = newRegistrationRequest.getUser();
+		User newUser = new User();
 		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
+		newUser.setEmail(newRegistrationRequestEmail);
 		newUser.setActive(true);
 		newUser.setUsername(newRegistrationRequestEmail);
-		newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+		newUser.setPassword(passwordEncoder.encode(newRegistrationRequest.getPassword()));
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		newUser.setCreatedAt(new Date().toInstant());
 		newUser.setUpdatedAt(new Date().toInstant());
