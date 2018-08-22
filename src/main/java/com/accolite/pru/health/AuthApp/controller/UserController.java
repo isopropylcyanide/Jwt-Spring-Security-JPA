@@ -1,9 +1,12 @@
 package com.accolite.pru.health.AuthApp.controller;
 
+import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
+import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import com.accolite.pru.health.AuthApp.security.CurrentUser;
 import com.accolite.pru.health.AuthApp.service.AuthService;
+import com.accolite.pru.health.AuthApp.service.UserService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,9 @@ public class UserController {
 	@Autowired
 	private AuthService authService;
 
+	@Autowired
+	private UserService userService;
+
 	@GetMapping("/checkEmailAvailability")
 	public ResponseEntity<?> checkEmailAvailability(@RequestParam("email") String email) {
 		Boolean emailExists = authService.emailAlreadyExists(email);
@@ -35,7 +41,6 @@ public class UserController {
 	}
 
 	@GetMapping("/me")
-	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails customUserDetails) {
 		logger.info("Inside secured resource with user");
 		logger.info(customUserDetails.getEmail() + " has role: " + customUserDetails.getRoles());
@@ -44,9 +49,16 @@ public class UserController {
 
 	@GetMapping("/admins")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> sayAlternateHello() {
+	public ResponseEntity<?> getAllAdmins() {
 		logger.info("Inside secured resource with admin");
 		return ResponseEntity.ok("Hello. This is about admins");
+	}
+
+	@GetMapping()
+	public ResponseEntity<?> getUser(@RequestParam("email") String email) {
+		User user = userService.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+		return ResponseEntity.ok(user);
 	}
 
 }

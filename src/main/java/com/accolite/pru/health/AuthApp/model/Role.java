@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Column;
@@ -31,6 +32,7 @@ public class Role {
 	private RoleName role;
 
 	@ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+	@JsonIgnore
 	private Set<User> userList = new HashSet<>();
 
 	public Role(RoleName role) {
