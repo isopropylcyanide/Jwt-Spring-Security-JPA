@@ -54,12 +54,12 @@ public class AuthService {
 		User newUser = new User();
 		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
 		newUser.setEmail(newRegistrationRequestEmail);
-		newUser.setActive(true);
-		newUser.setUsername(newRegistrationRequestEmail);
 		newUser.setPassword(passwordEncoder.encode(newRegistrationRequest.getPassword()));
+		newUser.setUsername(newRegistrationRequestEmail);
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		newUser.setCreatedAt(new Date().toInstant());
 		newUser.setUpdatedAt(new Date().toInstant());
+		newUser.setActive(true);
 		User registeredNewUser = userRepository.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
 	}

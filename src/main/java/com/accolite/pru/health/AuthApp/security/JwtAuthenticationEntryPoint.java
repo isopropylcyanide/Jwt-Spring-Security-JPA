@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.security;
 
+import com.accolite.pru.health.AuthApp.exception.UserLoginException;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -19,8 +20,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 	public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
 			AuthenticationException e) throws IOException, ServletException {
 		logger.error("User is unauthorised. Routing from the entry point");
-		httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Sorry, you don't have the authorization " +
-				"to access this resource");
-
+		throw new UserLoginException("Sorry, you don't have the authorization \" +\n" +
+				"\t\t\t\t\"to access this resource");
 	}
 }
