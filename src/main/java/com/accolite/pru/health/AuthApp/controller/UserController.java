@@ -5,6 +5,7 @@ import com.accolite.pru.health.AuthApp.service.AuthService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,16 +32,18 @@ public class UserController {
 		return ResponseEntity.ok(new ApiResponse(usernameExists.toString(), true));
 	}
 
-	@GetMapping("/all")
-	public ResponseEntity<?> sayHello() {
-		logger.info("Inside unsecured resource");
-		return ResponseEntity.ok("Hello. This is a not a secured resource");
+	@GetMapping("/me")
+	@Secured("ROLE_USER")
+	public ResponseEntity<?> getUserProfile() {
+		logger.info("Inside secured resource with user");
+		return ResponseEntity.ok("Hello. This is about me");
 	}
 
-	@GetMapping("/secured/alternate")
+	@GetMapping("/admins")
+	@Secured("ROLE_ADMIN")
 	public ResponseEntity<?> sayAlternateHello() {
-		logger.info("Inside unsecured resource which is open for any role");
-		return ResponseEntity.ok("Hello. This is an alternate secured resource");
+		logger.info("Inside secured resource with admin");
+		return ResponseEntity.ok("Hello. This is about admins");
 	}
 
 }
