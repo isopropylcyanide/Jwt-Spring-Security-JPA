@@ -4,12 +4,15 @@ import com.accolite.pru.health.AuthApp.exception.AppException;
 import com.accolite.pru.health.AuthApp.exception.BadRequestException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
+import com.accolite.pru.health.AuthApp.exception.UserLoginException;
+import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -103,7 +106,7 @@ public class AuthControllerAdvice {
 	@ExceptionHandler(value = BadRequestException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
-	public ApiResponse handleBadRequestExceptionException(BadRequestException ex) {
+	public ApiResponse handleBadRequestException(BadRequestException ex) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setSuccess(false);
 		apiResponse.setData(ex.getMessage());
@@ -113,7 +116,38 @@ public class AuthControllerAdvice {
 	@ExceptionHandler(value = UsernameNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ResponseBody
-	public ApiResponse handleUsernameNotFoundExceptionException(UsernameNotFoundException ex) {
+	public ApiResponse handleUsernameNotFoundException(UsernameNotFoundException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+
+	@ExceptionHandler(value = UserLoginException.class)
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	@ResponseBody
+	public ApiResponse handleUserLoginException(UserLoginException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+	@ExceptionHandler(value = BadCredentialsException.class)
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	@ResponseBody
+	public ApiResponse handleBadCredentialsException(BadCredentialsException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+	@ExceptionHandler(value = UserRegistrationException.class)
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	@ResponseBody
+	public ApiResponse handleUserRegistrationtaException(UserRegistrationException ex) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setSuccess(false);
 		apiResponse.setData(ex.getMessage());

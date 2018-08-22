@@ -6,17 +6,17 @@ import javax.validation.constraints.NotNull;
 
 public class LoginRequest {
 
-	@NullOrNotBlank(message = "Username can be null but not blank")
-	private String userName;
+	@NullOrNotBlank(message = "Login Username can be null but not blank")
+	private String username;
 
-	@NullOrNotBlank(message = "Email can be null but not blank")
+	@NullOrNotBlank(message = "Login Email can be null but not blank")
 	private String email;
 
-	@NotNull(message = "Password cannot be blank")
+	@NotNull(message = "Login password cannot be blank")
 	private String password;
 
-	public LoginRequest(String userName, String email, String password) {
-		this.userName = userName;
+	public LoginRequest(String username, String email, String password) {
+		this.username = username;
 		this.email = email;
 		this.password = password;
 	}
@@ -24,12 +24,12 @@ public class LoginRequest {
 	public LoginRequest() {
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 	public String getEmail() {

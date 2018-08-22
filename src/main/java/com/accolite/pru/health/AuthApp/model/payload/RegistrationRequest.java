@@ -6,13 +6,13 @@ import javax.validation.constraints.NotNull;
 
 public class RegistrationRequest {
 
-	@NullOrNotBlank(message = "Username can be null but not blank")
+	@NullOrNotBlank(message = "Registration username can be null but not blank")
 	private String username;
 
-	@NullOrNotBlank(message = "Email can be null but not blank")
+	@NullOrNotBlank(message = "Registration email can be null but not blank")
 	private String email;
 
-	@NotNull(message = "Password cannot be null")
+	@NotNull(message = "Registration password cannot be null")
 	private String password;
 
 	@NotNull(message = "Specify whether the user has to be registered as an admin or not")
