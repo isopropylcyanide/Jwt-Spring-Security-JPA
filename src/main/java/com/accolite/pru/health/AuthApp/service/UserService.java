@@ -20,4 +20,16 @@ public class UserService {
 	public Optional<User> findByEmail(String username) {
 		return userRepository.findByEmail(username);
 	}
+
+	public User save(User newUser) {
+		return userRepository.save(newUser);
+	}
+
+	public Boolean existsByEmail(String email) {
+		return userRepository.existsByEmail(email);
+	}
+
+	public Boolean existsByUsername(String username) {
+		return userRepository.existsByUsername(username);
+	}
 }

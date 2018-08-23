@@ -7,7 +7,6 @@ import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
-import com.accolite.pru.health.AuthApp.repository.UserRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +23,7 @@ import java.util.Set;
 public class AuthService {
 
 	@Autowired
-	private UserRepository userRepository;
+	private UserService userService;
 
 	@Autowired
 	private RoleService roleService;
@@ -57,7 +56,7 @@ public class AuthService {
 		newUser.setUsername(newRegistrationRequestEmail);
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		newUser.setActive(true);
-		User registeredNewUser = userRepository.save(newUser);
+		User registeredNewUser = userService.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
 	}
 
@@ -81,7 +80,7 @@ public class AuthService {
 	 * @return true if the email exists else false
 	 */
 	public Boolean emailAlreadyExists(String email) {
-		return userRepository.existsByEmail(email);
+		return userService.existsByEmail(email);
 	}
 
 	/**
@@ -89,7 +88,7 @@ public class AuthService {
 	 * @return true if the email exists else false
 	 */
 	public Boolean usernameAlreadyExists(String username) {
-		return userRepository.existsByUsername(username);
+		return userService.existsByUsername(username);
 	}
 
 
@@ -100,4 +99,5 @@ public class AuthService {
 		return Optional.ofNullable(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
 				loginRequest.getPassword())));
 	}
+
 }
