@@ -1,0 +1,63 @@
+package com.accolite.pru.health.AuthApp.service;
+
+import com.accolite.pru.health.AuthApp.model.Mail;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+@Service
+public class MailService {
+
+	@Autowired
+	private JavaMailSender mailSender;
+
+	@Autowired
+	private Configuration templateConfiguration;
+
+	@Value("${spring.mail.username}")
+	private String mailFrom;
+
+	public void sendEmailVerification(String emailVerificationUrl, String to) throws IOException,
+			TemplateException, MessagingException {
+		Mail mail = new Mail();
+		mail.setSubject("Email Verification [Team CEP]");
+		mail.setTo(to);
+		mail.setFrom(mailFrom);
+		mail.getModel().put("userName", to);
+		mail.getModel().put("userEmailTokenVerificationLink", emailVerificationUrl);
+
+		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
+		Template t = templateConfiguration.getTemplate("email-verification.ftl");
+		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(t, mail.getModel());
+		mail.setContent(mailContent);
+		send(mail);
+	}
+
+	/**
+	 * Sends a simple mail as a MIME Multipart message
+	 */
+	public void send(Mail mail) throws MessagingException {
+		MimeMessage message = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(message,
+				MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+				StandardCharsets.UTF_8.name());
+
+		helper.setTo(mail.getTo());
+		helper.setText(mail.getContent(), true);
+		helper.setSubject(mail.getSubject());
+		helper.setFrom(mail.getFrom());
+		mailSender.send(message);
+	}
+
+}

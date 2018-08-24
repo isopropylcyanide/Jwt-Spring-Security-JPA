@@ -13,23 +13,45 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	/**
+	 * Finds a user in the database by username
+	 */
 	public Optional<User> findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
 
+	/**
+	 * Finds a user in the database by email
+	 */
 	public Optional<User> findByEmail(String username) {
 		return userRepository.findByEmail(username);
 	}
 
-	public User save(User newUser) {
-		return userRepository.save(newUser);
+	/**
+	 * Save the user to the database
+	 */
+	public User save(User user) {
+		return userRepository.save(user);
 	}
 
+	/**
+	 * Check is the user exists given the email: naturalId
+	 */
 	public Boolean existsByEmail(String email) {
 		return userRepository.existsByEmail(email);
 	}
 
+	/**
+	 * Check is the user exists given the username: naturalId
+	 */
 	public Boolean existsByUsername(String username) {
 		return userRepository.existsByUsername(username);
+	}
+
+	/**
+	 * Create an email verification token and persist it in the database which will be
+	 * verified by the user
+	 */
+	public void persistEmailVerificationToken(User user, String token) {
 	}
 }

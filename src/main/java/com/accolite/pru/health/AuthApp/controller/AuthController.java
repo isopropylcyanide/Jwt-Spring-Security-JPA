@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.controller;
 
+import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
 import com.accolite.pru.health.AuthApp.exception.UserLoginException;
 import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
 import com.accolite.pru.health.AuthApp.model.User;
@@ -11,6 +12,7 @@ import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -36,6 +39,9 @@ public class AuthController {
 	@Autowired
 	private JwtTokenProvider tokenProvider;
 
+	@Autowired
+	private ApplicationEventPublisher applicationEventPublisher;
+
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		Optional<Authentication> authenticationOpt = authService.authenticateUser(loginRequest);
@@ -49,11 +55,15 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
+	public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest,
+			WebRequest request) {
 		Optional<User> registeredUserOpt = authService.registerUser(registrationRequest);
 		registeredUserOpt.orElseThrow(() -> new UserRegistrationException("Couldn't register user [" + registrationRequest +
 				"]"));
 		User registeredUser = registeredUserOpt.get();
+		OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent =
+				new OnUserRegistrationCompleteEvent(registeredUser, request.getContextPath());
+		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
 		logger.info("Registered User returned [API[: " + registeredUser);
 		URI location = ServletUriComponentsBuilder

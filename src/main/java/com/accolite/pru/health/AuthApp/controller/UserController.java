@@ -1,10 +1,10 @@
 package com.accolite.pru.health.AuthApp.controller;
 
+import com.accolite.pru.health.AuthApp.annotation.CurrentUser;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
-import com.accolite.pru.health.AuthApp.security.CurrentUser;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import com.accolite.pru.health.AuthApp.service.UserService;
 import org.apache.log4j.Logger;

@@ -25,6 +25,7 @@
         <jjwt.version>0.9.1</jjwt.version>
         <log4j.version>1.2.17</log4j.version>
         <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
+        <freemarker.version>2.3.28</freemarker.version>
     </properties>
 
     <dependencies>
@@ -100,6 +101,19 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
+        <!--Spring Mail -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+
+        <!--Template engine-->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
