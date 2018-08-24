@@ -2,6 +2,7 @@ package com.accolite.pru.health.AuthApp.advice;
 
 import com.accolite.pru.health.AuthApp.exception.AppException;
 import com.accolite.pru.health.AuthApp.exception.BadRequestException;
+import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.MailSendException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
@@ -159,6 +160,16 @@ public class AuthControllerAdvice {
 	@ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
 	@ResponseBody
 	public ApiResponse handleMailSendException(MailSendException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+	@ExceptionHandler(value = InvalidTokenRequestException.class)
+	@ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+	@ResponseBody
+	public ApiResponse handleInvalidTokenException(InvalidTokenRequestException ex) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setSuccess(false);
 		apiResponse.setData(ex.getMessage());

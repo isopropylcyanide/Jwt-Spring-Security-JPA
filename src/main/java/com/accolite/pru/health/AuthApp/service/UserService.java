@@ -48,10 +48,4 @@ public class UserService {
 		return userRepository.existsByUsername(username);
 	}
 
-	/**
-	 * Create an email verification token and persist it in the database which will be
-	 * verified by the user
-	 */
-	public void persistEmailVerificationToken(User user, String token) {
-	}
 }

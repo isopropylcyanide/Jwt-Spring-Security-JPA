@@ -1,6 +1,7 @@
 package com.accolite.pru.health.AuthApp.controller;
 
 import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
+import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.UserLoginException;
 import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
 import com.accolite.pru.health.AuthApp.model.User;
@@ -16,9 +17,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -42,6 +45,9 @@ public class AuthController {
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 
+	/**
+	 * Entry point for the user log in
+	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		Optional<Authentication> authenticationOpt = authService.authenticateUser(loginRequest);
@@ -54,6 +60,10 @@ public class AuthController {
 		return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
 	}
 
+	/**
+	 * Entry point for the user registration process. On successful registration, publish
+	 * an event to generate email verification token
+	 */
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest,
 			WebRequest request) {
@@ -62,7 +72,8 @@ public class AuthController {
 				"]"));
 		User registeredUser = registeredUserOpt.get();
 		OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent =
-				new OnUserRegistrationCompleteEvent(registeredUser, request.getContextPath());
+				new OnUserRegistrationCompleteEvent(registeredUser, request.getContextPath() +
+						"/registrationConfirmation");
 		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
 		logger.info("Registered User returned [API[: " + registeredUser);
@@ -72,4 +83,19 @@ public class AuthController {
 
 		return ResponseEntity.created(location).body(new ApiResponse("User registered successfully", true));
 	}
+
+
+	@GetMapping("/registrationConfirmation")
+	public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
+		Optional<User> verifiedUserOpt = authService.confirmRegistration(token);
+		verifiedUserOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", token,
+				"Failed to confirm. Please generate a new email verification request"));
+
+		User verifiedUser = verifiedUserOpt.get();
+		URI location = ServletUriComponentsBuilder
+				.fromCurrentContextPath().path("/api/users/{email}")
+				.buildAndExpand(verifiedUser.getEmail()).toUri();
+		return ResponseEntity.created(location).body(new ApiResponse("User verified successfully", true));
+	}
+
 }

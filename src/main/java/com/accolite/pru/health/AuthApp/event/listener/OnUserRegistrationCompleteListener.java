@@ -3,8 +3,8 @@ package com.accolite.pru.health.AuthApp.event.listener;
 import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
 import com.accolite.pru.health.AuthApp.exception.MailSendException;
 import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.service.EmailVerificationTokenService;
 import com.accolite.pru.health.AuthApp.service.MailService;
-import com.accolite.pru.health.AuthApp.service.UserService;
 import freemarker.template.TemplateException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class OnUserRegistrationCompleteListener implements ApplicationListener<OnUserRegistrationCompleteEvent> {
 
 	@Autowired
-	private UserService userService;
+	private EmailVerificationTokenService emailVerificationTokenService;
 
 	@Autowired
 	private MailService mailService;
@@ -40,7 +40,7 @@ public class OnUserRegistrationCompleteListener implements ApplicationListener<O
 	private void sendEmailVerification(OnUserRegistrationCompleteEvent event) {
 		User user = event.getUser();
 		String token = UUID.randomUUID().toString();
-		userService.persistEmailVerificationToken(user, token);
+		emailVerificationTokenService.createVerificationToken(user, token);
 
 		String recipientAddress = user.getEmail();
 		String emailConfirmationUrl = event.getRedirectUrl() + token;

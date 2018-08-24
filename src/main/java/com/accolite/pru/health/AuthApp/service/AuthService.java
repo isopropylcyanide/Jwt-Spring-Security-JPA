@@ -1,12 +1,16 @@
 package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.exception.AppException;
+import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
+import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
+import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +40,8 @@ public class AuthService {
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	@Autowired
+	private EmailVerificationTokenService emailVerificationTokenService;
 
 	/**
 	 * Registers a new user in the database by performing a series of quick checks.
@@ -101,4 +107,28 @@ public class AuthService {
 				loginRequest.getPassword())));
 	}
 
+	/**
+	 * Confirms the user verification based on the token expiry and mark the user as active
+	 */
+	public Optional<User> confirmRegistration(String emailToken) {
+		Optional<EmailVerificationToken> emailVerificationTokenOpt =
+				emailVerificationTokenService.findByToken(emailToken);
+		emailVerificationTokenOpt.orElseThrow(() ->
+				new ResourceNotFoundException("Token", "Email verification", emailToken));
+
+		Optional<EmailVerificationToken> validEmailTokenOpt =
+				emailVerificationTokenOpt.flatMap(EmailVerificationToken::isNotExpired);
+
+		validEmailTokenOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", emailToken,
+				"Expired token. Please issue a new request"));
+
+		validEmailTokenOpt.ifPresent(token -> {
+			token.setTokenStatus(TokenStatus.STATUS_CONFIRMED);
+			emailVerificationTokenService.save(token);
+			User user = token.getUser();
+			user.setEmailVerified(true);
+			userService.save(user);
+		});
+		return emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
+	}
 }

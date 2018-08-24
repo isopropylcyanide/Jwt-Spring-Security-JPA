@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import java.time.Instant;
+import java.util.Optional;
 
 @Entity(name = "EMAIL_VERIFICATION_TOKEN")
 public class EmailVerificationToken extends DateAudit {
@@ -51,6 +52,13 @@ public class EmailVerificationToken extends DateAudit {
 		this.user = user;
 		this.tokenStatus = tokenStatus;
 		this.expiryDate = expiryDate;
+	}
+
+	public Optional<EmailVerificationToken> isNotExpired() {
+		if (expiryDate.compareTo(Instant.now()) < 0) {
+			return Optional.of(this);
+		}
+		return Optional.empty();
 	}
 
 	public Long getId() {

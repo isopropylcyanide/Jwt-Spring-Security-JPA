@@ -12,7 +12,7 @@ public class OnUserRegistrationCompleteEvent extends ApplicationEvent {
 			User user, String redirectUrl) {
 		super(user);
 		this.user = user;
-		redirectUrl = redirectUrl;
+		this.redirectUrl = redirectUrl;
 	}
 
 	public String getRedirectUrl() {
