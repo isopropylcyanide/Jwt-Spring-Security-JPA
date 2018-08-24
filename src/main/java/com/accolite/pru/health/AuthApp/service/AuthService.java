@@ -56,6 +56,7 @@ public class AuthService {
 		newUser.setUsername(newRegistrationRequestEmail);
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		newUser.setActive(true);
+		newUser.setEmailVerified(false);
 		User registeredNewUser = userService.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
 	}
