@@ -129,7 +129,7 @@ public class AuthService {
 		}
 		//filter only valid token
 		Optional<Instant> validEmailTokenOpt =
-				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate).filter(dt -> dt.compareTo(Instant.now()) < 0);
+				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate).filter(dt -> dt.compareTo(Instant.now()) >= 0);
 
 		validEmailTokenOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", emailToken,
 				"Expired token. Please issue a new request"));
