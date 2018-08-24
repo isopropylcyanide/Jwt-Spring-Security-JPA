@@ -41,9 +41,9 @@ public class UserController {
 	}
 
 	@GetMapping("/me")
-	public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails customUserDetails) {
+	public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails currentUser) {
 		logger.info("Inside secured resource with user");
-		logger.info(customUserDetails.getEmail() + " has role: " + customUserDetails.getRoles());
+		logger.info(currentUser.getEmail() + " has role: " + currentUser.getRoles());
 		return ResponseEntity.ok("Hello. This is about me");
 	}
 

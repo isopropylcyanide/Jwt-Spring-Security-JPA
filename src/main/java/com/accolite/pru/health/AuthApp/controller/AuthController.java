@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -71,14 +72,16 @@ public class AuthController {
 		registeredUserOpt.orElseThrow(() -> new UserRegistrationException("Couldn't register user [" + registrationRequest +
 				"]"));
 		User registeredUser = registeredUserOpt.get();
+		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth" +
+				"/registrationConfirmation");
+
 		OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent =
-				new OnUserRegistrationCompleteEvent(registeredUser, request.getContextPath() +
-						"/registrationConfirmation");
+				new OnUserRegistrationCompleteEvent(registeredUser, urlBuilder);
 		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
 		logger.info("Registered User returned [API[: " + registeredUser);
 		URI location = ServletUriComponentsBuilder
-				.fromCurrentContextPath().path("/api/users/{email}")
+				.fromCurrentContextPath().path("/api/user/me")
 				.buildAndExpand(registeredUser.getEmail()).toUri();
 
 		return ResponseEntity.created(location).body(new ApiResponse("User registered successfully", true));
@@ -93,7 +96,7 @@ public class AuthController {
 
 		User verifiedUser = verifiedUserOpt.get();
 		URI location = ServletUriComponentsBuilder
-				.fromCurrentContextPath().path("/api/users/{email}")
+				.fromCurrentContextPath().path("/api/user/me")
 				.buildAndExpand(verifiedUser.getEmail()).toUri();
 		return ResponseEntity.created(location).body(new ApiResponse("User verified successfully", true));
 	}

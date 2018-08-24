@@ -2,24 +2,25 @@ package com.accolite.pru.health.AuthApp.event;
 
 import com.accolite.pru.health.AuthApp.model.User;
 import org.springframework.context.ApplicationEvent;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public class OnUserRegistrationCompleteEvent extends ApplicationEvent {
 
-	private String redirectUrl;
+	private UriComponentsBuilder redirectUrl;
 	private User user;
 
 	public OnUserRegistrationCompleteEvent(
-			User user, String redirectUrl) {
+			User user, UriComponentsBuilder redirectUrl) {
 		super(user);
 		this.user = user;
 		this.redirectUrl = redirectUrl;
 	}
 
-	public String getRedirectUrl() {
+	public UriComponentsBuilder getRedirectUrl() {
 		return redirectUrl;
 	}
 
-	public void setRedirectUrl(String redirectUrl) {
+	public void setRedirectUrl(UriComponentsBuilder redirectUrl) {
 		this.redirectUrl = redirectUrl;
 	}
 
