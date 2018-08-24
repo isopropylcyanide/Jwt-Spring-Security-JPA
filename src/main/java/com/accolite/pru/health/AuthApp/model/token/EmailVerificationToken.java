@@ -1,11 +1,14 @@
 package com.accolite.pru.health.AuthApp.model.token;
 
+import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,16 +35,21 @@ public class EmailVerificationToken extends DateAudit {
 	@JoinColumn(nullable = false, name = "USER_ID")
 	private User user;
 
+	@Column(name = "TOKEN_STATUS")
+	@Enumerated(EnumType.STRING)
+	private TokenStatus tokenStatus;
+
 	@Column(name = "EXPIRY_DT", nullable = false)
 	private Instant expiryDate;
 
 	public EmailVerificationToken() {
 	}
 
-	public EmailVerificationToken(Long id, String token, User user, Instant expiryDate) {
+	public EmailVerificationToken(Long id, String token, User user, TokenStatus tokenStatus, Instant expiryDate) {
 		this.id = id;
 		this.token = token;
 		this.user = user;
+		this.tokenStatus = tokenStatus;
 		this.expiryDate = expiryDate;
 	}
 
@@ -75,5 +83,13 @@ public class EmailVerificationToken extends DateAudit {
 
 	public void setExpiryDate(Instant expiryDate) {
 		this.expiryDate = expiryDate;
+	}
+
+	public TokenStatus getTokenStatus() {
+		return tokenStatus;
+	}
+
+	public void setTokenStatus(TokenStatus tokenStatus) {
+		this.tokenStatus = tokenStatus;
 	}
 }
