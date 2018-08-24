@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -108,7 +109,8 @@ public class AuthService {
 	}
 
 	/**
-	 * Confirms the user verification based on the token expiry and mark the user as active
+	 * Confirms the user verification based on the token expiry and mark the user as active.
+	 * If user is already registered, save the unnecessary database calls.
 	 */
 	public Optional<User> confirmRegistration(String emailToken) {
 		Optional<EmailVerificationToken> emailVerificationTokenOpt =
@@ -116,19 +118,29 @@ public class AuthService {
 		emailVerificationTokenOpt.orElseThrow(() ->
 				new ResourceNotFoundException("Token", "Email verification", emailToken));
 
-		Optional<EmailVerificationToken> validEmailTokenOpt =
-				emailVerificationTokenOpt.flatMap(EmailVerificationToken::isNotExpired);
+		Optional<User> registeredUser = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
+		//if user is already verified
+		Boolean userAlreadyRegistered =
+				emailVerificationTokenOpt.map(EmailVerificationToken::getUser).map(User::getEmailVerified).filter(x -> x == true).orElse(false);
+
+		if (userAlreadyRegistered) {
+			logger.info("User [" + registeredUser + "] already registered.");
+			return registeredUser;
+		}
+		//filter only valid token
+		Optional<Instant> validEmailTokenOpt =
+				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate).filter(dt -> dt.compareTo(Instant.now()) < 0);
 
 		validEmailTokenOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", emailToken,
 				"Expired token. Please issue a new request"));
 
-		validEmailTokenOpt.ifPresent(token -> {
+		emailVerificationTokenOpt.ifPresent(token -> {
 			token.setTokenStatus(TokenStatus.STATUS_CONFIRMED);
 			emailVerificationTokenService.save(token);
-			User user = token.getUser();
+			User user = registeredUser.get();
 			user.setEmailVerified(true);
 			userService.save(user);
 		});
-		return emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
+		return registeredUser;
 	}
 }
