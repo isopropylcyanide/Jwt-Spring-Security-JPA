@@ -28,14 +28,14 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-	@GetMapping("/checkEmailAvailability")
-	public ResponseEntity<?> checkEmailAvailability(@RequestParam("email") String email) {
+	@GetMapping("/checkEmailInUse")
+	public ResponseEntity<?> checkEmailInUse(@RequestParam("email") String email) {
 		Boolean emailExists = authService.emailAlreadyExists(email);
 		return ResponseEntity.ok(new ApiResponse(emailExists.toString(), true));
 	}
 
-	@GetMapping("/checkUsernameAvailability")
-	public ResponseEntity<?> checkUsernameAvailability(@RequestParam("username") String username) {
+	@GetMapping("/checkUsernameInUse")
+	public ResponseEntity<?> checkUsernameInUse(@RequestParam("username") String username) {
 		Boolean usernameExists = authService.usernameAlreadyExists(username);
 		return ResponseEntity.ok(new ApiResponse(usernameExists.toString(), true));
 	}
