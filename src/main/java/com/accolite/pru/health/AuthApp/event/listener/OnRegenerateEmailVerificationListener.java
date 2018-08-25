@@ -1,9 +1,9 @@
 package com.accolite.pru.health.AuthApp.event.listener;
 
-import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
+import com.accolite.pru.health.AuthApp.event.OnRegenerateEmailVerificationEvent;
 import com.accolite.pru.health.AuthApp.exception.MailSendException;
 import com.accolite.pru.health.AuthApp.model.User;
-import com.accolite.pru.health.AuthApp.service.EmailVerificationTokenService;
+import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.service.MailService;
 import freemarker.template.TemplateException;
 import org.apache.log4j.Logger;
@@ -15,34 +15,31 @@ import javax.mail.MessagingException;
 import java.io.IOException;
 
 @Component
-public class OnUserRegistrationCompleteListener implements ApplicationListener<OnUserRegistrationCompleteEvent> {
-
-	@Autowired
-	private EmailVerificationTokenService emailVerificationTokenService;
+public class OnRegenerateEmailVerificationListener implements ApplicationListener<OnRegenerateEmailVerificationEvent> {
 
 	@Autowired
 	private MailService mailService;
 
-	private static final Logger logger = Logger.getLogger(OnUserRegistrationCompleteListener.class);
+	private static final Logger logger = Logger.getLogger(OnRegenerateEmailVerificationListener.class);
 
 	/**
 	 * As soon as a registration event is complete, invoke the email verification
 	 */
 	@Override
-	public void onApplicationEvent(OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent) {
-		sendEmailVerification(onUserRegistrationCompleteEvent);
+	public void onApplicationEvent(OnRegenerateEmailVerificationEvent onRegenerateEmailVerificationEvent) {
+		resendEmailVerification(onRegenerateEmailVerificationEvent);
 	}
 
 	/**
 	 * Send email verification to the user and persist the token in the database.
 	 */
-	private void sendEmailVerification(OnUserRegistrationCompleteEvent event) {
+	private void resendEmailVerification(OnRegenerateEmailVerificationEvent event) {
 		User user = event.getUser();
-		String token = emailVerificationTokenService.generateNewToken();
-		emailVerificationTokenService.createVerificationToken(user, token);
-
+		EmailVerificationToken emailVerificationToken = event.getToken();
 		String recipientAddress = user.getEmail();
-		String emailConfirmationUrl = event.getRedirectUrl().queryParam("token", token).toUriString();
+
+		String emailConfirmationUrl =
+				event.getRedirectUrl().queryParam("token", emailVerificationToken.getToken()).toUriString();
 		try {
 			mailService.sendEmailVerification(emailConfirmationUrl, recipientAddress);
 		} catch (IOException | TemplateException | MessagingException e) {
@@ -50,4 +47,5 @@ public class OnUserRegistrationCompleteListener implements ApplicationListener<O
 			throw new MailSendException(recipientAddress, "Email Verification");
 		}
 	}
+
 }

@@ -3,7 +3,6 @@ package com.accolite.pru.health.AuthApp.model.token;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
-import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,7 +26,6 @@ public class EmailVerificationToken extends DateAudit {
 	@SequenceGenerator(name = "email_token_seq", allocationSize = 1)
 	private Long id;
 
-	@NaturalId
 	@Column(name = "TOKEN", nullable = false, unique = true)
 	private String token;
 

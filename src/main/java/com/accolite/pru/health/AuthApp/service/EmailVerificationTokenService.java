@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class EmailVerificationTokenService {
@@ -38,15 +38,41 @@ public class EmailVerificationTokenService {
 		emailVerificationTokenRepository.save(emailVerificationToken);
 	}
 
+	/**
+	 * Updates an existing token in the database with a new expiration
+	 */
+	public EmailVerificationToken updateExistingTokenWithNameAndExpiry(EmailVerificationToken existingToken) {
+		existingToken.setTokenStatus(TokenStatus.STATUS_PENDING);
+		existingToken.setExpiryDate(Instant.now().plusMillis(emailVerificationTokenExpiryDuration));
+		logger.info("Updated Email verification token [" + existingToken + "]");
+		return save(existingToken);
+	}
+
+	/**
+	 * Finds an email verification token by the @NaturalId token
+	 */
 	public Optional<EmailVerificationToken> findByToken(String token) {
 		return emailVerificationTokenRepository.findByToken(token);
 	}
 
-	public List<EmailVerificationToken> findByUser(User user) {
+	/**
+	 * Finds an email verification token by the user one-one mapping
+	 */
+	public EmailVerificationToken findByUser(User user) {
 		return emailVerificationTokenRepository.findByUser(user);
 	}
 
-	public void save(EmailVerificationToken emailVerificationToken) {
-		emailVerificationTokenRepository.save(emailVerificationToken);
+	/**
+	 * Saves an email verification token in the repository
+	 */
+	public EmailVerificationToken save(EmailVerificationToken emailVerificationToken) {
+		return emailVerificationTokenRepository.save(emailVerificationToken);
+	}
+
+	/**
+	 * Generates a new random UUID to be used as the token for email verification
+	 */
+	public String generateNewToken() {
+		return UUID.randomUUID().toString();
 	}
 }

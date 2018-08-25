@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.controller;
 
+import com.accolite.pru.health.AuthApp.event.OnRegenerateEmailVerificationEvent;
 import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.UserLoginException;
@@ -9,6 +10,7 @@ import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import org.apache.log4j.Logger;
@@ -84,10 +86,15 @@ public class AuthController {
 				.fromCurrentContextPath().path("/api/user/me")
 				.buildAndExpand(registeredUser.getEmail()).toUri();
 
-		return ResponseEntity.created(location).body(new ApiResponse("User registered successfully", true));
+		return ResponseEntity.created(location).body(new ApiResponse("User registered successfully. Check your email" +
+				" for verification", true));
 	}
 
 
+	/**
+	 * Confirm the email verification token generated for the user during registration. If
+	 * token is invalid or token is expired, report error.
+	 */
 	@GetMapping("/registrationConfirmation")
 	public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
 		Optional<User> verifiedUserOpt = authService.confirmRegistration(token);
@@ -100,5 +107,31 @@ public class AuthController {
 				.buildAndExpand(verifiedUser.getEmail()).toUri();
 		return ResponseEntity.created(location).body(new ApiResponse("User verified successfully", true));
 	}
+
+	/**
+	 * Resend the email registration mail with an updated token expiry.
+	 * Safe to assume that the user would always click on the last re-verification email
+	 * and any attempts at generating new token from past (possibly archived/deleted) tokens
+	 * should fail and report an exception.
+	 */
+	@GetMapping("/resendRegistrationToken")
+	public ResponseEntity<?> resendRegistrationToken(@RequestParam("token") String existingToken) {
+		Optional<EmailVerificationToken> newEmailTokenOpt = authService.recreateRegistrationToken(existingToken);
+		newEmailTokenOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", existingToken,
+				"User is already registered. No need to re-generate token"));
+
+		User registeredUser = newEmailTokenOpt.map(EmailVerificationToken::getUser)
+				.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", existingToken,
+						"No user associated with this request. Re-verification denied"));
+
+		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth" +
+				"/registrationConfirmation");
+		OnRegenerateEmailVerificationEvent regenerateEmailVerificationEvent =
+				new OnRegenerateEmailVerificationEvent(registeredUser, urlBuilder, newEmailTokenOpt.get());
+		applicationEventPublisher.publishEvent(regenerateEmailVerificationEvent);
+
+		return ResponseEntity.ok(new ApiResponse("Email verification resent successfully", true));
+	}
+
 
 }

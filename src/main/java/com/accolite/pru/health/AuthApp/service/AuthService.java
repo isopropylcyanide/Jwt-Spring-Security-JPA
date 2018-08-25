@@ -120,14 +120,13 @@ public class AuthService {
 
 		Optional<User> registeredUser = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
 		//if user is already verified
-		Boolean userAlreadyRegistered =
+		Boolean userAlreadyVerified =
 				emailVerificationTokenOpt.map(EmailVerificationToken::getUser).map(User::getEmailVerified).filter(x -> x == true).orElse(false);
 
-		if (userAlreadyRegistered) {
+		if (userAlreadyVerified) {
 			logger.info("User [" + registeredUser + "] already registered.");
 			return registeredUser;
 		}
-		//filter only valid token
 		Optional<Instant> validEmailTokenOpt =
 				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate).filter(dt -> dt.compareTo(Instant.now()) >= 0);
 
@@ -142,5 +141,23 @@ public class AuthService {
 			userService.save(user);
 		});
 		return registeredUser;
+	}
+
+	/**
+	 * Attempt to regenerate a new email verification token given a valid
+	 * previous expired token. If the previous token is valid, increase its expiry
+	 * else update the token value and add a new expiration.
+	 */
+	public Optional<EmailVerificationToken> recreateRegistrationToken(String existingToken) {
+		Optional<EmailVerificationToken> emailVerificationTokenOpt =
+				emailVerificationTokenService.findByToken(existingToken);
+		emailVerificationTokenOpt.orElseThrow(() ->
+				new ResourceNotFoundException("Token", "Existing email verification", existingToken));
+		Boolean userAlreadyVerified =
+				emailVerificationTokenOpt.map(EmailVerificationToken::getUser).map(User::getEmailVerified).filter(x -> x == true).orElse(false);
+		if (userAlreadyVerified) {
+			return Optional.empty();
+		}
+		return emailVerificationTokenOpt.map(emailVerificationTokenService::updateExistingTokenWithNameAndExpiry);
 	}
 }
