@@ -11,6 +11,7 @@ import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
+import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -121,14 +122,16 @@ public class AuthService {
 		Optional<User> registeredUser = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
 		//if user is already verified
 		Boolean userAlreadyVerified =
-				emailVerificationTokenOpt.map(EmailVerificationToken::getUser).map(User::getEmailVerified).filter(x -> x == true).orElse(false);
+				emailVerificationTokenOpt.map(EmailVerificationToken::getUser)
+						.map(User::getEmailVerified).filter(Util::isTrue).orElse(false);
 
 		if (userAlreadyVerified) {
 			logger.info("User [" + registeredUser + "] already registered.");
 			return registeredUser;
 		}
 		Optional<Instant> validEmailTokenOpt =
-				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate).filter(dt -> dt.compareTo(Instant.now()) >= 0);
+				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate)
+						.filter(dt -> dt.compareTo(Instant.now()) >= 0);
 
 		validEmailTokenOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", emailToken,
 				"Expired token. Please issue a new request"));
@@ -154,7 +157,8 @@ public class AuthService {
 		emailVerificationTokenOpt.orElseThrow(() ->
 				new ResourceNotFoundException("Token", "Existing email verification", existingToken));
 		Boolean userAlreadyVerified =
-				emailVerificationTokenOpt.map(EmailVerificationToken::getUser).map(User::getEmailVerified).filter(x -> x == true).orElse(false);
+				emailVerificationTokenOpt.map(EmailVerificationToken::getUser)
+						.map(User::getEmailVerified).filter(Util::isTrue).orElse(false);
 		if (userAlreadyVerified) {
 			return Optional.empty();
 		}
