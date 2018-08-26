@@ -60,7 +60,7 @@ public class UserController {
 	 * Gets the current user profile of the logged in user
 	 */
 	@GetMapping("/me")
-	@PreAuthorize("USER")
+	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails currentUser) {
 		logger.info("Inside secured resource with user");
 		logger.info(currentUser.getEmail() + " has role: " + currentUser.getRoles());
