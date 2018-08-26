@@ -89,7 +89,7 @@ public class UserController {
 				.orElseThrow(() -> new UpdatePasswordException("--Empty--", "No such user present."));
 
 		OnUserAccountChangeEvent onUserPasswordChangeEvent =
-				new OnUserAccountChangeEvent(updatedUser, "Update Password", "Changed successful");
+				new OnUserAccountChangeEvent(updatedUser, "Update Password", "Change successful");
 		applicationEventPublisher.publishEvent(onUserPasswordChangeEvent);
 
 		return ResponseEntity.ok(new ApiResponse("Password changed successfully", true));
