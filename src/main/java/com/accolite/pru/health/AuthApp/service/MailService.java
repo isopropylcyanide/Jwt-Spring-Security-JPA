@@ -4,6 +4,7 @@ import com.accolite.pru.health.AuthApp.model.Mail;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,6 +28,8 @@ public class MailService {
 
 	@Value("${spring.mail.username}")
 	private String mailFrom;
+
+	private static final Logger logger = Logger.getLogger(MailService.class);
 
 	public void sendEmailVerification(String emailVerificationUrl, String to) throws IOException,
 			TemplateException, MessagingException {
@@ -57,6 +60,7 @@ public class MailService {
 		helper.setText(mail.getContent(), true);
 		helper.setSubject(mail.getSubject());
 		helper.setFrom(mail.getFrom());
+		logger.info("Sending mail service in thread: " + Thread.currentThread());
 		mailSender.send(message);
 	}
 

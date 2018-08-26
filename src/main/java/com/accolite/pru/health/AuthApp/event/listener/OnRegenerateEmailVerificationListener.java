@@ -9,6 +9,7 @@ import freemarker.template.TemplateException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.mail.MessagingException;
@@ -26,6 +27,7 @@ public class OnRegenerateEmailVerificationListener implements ApplicationListene
 	 * As soon as a registration event is complete, invoke the email verification
 	 */
 	@Override
+	@Async
 	public void onApplicationEvent(OnRegenerateEmailVerificationEvent onRegenerateEmailVerificationEvent) {
 		resendEmailVerification(onRegenerateEmailVerificationEvent);
 	}

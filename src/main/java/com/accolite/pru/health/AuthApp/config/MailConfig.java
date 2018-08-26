@@ -7,12 +7,14 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
 
 import java.util.Properties;
 
 @Configuration
 @PropertySource("classpath:mail.properties")
+@EnableAsync
 public class MailConfig {
 
 	@Value("${spring.mail.default-encoding}")
