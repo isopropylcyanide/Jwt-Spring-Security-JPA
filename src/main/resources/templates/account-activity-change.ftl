@@ -79,19 +79,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 </style>
 <![endif]--><!-- Progressive Enhancements -->
 <div style="display: none; font-size: 1px; line-height: 1px; max-height: 0; max-width: 0; opacity: 0; overflow: hidden; mso-hide: all; font-family: sans-serif;">
@@ -120,7 +107,7 @@
                                         <td class="tw-card-header"
                                             style="padding: 5px 5px px; width: 366px; color: #ffff; text-decoration: none; font-family: sans-serif;"
                                             align="center"><span
-                                                style="font-weight: 600;">Email Confirmation Required</span></td>
+                                                style="font-weight: 600;">Account Status Changed</span></td>
 
                                     </tr>
                                     </tbody>
@@ -136,42 +123,19 @@
                                                 Hello ${userName},</h1>
                                             <p class=""
                                                style="margin: 20px 0; font-size: 16px; mso-line-height-rule: exactly; line-height: 24px;">
-                                            <span style="font-weight: 400;">Thank you for joining <strong>Customer Engagement App</strong>, an efficient and smart solution to manage your health!</span><br/><br/><span
-                                                style="font-weight: 400;">To complete the registration process, please confirm your email address to activate your account</span>
-                                            <table style="border: 0; width: 100%;" cellspacing="0" cellpadding="0">
-                                                <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <table class="button mobile-w-full"
-                                                               style="border: 0px; border-radius: 7px; margin: 0px auto; width: 525px; background-color: #008bcb; height: 50px;"
-                                                               cellspacing="0" cellpadding="0" align="center">
-                                                            <tbody>
-                                                            <tr>
-                                                                <td class="button__td "
-                                                                    style="border-radius: 7px; text-align: center; width: 523px;"><!-- [if mso]>
-                                                                    <a href="" class="button__a" target="_blank"
-                                                                       style="border-radius: 4px; color: #FFFFFF; display: block; font-family: sans-serif; font-size: 18px; font-weight: bold; mso-height-rule: exactly; line-height: 1.1; padding: 14px 18px; text-decoration: none; text-transform: none; border: 1px solid #316FEA;"> </a>
-                                                                    <![endif]--> <!-- [if !mso]><!--> <a
-                                                                            class="button__a"
-                                                                            style="border-radius: 4px; color: #ffffff; display: block; font-family: sans-serif; font-size: 18px; font-weight: bold; mso-height-rule: exactly; line-height: 1.1; padding: 14px 18px; text-decoration: none; text-transform: none; border: 0;"
-                                                                            href="${userEmailTokenVerificationLink}"
-                                                                            target="_blank"
-                                                                            rel="noopener">Confirm
-                                                                        email</a> <!--![endif]--></td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
+                                            <span style="font-weight: 400;">A new activity was initiated on your account.</span>
+                                            <br></br><span style="font-weight: 400;">Action: <strong>${action}</strong></span>
+                                            <br></br><span
+                                                style="font-weight: 400;">Status: <strong>${actionStatus}</strong></span>
+
                                             <div class=""
                                                  style="border-top: 0; font-size: 1px; mso-line-height-rule: exactly; line-height: 1px; max-height: 0; margin: 20px 0; overflow: hidden;">
                                                 ​
                                             </div>
                                             <p class=""
                                                style="margin: 20px 0; font-size: 16px; mso-line-height-rule: exactly; line-height: 24px;">
-                                                Contact our support team if you have any questions or concerns.&nbsp;<a
+                                                Contact our support team if you have any questions or concerns.&nbsp;
+                                                <br></br><a
                                                     style="color: #316fea; text-decoration: none;"
                                                     href="javascript:void(0);" target="_blank" rel="noopener">Ask us any
                                                 question</a></p>
