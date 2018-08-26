@@ -67,6 +67,9 @@ public class User extends DateAudit {
 			})
 	private Set<Role> roles = new HashSet<>();
 
+	@Column(name = "IS_EMAIL_VERIFIED", nullable = false)
+	private Boolean isEmailVerified;
+
 	public void addRole(Role role) {
 		roles.add(role);
 		role.getUserList().add(this);
@@ -82,6 +85,7 @@ public class User extends DateAudit {
 	}
 
 	public User() {
+		super();
 	}
 
 	public User(User user) {
@@ -93,6 +97,7 @@ public class User extends DateAudit {
 		email = user.getEmail();
 		active = user.getActive();
 		roles = user.getRoles();
+		isEmailVerified = user.getEmailVerified();
 	}
 
 	public Long getId() {
@@ -159,17 +164,26 @@ public class User extends DateAudit {
 		roles = authorities;
 	}
 
+	public Boolean getEmailVerified() {
+		return isEmailVerified;
+	}
+
+	public void setEmailVerified(Boolean emailVerified) {
+		isEmailVerified = emailVerified;
+	}
+
 	@Override
 	public String toString() {
 		return "User{" +
 				"id=" + id +
+				", email='" + email + '\'' +
 				", username='" + username + '\'' +
 				", password='" + password + '\'' +
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +
-				", email='" + email + '\'' +
 				", active=" + active +
 				", roles=" + roles +
+				", isEmailVerified=" + isEmailVerified +
 				'}';
 	}
 }

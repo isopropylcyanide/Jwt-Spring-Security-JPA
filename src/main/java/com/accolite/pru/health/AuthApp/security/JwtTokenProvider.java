@@ -24,7 +24,7 @@ public class JwtTokenProvider {
 	private String jwtSecret;
 
 	@Value("${app.jwt.expiration}")
-	private int jwtExpirationInMs;
+	private Long jwtExpirationInMs;
 
 	/**
 	 * Generates a token from a principal object.

@@ -1,4 +1,4 @@
-package com.accolite.pru.health.AuthApp.security;
+package com.accolite.pru.health.AuthApp.model.token;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
@@ -7,7 +7,7 @@ public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken 
 	private String token;
 
 	public JwtAuthenticationToken(Object principal, Object credentials, String token) {
-		super(null	, null);
+		super(null, null);
 		this.token = token;
 	}
 

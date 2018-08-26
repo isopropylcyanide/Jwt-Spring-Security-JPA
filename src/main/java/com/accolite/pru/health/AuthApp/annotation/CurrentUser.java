@@ -1,4 +1,4 @@
-package com.accolite.pru.health.AuthApp.security;
+package com.accolite.pru.health.AuthApp.annotation;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
