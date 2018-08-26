@@ -4,12 +4,15 @@ import com.accolite.pru.health.AuthApp.exception.AppException;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
+import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
+import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
@@ -163,5 +166,29 @@ public class AuthService {
 			return Optional.empty();
 		}
 		return emailVerificationTokenOpt.map(emailVerificationTokenService::updateExistingTokenWithNameAndExpiry);
+	}
+
+	/**
+	 * Validates the password of the current logged in user with the given password
+	 */
+	public Boolean currentPasswordMatches(User currentUser, String password) {
+		return passwordEncoder.matches(password, currentUser.getPassword());
+	}
+
+	/**
+	 * Updates the password of the current logged in user
+	 */
+	public Optional<User> updatePassword(CustomUserDetails customUserDetails,
+			UpdatePasswordRequest updatePasswordRequest) {
+		User currentUser = userService.getLoggedInUser(customUserDetails.getEmail());
+
+		if (!currentPasswordMatches(currentUser, updatePasswordRequest.getOldPassword())) {
+			logger.info("Current password is invalid for [" + currentUser.getPassword() + "]");
+			throw new UpdatePasswordException(currentUser.getEmail(), "Invalid current password");
+		}
+		String newPassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
+		currentUser.setPassword(newPassword);
+		userService.save(currentUser);
+		return Optional.ofNullable(currentUser);
 	}
 }

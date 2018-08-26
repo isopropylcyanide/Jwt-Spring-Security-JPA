@@ -2,6 +2,7 @@ package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.repository.UserRepository;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,8 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 
+	private static final Logger logger = Logger.getLogger(UserService.class);
+
 	/**
 	 * Finds a user in the database by username
 	 */
@@ -23,8 +26,16 @@ public class UserService {
 	/**
 	 * Finds a user in the database by email
 	 */
-	public Optional<User> findByEmail(String username) {
-		return userRepository.findByEmail(username);
+	public Optional<User> findByEmail(String email) {
+		return userRepository.findByEmail(email);
+	}
+
+	/**
+	 * Finds current logged in user in the database by email
+	 * Note: This will always return a concrete valid instance.
+	 */
+	public User getLoggedInUser(String email) {
+		return findByEmail(email).get();
 	}
 
 	/**
