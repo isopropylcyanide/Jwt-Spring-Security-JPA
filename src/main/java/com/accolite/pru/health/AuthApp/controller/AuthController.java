@@ -59,8 +59,8 @@ public class AuthController {
 
 		logger.info("Logged in User returned [API]: " + authentication.getName());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwt = tokenProvider.generateToken(authentication);
-		return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+		String jwtToken = tokenProvider.generateToken(authentication);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken));
 	}
 
 	/**
