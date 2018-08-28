@@ -1,7 +1,7 @@
 package com.accolite.pru.health.AuthApp.model.token;
 
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
-import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
 
 import javax.persistence.Column;
@@ -17,21 +17,21 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import java.time.Instant;
 
-@Entity(name = "EMAIL_VERIFICATION_TOKEN")
-public class EmailVerificationToken extends DateAudit {
+@Entity(name = "JWT_REFRESH_TOKEN")
+public class JwtRefreshToken extends DateAudit {
 
 	@Id
 	@Column(name = "TOKEN_ID")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "email_token_seq")
-	@SequenceGenerator(name = "email_token_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "refresh_token_seq")
+	@SequenceGenerator(name = "refresh_token_seq", allocationSize = 1)
 	private Long id;
 
 	@Column(name = "TOKEN", nullable = false, unique = true)
 	private String token;
 
-	@OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-	@JoinColumn(nullable = false, name = "USER_ID")
-	private User user;
+	@OneToOne(targetEntity = UserDevice.class, fetch = FetchType.LAZY)
+	@JoinColumn(nullable = false, name = "USER_DEVICE_ID")
+	private UserDevice userDevice;
 
 	@Column(name = "TOKEN_STATUS")
 	@Enumerated(EnumType.STRING)
@@ -40,13 +40,13 @@ public class EmailVerificationToken extends DateAudit {
 	@Column(name = "EXPIRY_DT", nullable = false)
 	private Instant expiryDate;
 
-	public EmailVerificationToken() {
+	public JwtRefreshToken() {
 	}
 
-	public EmailVerificationToken(Long id, String token, User user, TokenStatus tokenStatus, Instant expiryDate) {
+	public JwtRefreshToken(Long id, String token, UserDevice userDevice, TokenStatus tokenStatus, Instant expiryDate) {
 		this.id = id;
 		this.token = token;
-		this.user = user;
+		this.userDevice = userDevice;
 		this.tokenStatus = tokenStatus;
 		this.expiryDate = expiryDate;
 	}
@@ -67,20 +67,12 @@ public class EmailVerificationToken extends DateAudit {
 		this.token = token;
 	}
 
-	public User getUser() {
-		return user;
+	public UserDevice getUserDevice() {
+		return userDevice;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public Instant getExpiryDate() {
-		return expiryDate;
-	}
-
-	public void setExpiryDate(Instant expiryDate) {
-		this.expiryDate = expiryDate;
+	public void setUserDevice(UserDevice userDevice) {
+		this.userDevice = userDevice;
 	}
 
 	public TokenStatus getTokenStatus() {
@@ -89,5 +81,13 @@ public class EmailVerificationToken extends DateAudit {
 
 	public void setTokenStatus(TokenStatus tokenStatus) {
 		this.tokenStatus = tokenStatus;
+	}
+
+	public Instant getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(Instant expiryDate) {
+		this.expiryDate = expiryDate;
 	}
 }
