@@ -28,4 +28,10 @@ public class UserDeviceService {
 	public Optional<JwtRefreshToken> findRefreshTokenById(Long id) {
 		return userDeviceRepository.findRefreshTokenById(id);
 	}
+
+	public UserDevice save(UserDevice userDevice) {
+		return userDeviceRepository.save(userDevice);
+	}
+
+
 }

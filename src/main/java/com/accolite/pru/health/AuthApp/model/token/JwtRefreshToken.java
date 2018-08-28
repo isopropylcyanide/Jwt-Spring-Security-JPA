@@ -3,6 +3,7 @@ package com.accolite.pru.health.AuthApp.model.token;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +28,7 @@ public class JwtRefreshToken extends DateAudit {
 	private Long id;
 
 	@Column(name = "TOKEN", nullable = false, unique = true)
+	@NaturalId(mutable = true)
 	private String token;
 
 	@OneToOne(targetEntity = UserDevice.class, fetch = FetchType.LAZY)
