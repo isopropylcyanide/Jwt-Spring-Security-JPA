@@ -13,9 +13,9 @@ public interface JwtRefreshTokenRepository extends JpaRepository<JwtRefreshToken
 
 	Optional<String> findTokenById(Long id);
 
-	Optional<JwtRefreshToken> findByNaturalId(String token);
+	Optional<JwtRefreshToken> findByToken(String token);
 
 	Optional<UserDevice> findUserDeviceById(Long id);
 
-	Optional<UserDevice> findUserDeviceByNaturalId(String token);
+	Optional<UserDevice> findUserDeviceByToken(String token);
 }

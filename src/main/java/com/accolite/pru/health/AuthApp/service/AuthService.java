@@ -10,10 +10,13 @@ import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
+import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
+import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,12 @@ public class AuthService {
 	private static final Logger logger = Logger.getLogger(AuthService.class);
 
 	@Autowired
+	private JwtTokenProvider tokenProvider;
+
+	@Autowired
+	private JwtRefreshTokenService jwtRefreshTokenService;
+
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
@@ -47,6 +56,9 @@ public class AuthService {
 
 	@Autowired
 	private EmailVerificationTokenService emailVerificationTokenService;
+
+	@Autowired
+	private UserDeviceService userDeviceService;
 
 	/**
 	 * Registers a new user in the database by performing a series of quick checks.
@@ -190,5 +202,30 @@ public class AuthService {
 		currentUser.setPassword(newPassword);
 		userService.save(currentUser);
 		return Optional.ofNullable(currentUser);
+	}
+
+	/**
+	 * Generates a JWT token for the validated client
+	 */
+	public String generateToken(Authentication authentication, JwtRefreshToken jwtRefreshToken) {
+		return tokenProvider.generateToken(authentication, jwtRefreshToken);
+	}
+
+	/**
+	 * Creates and persists the refresh token for the user device. If device exists
+	 * already, we don't care. Unused devices with expired tokens should be cleaned
+	 * with a cron job. The generated token would be encapsulated within the jwt.
+	 */
+	public Optional<JwtRefreshToken> createAndPersistRefreshTokenForDevice(Authentication authentication,
+			LoginRequest loginRequest) {
+		User currentUser = (User) authentication.getPrincipal();
+		JwtRefreshToken jwtRefreshToken = jwtRefreshTokenService.createRefreshToken();
+		UserDevice userDevice = userDeviceService.createUserDevice(loginRequest.getDeviceInfo());
+		userDevice.setUser(currentUser);
+		userDevice.setRefreshToken(jwtRefreshToken);
+		jwtRefreshToken.setUserDevice(userDevice);
+		userDeviceService.save(userDevice);
+		jwtRefreshTokenService.save(jwtRefreshToken);
+		return Optional.ofNullable(jwtRefreshToken);
 	}
 }

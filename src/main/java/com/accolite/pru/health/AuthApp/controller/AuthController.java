@@ -11,6 +11,7 @@ import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
+import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import org.apache.log4j.Logger;
@@ -49,7 +50,7 @@ public class AuthController {
 	private ApplicationEventPublisher applicationEventPublisher;
 
 	/**
-	 * Entry point for the user log in
+	 * Entry point for the user log in. Return the jwt auth token and the refresh token
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -59,7 +60,11 @@ public class AuthController {
 
 		logger.info("Logged in User returned [API]: " + authentication.getName());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwtToken = tokenProvider.generateToken(authentication);
+		Optional<JwtRefreshToken> refreshTokenOpt = authService.createAndPersistRefreshTokenForDevice(authentication,
+				loginRequest);
+
+		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
+		String jwtToken = authService.generateToken(authentication, refreshTokenOpt.get());
 		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken));
 	}
 
