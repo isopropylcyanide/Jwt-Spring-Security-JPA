@@ -89,7 +89,6 @@ public class AuthController {
 				new OnUserRegistrationCompleteEvent(registeredUser, urlBuilder);
 		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
-		logger.info("Executing main service in thread: " + Thread.currentThread());
 		logger.info("Registered User returned [API[: " + registeredUser);
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentContextPath().path("/api/user/me")
