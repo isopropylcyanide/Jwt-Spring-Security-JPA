@@ -172,8 +172,15 @@ public class AuthService {
 	/**
 	 * Generates a JWT token for the validated client
 	 */
-	public String generateToken(Authentication authentication) {
-		return tokenProvider.generateToken(authentication);
+	public String generateToken(CustomUserDetails customUserDetails) {
+		return tokenProvider.generateToken(customUserDetails);
+	}
+
+	/**
+	 * Generates a JWT token for the validated client by userId
+	 */
+	public String generateTokenFromUserId(Long userId) {
+		return tokenProvider.generateTokenFromUserId(userId);
 	}
 
 	/**
@@ -214,9 +221,11 @@ public class AuthService {
 		//user device shouldn't be blocked for refresh
 		refreshTokenOpt.ifPresent(userDeviceService::verifyRefreshAvailability);
 
-		//if all good, generate a new jwt, update the count of usage
-
-
+		//if all good, generate a new jwt from the underlying user, update the count of usage
+		refreshTokenOpt.map(RefreshToken::getUserDevice)
+				.map(UserDevice::getUser)
+				.map(User::getId).map(this::generateTokenFromUserId);
+//		return generateToken(authentication);
 		return null;
 	}
 }

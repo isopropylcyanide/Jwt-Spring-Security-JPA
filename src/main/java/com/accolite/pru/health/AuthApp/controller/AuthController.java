@@ -6,6 +6,7 @@ import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UserLoginException;
 import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
+import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
@@ -78,16 +79,18 @@ public class AuthController {
 		Optional<Authentication> authenticationOpt = authService.authenticateUser(loginRequest);
 		authenticationOpt.orElseThrow(() -> new UserLoginException("Couldn't login user [" + loginRequest + "]"));
 		Authentication authentication = authenticationOpt.get();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-		logger.info("Logged in User returned [API]: " + authentication.getName());
+		logger.info("Logged in User returned [API]: " + customUserDetails.getUsername());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		Optional<RefreshToken> refreshTokenOpt = authService.createAndPersistRefreshTokenForDevice(authentication,
 				loginRequest);
 
 		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
 		String refreshToken = refreshTokenOpt.map(RefreshToken::getToken).get();
-		String jwtToken = authService.generateToken(authentication);
-		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken));
+		String jwtToken = authService.generateToken(customUserDetails);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken,
+				tokenProvider.getExpiryDuration()));
 	}
 
 	/**
@@ -170,8 +173,9 @@ public class AuthController {
 		Optional<String> updatedJwtToken = authService.refreshJwtToken(tokenRefreshRequest);
 		updatedJwtToken.orElseThrow(() -> new TokenRefreshException(tokenRefreshRequest.getRefreshToken(),
 				"Unexpected error during token refresh. Please logout and login again."));
-
 		String refreshToken = tokenRefreshRequest.getRefreshToken();
-		return ResponseEntity.ok(new JwtAuthenticationResponse(updatedJwtToken.get(), refreshToken));
+		logger.info("Created new Jwt Auth token: " + updatedJwtToken);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(updatedJwtToken.get(), refreshToken,
+				tokenProvider.getExpiryDuration()));
 	}
 }

@@ -10,7 +10,6 @@ import io.jsonwebtoken.SignatureException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -34,10 +33,8 @@ public class JwtTokenProvider {
 	 * Generates a token from a principal object. Embed the refresh token in the jwt
 	 * so that a new jwt can be created
 	 */
-	public String generateToken(Authentication authentication) {
-		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+	public String generateToken(CustomUserDetails customUserDetails) {
 		Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
-
 		return Jwts.builder()
 				.setSubject(Long.toString(customUserDetails.getId()))
 				.setIssuedAt(Date.from(Instant.now()))
@@ -45,6 +42,21 @@ public class JwtTokenProvider {
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 	}
+
+	/**
+	 * Generates a token from a principal object. Embed the refresh token in the jwt
+	 * so that a new jwt can be created
+	 */
+	public String generateTokenFromUserId(Long userId) {
+		Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
+		return Jwts.builder()
+				.setSubject(Long.toString(userId))
+				.setIssuedAt(Date.from(Instant.now()))
+				.setExpiration(Date.from(expiryDate))
+				.signWith(SignatureAlgorithm.HS512, jwtSecret)
+				.compact();
+	}
+
 
 	/**
 	 * Returns the user id encapsulated within the token
@@ -77,5 +89,13 @@ public class JwtTokenProvider {
 			logger.error("JWT claims string is empty.");
 		}
 		return false;
+	}
+
+	/**
+	 * Return the jwt expiration for the client so that they can execute
+	 * the refresh token logic appropriately
+	 */
+	public Long getExpiryDuration() {
+		return jwtExpirationInMs;
 	}
 }

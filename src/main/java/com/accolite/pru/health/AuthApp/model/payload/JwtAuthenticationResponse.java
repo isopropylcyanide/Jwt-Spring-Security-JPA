@@ -8,9 +8,12 @@ public class JwtAuthenticationResponse {
 
 	private String tokenType;
 
-	public JwtAuthenticationResponse(String accessToken, String refreshToken) {
+	private Long expiryDuration;
+
+	public JwtAuthenticationResponse(String accessToken, String refreshToken, Long expiryDuration) {
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
+		this.expiryDuration = expiryDuration;
 		tokenType = "Bearer ";
 	}
 
@@ -36,5 +39,13 @@ public class JwtAuthenticationResponse {
 
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
+	}
+
+	public Long getExpiryDuration() {
+		return expiryDuration;
+	}
+
+	public void setExpiryDuration(Long expiryDuration) {
+		this.expiryDuration = expiryDuration;
 	}
 }
