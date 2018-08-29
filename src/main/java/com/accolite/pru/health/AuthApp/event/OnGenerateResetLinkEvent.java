@@ -5,17 +5,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
 
-public class OnGenerateResetLinkMailEvent extends ApplicationEvent {
+public class OnGenerateResetLinkEvent extends ApplicationEvent {
 	private UriComponentsBuilder redirectUrl;
 	private PasswordResetToken passwordResetToken;
-	private String token;
 
-	public OnGenerateResetLinkMailEvent(PasswordResetToken passwordResetToken, UriComponentsBuilder redirectUrl,
-			String token) {
+	public OnGenerateResetLinkEvent(PasswordResetToken passwordResetToken, UriComponentsBuilder redirectUrl) {
 		super(passwordResetToken);
 		this.passwordResetToken = passwordResetToken;
 		this.redirectUrl = redirectUrl;
-		this.token = token;
 	}
 
 	public PasswordResetToken getPasswordResetToken() {
@@ -24,14 +21,6 @@ public class OnGenerateResetLinkMailEvent extends ApplicationEvent {
 
 	public void setPasswordResetToken(PasswordResetToken passwordResetToken) {
 		this.passwordResetToken = passwordResetToken;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
 	}
 
 	public UriComponentsBuilder getRedirectUrl() {

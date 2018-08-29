@@ -1,12 +1,13 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.model.User;
-import com.accolite.pru.health.AuthApp.repository.UserRepository;
+import java.util.Optional;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.repository.UserRepository;
 
 @Service
 public class UserService {
@@ -31,11 +32,19 @@ public class UserService {
 	}
 
 	/**
-	 * Finds current logged in user in the database by email
-	 * Note: This will always return a concrete valid instance.
+	 * Finds current logged in user in the database by email Note: This will always
+	 * return a concrete valid instance.
 	 */
 	public User getLoggedInUser(String email) {
 		return findByEmail(email).get();
+	}
+
+	/**
+	 * Find a user in db by id.
+	 *
+	 */
+	public Optional<User> findById(Long Id) {
+		return userRepository.findById(Id);
 	}
 
 	/**

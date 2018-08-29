@@ -1,9 +1,7 @@
 package com.accolite.pru.health.AuthApp.model;
 
-
-import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
-import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
-import org.hibernate.annotations.NaturalId;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,11 +13,15 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.HashSet;
-import java.util.Set;
+
+import org.hibernate.annotations.NaturalId;
+
+import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
+import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 
 @Entity(name = "USER")
 public class User extends DateAudit {
@@ -54,17 +56,13 @@ public class User extends DateAudit {
 	@Column(name = "IS_ACTIVE", nullable = false)
 	private Boolean active;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = {
-			CascadeType.PERSIST,
-			CascadeType.MERGE
-	})
-	@JoinTable(name = "USER_AUTHORITY",
-			joinColumns = {
-					@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
-			},
-			inverseJoinColumns = {
-					@JoinColumn(name = "ROLE_ID", referencedColumnName = "ROLE_ID")
-			})
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
+	private PasswordResetToken passwordResetToken;
+
+	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+	@JoinTable(name = "USER_AUTHORITY", joinColumns = {
+			@JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID") }, inverseJoinColumns = {
+					@JoinColumn(name = "ROLE_ID", referencedColumnName = "ROLE_ID") })
 	private Set<Role> roles = new HashSet<>();
 
 	@Column(name = "IS_EMAIL_VERIFIED", nullable = false)
@@ -106,6 +104,14 @@ public class User extends DateAudit {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public PasswordResetToken getPasswordResetToken() {
+		return passwordResetToken;
+	}
+
+	public void setPasswordResetToken(PasswordResetToken passwordResetToken) {
+		this.passwordResetToken = passwordResetToken;
 	}
 
 	public String getUsername() {
@@ -174,16 +180,8 @@ public class User extends DateAudit {
 
 	@Override
 	public String toString() {
-		return "User{" +
-				"id=" + id +
-				", email='" + email + '\'' +
-				", username='" + username + '\'' +
-				", password='" + password + '\'' +
-				", firstName='" + firstName + '\'' +
-				", lastName='" + lastName + '\'' +
-				", active=" + active +
-				", roles=" + roles +
-				", isEmailVerified=" + isEmailVerified +
-				'}';
+		return "User{" + "id=" + id + ", email='" + email + '\'' + ", username='" + username + '\'' + ", password='"
+				+ password + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", active="
+				+ active + ", roles=" + roles + ", isEmailVerified=" + isEmailVerified + '}';
 	}
 }

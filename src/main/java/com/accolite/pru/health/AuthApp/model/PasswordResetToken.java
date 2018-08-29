@@ -1,55 +1,50 @@
 package com.accolite.pru.health.AuthApp.model;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
-
-import org.springframework.beans.factory.annotation.Value;
-
-import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 
 @Entity(name = "PASSWORD_RESET_TOKEN")
 public class PasswordResetToken {
 
 	@Id
 	@Column(name = "TOKEN_ID")
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "token_seq")
-	@SequenceGenerator(name = "token_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pwd_reset_token_seq")
+	@SequenceGenerator(name = "pwd_reset_token_seq", allocationSize = 1)
 	private Long id;
 
 	@Column(name = "TOKEN_NAME", nullable = false, unique = true)
 	private String token;
 
 	@Column(name = "EXPIRY_TIME", nullable = false)
-	private Timestamp expiryTime;
+	private Instant expiryTime;
 
-	@Column(name = "EMAIL")
-	@NullOrNotBlank(message = "Email cannot be blank")
-	private String email;
+	@OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+	@JoinColumn(nullable = false, name = "USER_ID")
+	private User user;
 
-	@Column(name = "EXPIRATION")
-	@Value("${app.token.expiration}")
-	private long expiration;
-
-	public Timestamp getExpiryTime() {
+	public Instant getExpiryTime() {
 		return expiryTime;
 	}
 
-	public void setExpiryTime(Timestamp expiryTime) {
-		this.expiryTime = expiryTime;
+	public void setExpiryTime(Instant expiryDate) {
+		this.expiryTime = expiryDate;
 	}
 
-	public String getEmail() {
-		return email;
+	public User getUser() {
+		return user;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public String getToken() {
@@ -58,14 +53,6 @@ public class PasswordResetToken {
 
 	public void setToken(String token) {
 		this.token = token;
-	}
-
-	public long getExpiration() {
-		return expiration;
-	}
-
-	public void setExpiration(long expiration) {
-		this.expiration = expiration;
 	}
 
 }

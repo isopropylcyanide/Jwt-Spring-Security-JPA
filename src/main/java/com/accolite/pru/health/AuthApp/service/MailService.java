@@ -1,9 +1,11 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.model.Mail;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,10 +14,11 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import com.accolite.pru.health.AuthApp.model.Mail;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 @Service
 public class MailService {
@@ -31,8 +34,8 @@ public class MailService {
 
 	private static final Logger logger = Logger.getLogger(MailService.class);
 
-	public void sendEmailVerification(String emailVerificationUrl, String to) throws IOException,
-			TemplateException, MessagingException {
+	public void sendEmailVerification(String emailVerificationUrl, String to)
+			throws IOException, TemplateException, MessagingException {
 		Mail mail = new Mail();
 		mail.setSubject("Email Verification [Team CEP]");
 		mail.setTo(to);
@@ -41,17 +44,83 @@ public class MailService {
 		mail.getModel().put("userEmailTokenVerificationLink", emailVerificationUrl);
 
 		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
-		Template t = templateConfiguration.getTemplate("email-verification.ftl");
-		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(t, mail.getModel());
+		Template template = templateConfiguration.getTemplate("email-verification.ftl");
+		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
 		mail.setContent(mailContent);
 		send(mail);
 	}
 
 	/**
-	 * Send an email to the user indicating an account change event with the correct status
+	 * Send reset link.
+	 *
+	 * 1) Send the reset link to the respective user's mail
+	 * 
+	 * @param emailVerificationUrl
+	 *            the email verification url
+	 * @param to
+	 *            the to
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws TemplateException
+	 *             the template exception
+	 * @throws MessagingException
+	 *             the messaging exception
 	 */
-	public void sendAccountChangeEmail(String action, String actionStatus, String to) throws IOException,
-			TemplateException, MessagingException {
+	public void sendResetLink(String emailVerificationUrl, String to)
+			throws IOException, TemplateException, MessagingException {
+		Mail mail = new Mail();
+		mail.setSubject("Email Verification [Team CEP]");
+		mail.setTo(to);
+		mail.setFrom(mailFrom);
+		mail.getModel().put("userName", to);
+		mail.getModel().put("userEmailTokenVerificationLink", emailVerificationUrl);
+
+		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
+		Template template = templateConfiguration.getTemplate("reset-link.ftl");
+		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
+		mail.setContent(mailContent);
+		send(mail);
+	}
+
+	/**
+	 * Send password changed acknowledgement to the respective user's mail.
+	 *
+	 * @param action
+	 *            the action
+	 * @param actionStatus
+	 *            the action status
+	 * @param to
+	 *            the to
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
+	 * @throws TemplateException
+	 *             the template exception
+	 * @throws MessagingException
+	 *             the messaging exception
+	 */
+	public void sendPasswordChangedAcknowledgement(String action, String actionStatus, String to)
+			throws IOException, TemplateException, MessagingException {
+		Mail mail = new Mail();
+		mail.setSubject("Account Status Change [Team CEP]");
+		mail.setTo(to);
+		mail.setFrom(mailFrom);
+		mail.getModel().put("userName", to);
+		mail.getModel().put("action", action);
+		mail.getModel().put("actionStatus", actionStatus);
+
+		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
+		Template template = templateConfiguration.getTemplate("account-activity-change.ftl");
+		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
+		mail.setContent(mailContent);
+		send(mail);
+	}
+
+	/**
+	 * Send an email to the user indicating an account change event with the correct
+	 * status
+	 */
+	public void sendAccountChangeEmail(String action, String actionStatus, String to)
+			throws IOException, TemplateException, MessagingException {
 		Mail mail = new Mail();
 		mail.setSubject("Account Status Change [Team CEP]");
 		mail.setTo(to);
@@ -72,8 +141,7 @@ public class MailService {
 	 */
 	public void send(Mail mail) throws MessagingException {
 		MimeMessage message = mailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message,
-				MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+		MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
 				StandardCharsets.UTF_8.name());
 
 		helper.setTo(mail.getTo());

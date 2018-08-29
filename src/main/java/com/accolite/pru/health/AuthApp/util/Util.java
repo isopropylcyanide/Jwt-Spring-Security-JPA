@@ -1,5 +1,7 @@
 package com.accolite.pru.health.AuthApp.util;
 
+import java.util.UUID;
+
 public class Util {
 
 	/**
@@ -14,5 +16,9 @@ public class Util {
 	 */
 	public static Boolean isFalse(Boolean value) {
 		return false == value;
+	}
+
+	public String generateResetLinkToken() {
+		return UUID.randomUUID().toString();
 	}
 }

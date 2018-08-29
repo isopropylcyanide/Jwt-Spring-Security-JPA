@@ -10,41 +10,42 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.accolite.pru.health.AuthApp.event.OnGenerateResetLinkMailEvent;
+import com.accolite.pru.health.AuthApp.event.OnGenerateResetLinkEvent;
 import com.accolite.pru.health.AuthApp.exception.MailSendException;
 import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
+import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.service.MailService;
 
 import freemarker.template.TemplateException;
 
 @Component
-public class OnGenerateResetLinkMailEventListener implements ApplicationListener<OnGenerateResetLinkMailEvent> {
+public class OnGenerateResetLinkEventListener implements ApplicationListener<OnGenerateResetLinkEvent> {
 	@Autowired
 	private MailService mailService;
 
-	private static final Logger logger = Logger.getLogger(OnGenerateResetLinkMailEventListener.class);
+	private static final Logger logger = Logger.getLogger(OnGenerateResetLinkEventListener.class);
 
 	/**
-	 * As soon as a registration event is complete, invoke the email verification
+	 * As soon as a forgot password link is clicked and email id is entered, Reset
+	 * password link will be sent to respective mail via this event
 	 */
 	@Override
 	@Async
-	public void onApplicationEvent(OnGenerateResetLinkMailEvent onGenerateResetLinkMailEvent) {
+	public void onApplicationEvent(OnGenerateResetLinkEvent onGenerateResetLinkMailEvent) {
 		sendResetLink(onGenerateResetLinkMailEvent);
 	}
 
 	/**
-	 * Send email verification to the passwordResetToken and persist the token in
-	 * the database.
+	 * Sends Reset Link to the mail address with a password reset link token
 	 */
-	private void sendResetLink(OnGenerateResetLinkMailEvent event) {
+	private void sendResetLink(OnGenerateResetLinkEvent event) {
 		PasswordResetToken passwordResetToken = event.getPasswordResetToken();
-		String emailVerificationToken = event.getToken();
-		String recipientAddress = passwordResetToken.getEmail();
+		User user = passwordResetToken.getUser();
+		String recipientAddress = user.getEmail();
 		String emailConfirmationUrl = event.getRedirectUrl().queryParam("token", passwordResetToken.getToken())
 				.toUriString();
 		try {
-			mailService.sendEmailVerification(emailConfirmationUrl, recipientAddress);
+			mailService.sendResetLink(emailConfirmationUrl, recipientAddress);
 		} catch (IOException | TemplateException | MessagingException e) {
 			logger.error(e);
 			throw new MailSendException(recipientAddress, "Email Verification");
