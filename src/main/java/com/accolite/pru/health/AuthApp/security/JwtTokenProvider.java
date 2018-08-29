@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.security;
 
+import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -79,16 +80,20 @@ public class JwtTokenProvider {
 			return true;
 		} catch (SignatureException ex) {
 			logger.error("Invalid JWT signature");
+			throw new InvalidTokenRequestException("JWT", authToken, "Incorrect signature");
 		} catch (MalformedJwtException ex) {
 			logger.error("Invalid JWT token");
+			throw new InvalidTokenRequestException("JWT", authToken, "Malformed jwt token");
 		} catch (ExpiredJwtException ex) {
 			logger.error("Expired JWT token");
+			throw new InvalidTokenRequestException("JWT", authToken, "Token expired. Refresh required.");
 		} catch (UnsupportedJwtException ex) {
 			logger.error("Unsupported JWT token");
+			throw new InvalidTokenRequestException("JWT", authToken, "Unsupported JWT token");
 		} catch (IllegalArgumentException ex) {
 			logger.error("JWT claims string is empty.");
+			throw new InvalidTokenRequestException("JWT", authToken, "Illegal argument token");
 		}
-		return false;
 	}
 
 	/**
