@@ -1,6 +1,5 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.exception.AppException;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
@@ -92,13 +91,12 @@ public class UserService {
 	 * @return list of roles for the new user
 	 */
 	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
-		Set<Role> newUserRoles = new HashSet<>();
-		newUserRoles.add(roleService.findByRole(RoleName.ROLE_USER).orElseThrow(() -> new AppException("ROLE_USER " +
-				" is not set in database.")));
-		if (isAdmin) {
-			newUserRoles.add(roleService.findByRole(RoleName.ROLE_ADMIN).orElseThrow(() -> new AppException(
-					"ROLE_ADMIN" + "not set in database.")));
+		Set<Role> newUserRoles = new HashSet<>(roleService.findAll());
+		Role adminRole = new Role(RoleName.ROLE_ADMIN);
+		if (!isAdmin) {
+			newUserRoles.remove(adminRole);
 		}
+		logger.info("Setting user roles: " + newUserRoles);
 		return newUserRoles;
 	}
 }

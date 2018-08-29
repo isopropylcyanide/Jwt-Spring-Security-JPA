@@ -108,13 +108,12 @@ public class AuthService {
 				new ResourceNotFoundException("Token", "Email verification", emailToken));
 
 		Optional<User> registeredUser = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
-		//if user is already verified
 		Boolean userAlreadyVerified =
 				emailVerificationTokenOpt.map(EmailVerificationToken::getUser)
 						.map(User::getEmailVerified).filter(Util::isTrue).orElse(false);
 
 		if (userAlreadyVerified) {
-			logger.info("User [" + registeredUser + "] already registered.");
+			logger.info("User [" + emailToken + "] already registered.");
 			return registeredUser;
 		}
 		Optional<Instant> validEmailTokenOpt =
