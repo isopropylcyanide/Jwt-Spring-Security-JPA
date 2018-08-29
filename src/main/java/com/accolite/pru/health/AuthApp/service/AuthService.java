@@ -1,13 +1,10 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.exception.AppException;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
-import com.accolite.pru.health.AuthApp.model.Role;
-import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
@@ -28,9 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class AuthService {
@@ -40,8 +35,6 @@ public class AuthService {
 
 	@Autowired
 	private RoleService roleService;
-
-	private static final Logger logger = Logger.getLogger(AuthService.class);
 
 	@Autowired
 	private JwtTokenProvider tokenProvider;
@@ -61,6 +54,8 @@ public class AuthService {
 	@Autowired
 	private UserDeviceService userDeviceService;
 
+	private static final Logger logger = Logger.getLogger(AuthService.class);
+
 	/**
 	 * Registers a new user in the database by performing a series of quick checks.
 	 * @return A user object if successfully created
@@ -73,31 +68,9 @@ public class AuthService {
 			throw new ResourceAlreadyInUseException("Email", "Address", newRegistrationRequestEmail);
 		}
 		logger.info("Trying to register new user [" + newRegistrationRequestEmail + "]");
-		User newUser = new User();
-		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
-		newUser.setEmail(newRegistrationRequestEmail);
-		newUser.setPassword(passwordEncoder.encode(newRegistrationRequest.getPassword()));
-		newUser.setUsername(newRegistrationRequestEmail);
-		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
-		newUser.setActive(true);
-		newUser.setEmailVerified(false);
+		User newUser = userService.createUser(newRegistrationRequest);
 		User registeredNewUser = userService.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
-	}
-
-	/**
-	 * Performs a quick check to see what roles the new user could benefit from
-	 * @return list of roles for the new user
-	 */
-	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
-		Set<Role> newUserRoles = new HashSet<>();
-		newUserRoles.add(roleService.findByRole(RoleName.ROLE_USER).orElseThrow(() -> new AppException("ROLE_USER " +
-				" is not set in database.")));
-		if (isAdmin) {
-			newUserRoles.add(roleService.findByRole(RoleName.ROLE_ADMIN).orElseThrow(() -> new AppException(
-					"ROLE_ADMIN" + "not set in database.")));
-		}
-		return newUserRoles;
 	}
 
 	/**
@@ -115,7 +88,6 @@ public class AuthService {
 	public Boolean usernameAlreadyExists(String username) {
 		return userService.existsByUsername(username);
 	}
-
 
 	/**
 	 * Authenticate user and log them in given a loginRequest
