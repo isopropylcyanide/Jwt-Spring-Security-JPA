@@ -1,0 +1,74 @@
+package com.accolite.pru.health.AuthApp.service;
+
+import com.accolite.pru.health.AuthApp.model.UserDevice;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
+import com.accolite.pru.health.AuthApp.repository.RefreshTokenRepository;
+import com.accolite.pru.health.AuthApp.util.Util;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.Optional;
+
+@Service
+public class RefreshTokenService {
+
+	private RefreshTokenRepository refreshTokenRepository;
+
+	@Value("${app.token.refresh.duration}")
+	private Long refreshTokenDurationMs;
+
+	/**
+	 * Find a refresh token based on the id
+	 */
+	public Optional<RefreshToken> findById(Long id) {
+		return refreshTokenRepository.findById(id);
+	}
+
+	/**
+	 * Find the refresh token string based on the id
+	 */
+	public Optional<String> findTokenById(Long id) {
+		return refreshTokenRepository.findTokenById(id);
+	}
+
+	/**
+	 * Find a refresh token based on the natural id i.e the token itself
+	 */
+	public Optional<RefreshToken> findByToken(String token) {
+		return refreshTokenRepository.findByToken(token);
+	}
+
+	/**
+	 * Finds the user device the refreshed token is attached to using the id
+	 */
+	public Optional<UserDevice> findUserDeviceById(Long id) {
+		return refreshTokenRepository.findUserDeviceById(id);
+	}
+
+	/**
+	 * Finds the user device the refreshed token is attached to with the natural id
+	 */
+	public Optional<UserDevice> findUserDeviceByToken(String token) {
+		return refreshTokenRepository.findUserDeviceByToken(token);
+	}
+
+	/**
+	 * Persist the updated refreshToken instance to database
+	 */
+	public RefreshToken save(RefreshToken refreshToken) {
+		return refreshTokenRepository.save(refreshToken);
+	}
+
+
+	/**
+	 * Creates and returns a new refresh token
+	 */
+	public RefreshToken createRefreshToken() {
+		RefreshToken refreshToken = new RefreshToken();
+		refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+		refreshToken.setToken(Util.generateRefreshToken());
+		refreshToken.setRefreshCount(0L);
+		return refreshToken;
+	}
+}

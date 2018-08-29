@@ -1,7 +1,7 @@
 package com.accolite.pru.health.AuthApp.model;
 
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
-import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,9 +38,9 @@ public class UserDevice extends DateAudit {
 	@Column(name = "DEVICE_ID")
 	private String deviceId;
 
-	@OneToOne(targetEntity = JwtRefreshToken.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = RefreshToken.class, fetch = FetchType.LAZY)
 	@JoinColumn(nullable = false, name = "REFRESH_TOKEN")
-	private JwtRefreshToken refreshToken;
+	private RefreshToken refreshToken;
 
 	@Column(name = "IS_REFRESH_ACTIVE")
 	private Boolean isRefreshActive;
@@ -49,7 +49,7 @@ public class UserDevice extends DateAudit {
 	}
 
 	public UserDevice(Long id, User user, DeviceType deviceType, String notificationToken, String deviceId,
-			JwtRefreshToken refreshToken, Boolean isRefreshActive) {
+			RefreshToken refreshToken, Boolean isRefreshActive) {
 		this.id = id;
 		this.user = user;
 		this.deviceType = deviceType;
@@ -99,11 +99,11 @@ public class UserDevice extends DateAudit {
 		this.deviceId = deviceId;
 	}
 
-	public JwtRefreshToken getRefreshToken() {
+	public RefreshToken getRefreshToken() {
 		return refreshToken;
 	}
 
-	public void setRefreshToken(JwtRefreshToken refreshToken) {
+	public void setRefreshToken(RefreshToken refreshToken) {
 		this.refreshToken = refreshToken;
 	}
 

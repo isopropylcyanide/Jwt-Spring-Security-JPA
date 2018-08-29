@@ -1,19 +1,19 @@
 package com.accolite.pru.health.AuthApp.repository;
 
 import com.accolite.pru.health.AuthApp.model.UserDevice;
-import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface JwtRefreshTokenRepository extends JpaRepository<JwtRefreshToken, Long> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
 	@Override
-	Optional<JwtRefreshToken> findById(Long id);
+	Optional<RefreshToken> findById(Long id);
 
 	Optional<String> findTokenById(Long id);
 
-	Optional<JwtRefreshToken> findByToken(String token);
+	Optional<RefreshToken> findByToken(String token);
 
 	Optional<UserDevice> findUserDeviceById(Long id);
 

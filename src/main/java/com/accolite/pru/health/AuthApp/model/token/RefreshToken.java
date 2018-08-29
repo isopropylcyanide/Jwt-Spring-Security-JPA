@@ -16,7 +16,7 @@ import javax.persistence.SequenceGenerator;
 import java.time.Instant;
 
 @Entity(name = "JWT_REFRESH_TOKEN")
-public class JwtRefreshToken extends DateAudit {
+public class RefreshToken extends DateAudit {
 
 	@Id
 	@Column(name = "TOKEN_ID")
@@ -38,10 +38,10 @@ public class JwtRefreshToken extends DateAudit {
 	@Column(name = "EXPIRY_DT", nullable = false)
 	private Instant expiryDate;
 
-	public JwtRefreshToken() {
+	public RefreshToken() {
 	}
 
-	public JwtRefreshToken(Long id, String token, UserDevice userDevice, Long refreshCount, Instant expiryDate) {
+	public RefreshToken(Long id, String token, UserDevice userDevice, Long refreshCount, Instant expiryDate) {
 		this.id = id;
 		this.token = token;
 		this.userDevice = userDevice;

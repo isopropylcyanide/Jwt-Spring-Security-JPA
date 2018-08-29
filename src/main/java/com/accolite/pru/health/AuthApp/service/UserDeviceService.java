@@ -2,7 +2,7 @@ package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.payload.DeviceInfo;
-import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.repository.UserDeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class UserDeviceService {
 	/**
 	 * Finds the refresh token associated with the user_device
 	 */
-	public Optional<JwtRefreshToken> findRefreshTokenById(Long id) {
+	public Optional<RefreshToken> findRefreshTokenById(Long id) {
 		return userDeviceRepository.findRefreshTokenById(id);
 	}
 

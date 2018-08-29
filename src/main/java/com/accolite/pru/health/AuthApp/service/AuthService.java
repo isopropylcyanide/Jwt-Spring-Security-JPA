@@ -1,8 +1,8 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
@@ -13,7 +13,7 @@ import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
-import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
@@ -24,7 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -40,7 +39,7 @@ public class AuthService {
 	private JwtTokenProvider tokenProvider;
 
 	@Autowired
-	private JwtRefreshTokenService jwtRefreshTokenService;
+	private RefreshTokenService refreshTokenService;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -62,8 +61,7 @@ public class AuthService {
 	 */
 	public Optional<User> registerUser(RegistrationRequest newRegistrationRequest) {
 		String newRegistrationRequestEmail = newRegistrationRequest.getEmail();
-		Boolean emailAlreadyExists = emailAlreadyExists(newRegistrationRequestEmail);
-		if (emailAlreadyExists) {
+		if (emailAlreadyExists(newRegistrationRequestEmail)) {
 			logger.error("Email already exists: " + newRegistrationRequestEmail);
 			throw new ResourceAlreadyInUseException("Email", "Address", newRegistrationRequestEmail);
 		}
@@ -101,7 +99,7 @@ public class AuthService {
 	 * Confirms the user verification based on the token expiry and mark the user as active.
 	 * If user is already registered, save the unnecessary database calls.
 	 */
-	public Optional<User> confirmRegistration(String emailToken) {
+	public Optional<User> confirmEmailRegistration(String emailToken) {
 		Optional<EmailVerificationToken> emailVerificationTokenOpt =
 				emailVerificationTokenService.findByToken(emailToken);
 		emailVerificationTokenOpt.orElseThrow(() ->
@@ -116,12 +114,7 @@ public class AuthService {
 			logger.info("User [" + emailToken + "] already registered.");
 			return registeredUser;
 		}
-		Optional<Instant> validEmailTokenOpt =
-				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate)
-						.filter(dt -> dt.compareTo(Instant.now()) >= 0);
-
-		validEmailTokenOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", emailToken,
-				"Expired token. Please issue a new request"));
+		emailVerificationTokenOpt.ifPresent(emailVerificationTokenService::verifyExpiration);
 
 		emailVerificationTokenOpt.ifPresent(token -> {
 			token.setTokenStatus(TokenStatus.STATUS_CONFIRMED);
@@ -188,17 +181,17 @@ public class AuthService {
 	 * already, we don't care. Unused devices with expired tokens should be cleaned
 	 * with a cron job. The generated token would be encapsulated within the jwt.
 	 */
-	public Optional<JwtRefreshToken> createAndPersistRefreshTokenForDevice(Authentication authentication,
+	public Optional<RefreshToken> createAndPersistRefreshTokenForDevice(Authentication authentication,
 			LoginRequest loginRequest) {
 		User currentUser = (User) authentication.getPrincipal();
-		JwtRefreshToken jwtRefreshToken = jwtRefreshTokenService.createRefreshToken();
+		RefreshToken refreshToken = refreshTokenService.createRefreshToken();
 		UserDevice userDevice = userDeviceService.createUserDevice(loginRequest.getDeviceInfo());
 		userDevice.setUser(currentUser);
-		userDevice.setRefreshToken(jwtRefreshToken);
-		jwtRefreshToken.setUserDevice(userDevice);
+		userDevice.setRefreshToken(refreshToken);
+		refreshToken.setUserDevice(userDevice);
 		userDeviceService.save(userDevice);
-		jwtRefreshTokenService.save(jwtRefreshToken);
-		return Optional.ofNullable(jwtRefreshToken);
+		refreshTokenService.save(refreshToken);
+		return Optional.ofNullable(refreshToken);
 	}
 
 	/**
@@ -209,9 +202,17 @@ public class AuthService {
 	 */
 	public Optional<String> refreshJwtToken(TokenRefreshRequest tokenRefreshRequest) {
 		//tokenFromDb's device info should match this one
+		String requestRefreshToken = tokenRefreshRequest.getRefreshToken();
+		Optional<RefreshToken> refreshTokenOpt =
+				refreshTokenService.findByToken(requestRefreshToken);
+		refreshTokenOpt.orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Missing refresh token in " +
+				"database. Please login again"));
+
 		//token should not be expired else error.
 		//user device shouldn't be blocked for refresh
 		//if all good, generate a new jwt, update the count of usage
+//		refreshTokenOpt.get().getExpiryDate()
+
 		return null;
 	}
 }

@@ -13,7 +13,7 @@ import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
-import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import org.apache.log4j.Logger;
@@ -62,11 +62,11 @@ public class AuthController {
 
 		logger.info("Logged in User returned [API]: " + authentication.getName());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		Optional<JwtRefreshToken> refreshTokenOpt = authService.createAndPersistRefreshTokenForDevice(authentication,
+		Optional<RefreshToken> refreshTokenOpt = authService.createAndPersistRefreshTokenForDevice(authentication,
 				loginRequest);
 
 		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
-		String refreshToken = refreshTokenOpt.map(JwtRefreshToken::getToken).get();
+		String refreshToken = refreshTokenOpt.map(RefreshToken::getToken).get();
 		String jwtToken = authService.generateToken(authentication);
 		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken));
 	}
@@ -105,7 +105,7 @@ public class AuthController {
 	 */
 	@GetMapping("/registrationConfirmation")
 	public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
-		Optional<User> verifiedUserOpt = authService.confirmRegistration(token);
+		Optional<User> verifiedUserOpt = authService.confirmEmailRegistration(token);
 		verifiedUserOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", token,
 				"Failed to confirm. Please generate a new email verification request"));
 
