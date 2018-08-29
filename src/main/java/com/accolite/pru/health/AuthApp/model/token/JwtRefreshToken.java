@@ -1,14 +1,11 @@
 package com.accolite.pru.health.AuthApp.model.token;
 
-import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -35,9 +32,8 @@ public class JwtRefreshToken extends DateAudit {
 	@JoinColumn(nullable = false, name = "USER_DEVICE_ID")
 	private UserDevice userDevice;
 
-	@Column(name = "TOKEN_STATUS")
-	@Enumerated(EnumType.STRING)
-	private TokenStatus tokenStatus;
+	@Column(name = "REFRESH_COUNT")
+	private Long refreshCount;
 
 	@Column(name = "EXPIRY_DT", nullable = false)
 	private Instant expiryDate;
@@ -45,11 +41,11 @@ public class JwtRefreshToken extends DateAudit {
 	public JwtRefreshToken() {
 	}
 
-	public JwtRefreshToken(Long id, String token, UserDevice userDevice, TokenStatus tokenStatus, Instant expiryDate) {
+	public JwtRefreshToken(Long id, String token, UserDevice userDevice, Long refreshCount, Instant expiryDate) {
 		this.id = id;
 		this.token = token;
 		this.userDevice = userDevice;
-		this.tokenStatus = tokenStatus;
+		this.refreshCount = refreshCount;
 		this.expiryDate = expiryDate;
 	}
 
@@ -77,19 +73,19 @@ public class JwtRefreshToken extends DateAudit {
 		this.userDevice = userDevice;
 	}
 
-	public TokenStatus getTokenStatus() {
-		return tokenStatus;
-	}
-
-	public void setTokenStatus(TokenStatus tokenStatus) {
-		this.tokenStatus = tokenStatus;
-	}
-
 	public Instant getExpiryDate() {
 		return expiryDate;
 	}
 
 	public void setExpiryDate(Instant expiryDate) {
 		this.expiryDate = expiryDate;
+	}
+
+	public Long getRefreshCount() {
+		return refreshCount;
+	}
+
+	public void setRefreshCount(Long refreshCount) {
+		this.refreshCount = refreshCount;
 	}
 }

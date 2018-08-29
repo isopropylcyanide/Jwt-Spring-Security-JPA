@@ -6,6 +6,7 @@ import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.MailSendException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.exception.UserLoginException;
 import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
@@ -181,6 +182,16 @@ public class AuthControllerAdvice {
 	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
 	@ResponseBody
 	public ApiResponse handleUpdatePasswordException(UpdatePasswordException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+	@ExceptionHandler(value = TokenRefreshException.class)
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	@ResponseBody
+	public ApiResponse handleTokenRefreshException(TokenRefreshException ex) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setSuccess(false);
 		apiResponse.setData(ex.getMessage());

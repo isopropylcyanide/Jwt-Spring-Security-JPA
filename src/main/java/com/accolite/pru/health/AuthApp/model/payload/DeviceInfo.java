@@ -5,7 +5,7 @@ import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 
 import javax.validation.constraints.NotNull;
 
-public class LoginDeviceInfo {
+public class DeviceInfo {
 
 	@NotNull(message = "Device id cannot be null")
 	private String deviceId;
@@ -16,10 +16,10 @@ public class LoginDeviceInfo {
 	@NullOrNotBlank(message = "Device notification token can be null but not blank")
 	private String notificationToken;
 
-	public LoginDeviceInfo() {
+	public DeviceInfo() {
 	}
 
-	public LoginDeviceInfo(String deviceId, DeviceType deviceTypem, String notificationToken) {
+	public DeviceInfo(String deviceId, DeviceType deviceTypem, String notificationToken) {
 		this.deviceId = deviceId;
 		deviceType = deviceType;
 		notificationToken = notificationToken;

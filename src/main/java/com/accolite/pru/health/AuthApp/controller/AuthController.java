@@ -3,6 +3,7 @@ package com.accolite.pru.health.AuthApp.controller;
 import com.accolite.pru.health.AuthApp.event.OnRegenerateEmailVerificationEvent;
 import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UserLoginException;
 import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
 import com.accolite.pru.health.AuthApp.model.User;
@@ -10,6 +11,7 @@ import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
@@ -64,8 +66,9 @@ public class AuthController {
 				loginRequest);
 
 		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
+		String refreshToken = refreshTokenOpt.map(JwtRefreshToken::getToken).get();
 		String jwtToken = authService.generateToken(authentication);
-		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken));
+		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken));
 	}
 
 	/**
@@ -140,4 +143,17 @@ public class AuthController {
 	}
 
 
+	/**
+	 * Refresh the expired jwt token using a refresh token for the specific device
+	 * and return a new token to the caller
+	 */
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refreshJwtToken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest) {
+		Optional<String> updatedJwtToken = authService.refreshJwtToken(tokenRefreshRequest);
+		updatedJwtToken.orElseThrow(() -> new TokenRefreshException(tokenRefreshRequest.getRefreshToken(),
+				"Unexpected error"));
+
+		String refreshToken = tokenRefreshRequest.getRefreshToken();
+		return ResponseEntity.ok(new JwtAuthenticationResponse(updatedJwtToken.get(), refreshToken));
+	}
 }

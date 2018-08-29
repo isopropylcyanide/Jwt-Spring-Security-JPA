@@ -1,7 +1,7 @@
 package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.model.UserDevice;
-import com.accolite.pru.health.AuthApp.model.payload.LoginDeviceInfo;
+import com.accolite.pru.health.AuthApp.model.payload.DeviceInfo;
 import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
 import com.accolite.pru.health.AuthApp.repository.UserDeviceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class UserDeviceService {
 	/**
 	 * Creates a new user device and set the user to the current device
 	 */
-	public UserDevice createUserDevice(LoginDeviceInfo deviceInfo) {
+	public UserDevice createUserDevice(DeviceInfo deviceInfo) {
 		UserDevice userDevice = new UserDevice();
 		userDevice.setDeviceId(deviceInfo.getDeviceId());
 		userDevice.setDeviceType(deviceInfo.getDeviceType());

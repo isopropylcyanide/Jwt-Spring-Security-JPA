@@ -17,9 +17,10 @@ public class LoginRequest {
 	private String password;
 
 	@Valid
-	private LoginDeviceInfo deviceInfo;
+	@NotNull(message = "Device info cannot be null")
+	private DeviceInfo deviceInfo;
 
-	public LoginRequest(String username, String email, String password, LoginDeviceInfo deviceInfo) {
+	public LoginRequest(String username, String email, String password, DeviceInfo deviceInfo) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
@@ -53,11 +54,11 @@ public class LoginRequest {
 		this.password = password;
 	}
 
-	public LoginDeviceInfo getDeviceInfo() {
+	public DeviceInfo getDeviceInfo() {
 		return deviceInfo;
 	}
 
-	public void setDeviceInfo(LoginDeviceInfo deviceInfo) {
+	public void setDeviceInfo(DeviceInfo deviceInfo) {
 		this.deviceInfo = deviceInfo;
 	}
 }

@@ -4,10 +4,13 @@ public class JwtAuthenticationResponse {
 
 	private String accessToken;
 
+	private String refreshToken;
+
 	private String tokenType;
 
-	public JwtAuthenticationResponse(String accessToken) {
+	public JwtAuthenticationResponse(String accessToken, String refreshToken) {
 		this.accessToken = accessToken;
+		this.refreshToken = refreshToken;
 		tokenType = "Bearer ";
 	}
 
@@ -25,5 +28,13 @@ public class JwtAuthenticationResponse {
 
 	public void setTokenType(String tokenType) {
 		this.tokenType = tokenType;
+	}
+
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
 	}
 }

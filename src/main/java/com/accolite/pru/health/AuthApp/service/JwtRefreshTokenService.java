@@ -1,6 +1,5 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
 import com.accolite.pru.health.AuthApp.repository.JwtRefreshTokenRepository;
@@ -69,7 +68,7 @@ public class JwtRefreshTokenService {
 		JwtRefreshToken jwtRefreshToken = new JwtRefreshToken();
 		jwtRefreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
 		jwtRefreshToken.setToken(Util.generateRefreshToken());
-		jwtRefreshToken.setTokenStatus(TokenStatus.STATUS_PENDING);
+		jwtRefreshToken.setRefreshCount(0L);
 		return jwtRefreshToken;
 	}
 }

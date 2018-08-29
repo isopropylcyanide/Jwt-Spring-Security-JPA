@@ -13,6 +13,7 @@ import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
@@ -227,5 +228,19 @@ public class AuthService {
 		userDeviceService.save(userDevice);
 		jwtRefreshTokenService.save(jwtRefreshToken);
 		return Optional.ofNullable(jwtRefreshToken);
+	}
+
+	/**
+	 * Refresh the expired jwt token using a refresh token and device info. The
+	 * * refresh token is mapped to a specific device and if it is unexpired, can help
+	 * * generate a new jwt. If the refresh token is inactive for a device or it is expired,
+	 * * throw appropriate errors.
+	 */
+	public Optional<String> refreshJwtToken(TokenRefreshRequest tokenRefreshRequest) {
+		//tokenFromDb's device info should match this one
+		//token should not be expired else error.
+		//user device shouldn't be blocked for refresh
+		//if all good, generate a new jwt, update the count of usage
+		return null;
 	}
 }
