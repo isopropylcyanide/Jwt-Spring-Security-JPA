@@ -64,7 +64,7 @@ public class AuthController {
 				loginRequest);
 
 		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
-		String jwtToken = authService.generateToken(authentication, refreshTokenOpt.get());
+		String jwtToken = authService.generateToken(authentication);
 		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken));
 	}
 

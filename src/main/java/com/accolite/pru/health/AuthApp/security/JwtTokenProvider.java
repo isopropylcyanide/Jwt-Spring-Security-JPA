@@ -1,7 +1,6 @@
 package com.accolite.pru.health.AuthApp.security;
 
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
-import com.accolite.pru.health.AuthApp.model.token.JwtRefreshToken;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -15,10 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -38,16 +34,13 @@ public class JwtTokenProvider {
 	 * Generates a token from a principal object. Embed the refresh token in the jwt
 	 * so that a new jwt can be created
 	 */
-	public String generateToken(Authentication authentication, JwtRefreshToken jwtRefreshToken) {
+	public String generateToken(Authentication authentication) {
 		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 		Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
-		Map<String, String> claims = new HashMap<>();
-		claims.put(jwtClaimRefreshName, jwtRefreshToken.getToken());
 
 		return Jwts.builder()
 				.setSubject(Long.toString(customUserDetails.getId()))
 				.setIssuedAt(Date.from(Instant.now()))
-				.setClaims(Collections.unmodifiableMap(claims))
 				.setExpiration(Date.from(expiryDate))
 				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();

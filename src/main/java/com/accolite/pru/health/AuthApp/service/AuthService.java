@@ -207,8 +207,8 @@ public class AuthService {
 	/**
 	 * Generates a JWT token for the validated client
 	 */
-	public String generateToken(Authentication authentication, JwtRefreshToken jwtRefreshToken) {
-		return tokenProvider.generateToken(authentication, jwtRefreshToken);
+	public String generateToken(Authentication authentication) {
+		return tokenProvider.generateToken(authentication);
 	}
 
 	/**
