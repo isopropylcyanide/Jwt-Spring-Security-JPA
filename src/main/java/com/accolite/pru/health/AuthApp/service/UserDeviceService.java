@@ -25,6 +25,14 @@ public class UserDeviceService {
 	}
 
 	/**
+	 * Find the user device info by id. Assuming only one deviceId per device
+	 * as logout clears the refresh token associated with the device.
+	 */
+	public Optional<UserDevice> findByDeviceId(String deviceId) {
+		return userDeviceRepository.findByDeviceId(deviceId);
+	}
+
+	/**
 	 * Find the user device info by refresh token
 	 */
 	public Optional<UserDevice> findByRefreshToken(RefreshToken refreshToken) {
@@ -72,4 +80,5 @@ public class UserDeviceService {
 		userDeviceRefreshEnabledOpt.orElseThrow(() -> new TokenRefreshException(refreshToken.getToken(),
 				"Refresh blocked for the device. Please login through a different device"));
 	}
+
 }

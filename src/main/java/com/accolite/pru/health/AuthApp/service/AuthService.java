@@ -8,6 +8,7 @@ import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
+import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
@@ -222,10 +223,19 @@ public class AuthService {
 		refreshTokenOpt.ifPresent(userDeviceService::verifyRefreshAvailability);
 
 		//if all good, generate a new jwt from the underlying user, update the count of usage
-		refreshTokenOpt.map(RefreshToken::getUserDevice)
+		return refreshTokenOpt.map(RefreshToken::getUserDevice)
 				.map(UserDevice::getUser)
 				.map(User::getId).map(this::generateTokenFromUserId);
-//		return generateToken(authentication);
-		return null;
+	}
+
+	/**
+	 * Log the given user out and delete the refresh token associated with it. If no device
+	 * is associated with it, fail silently
+	 */
+	public void logoutUser(CustomUserDetails customUserDetails, LogOutRequest logOutRequest) {
+		String deviceId = logOutRequest.getDeviceInfo().getDeviceId();
+		Optional<UserDevice> userDeviceOpt = userDeviceService.findByDeviceId(deviceId);
+		logger.info("Removing refresh token associated with device: " + userDeviceOpt.get());
+		userDeviceOpt.ifPresent(refreshTokenService::deleteByUserDevice);
 	}
 }
