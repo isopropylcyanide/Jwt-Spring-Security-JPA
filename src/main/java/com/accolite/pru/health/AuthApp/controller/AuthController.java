@@ -43,13 +43,32 @@ public class AuthController {
 	@Autowired
 	private AuthService authService;
 
-	private static final Logger logger = Logger.getLogger(AuthController.class);
-
 	@Autowired
 	private JwtTokenProvider tokenProvider;
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
+
+	private static final Logger logger = Logger.getLogger(AuthController.class);
+
+	/**
+	 * Checks is a given email is in use or not.
+	 */
+	@GetMapping("/checkEmailInUse")
+	public ResponseEntity<?> checkEmailInUse(@RequestParam("email") String email) {
+		Boolean emailExists = authService.emailAlreadyExists(email);
+		return ResponseEntity.ok(new ApiResponse(emailExists.toString(), true));
+	}
+
+	/**
+	 * Checks is a given username is in use or not.
+	 */
+	@GetMapping("/checkUsernameInUse")
+	public ResponseEntity<?> checkUsernameInUse(@RequestParam("username") String username) {
+		Boolean usernameExists = authService.usernameAlreadyExists(username);
+		return ResponseEntity.ok(new ApiResponse(usernameExists.toString(), true));
+	}
+
 
 	/**
 	 * Entry point for the user log in. Return the jwt auth token and the refresh token
@@ -150,7 +169,7 @@ public class AuthController {
 	public ResponseEntity<?> refreshJwtToken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest) {
 		Optional<String> updatedJwtToken = authService.refreshJwtToken(tokenRefreshRequest);
 		updatedJwtToken.orElseThrow(() -> new TokenRefreshException(tokenRefreshRequest.getRefreshToken(),
-				"Unexpected error"));
+				"Unexpected error during token refresh. Please logout and login again."));
 
 		String refreshToken = tokenRefreshRequest.getRefreshToken();
 		return ResponseEntity.ok(new JwtAuthenticationResponse(updatedJwtToken.get(), refreshToken));

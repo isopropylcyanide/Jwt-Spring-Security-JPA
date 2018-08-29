@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.service;
 
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.payload.DeviceInfo;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
@@ -22,6 +23,14 @@ public class UserDeviceService {
 	public Optional<UserDevice> findById(Long id) {
 		return userDeviceRepository.findById(id);
 	}
+
+	/**
+	 * Find the user device info by refresh token
+	 */
+	public Optional<UserDevice> findByRefreshToken(RefreshToken refreshToken) {
+		return userDeviceRepository.findByRefreshToken(refreshToken);
+	}
+
 
 	/**
 	 * Finds the refresh token associated with the user_device
@@ -48,5 +57,19 @@ public class UserDeviceService {
 		userDevice.setNotificationToken(deviceInfo.getNotificationToken());
 		userDevice.setRefreshActive(true);
 		return userDevice;
+	}
+
+	/**
+	 * Check whether the user device corresponding to the token has refresh enabled and
+	 * throw appropriate errors to the client
+	 */
+	public void verifyRefreshAvailability(RefreshToken refreshToken) {
+		Optional<UserDevice> userDeviceOpt = findByRefreshToken(refreshToken);
+		userDeviceOpt.orElseThrow(() -> new TokenRefreshException(refreshToken.getToken(),
+				"No device found for the matching token. Please login again"));
+
+		Optional<Boolean> userDeviceRefreshEnabledOpt = userDeviceOpt.map(UserDevice::getRefreshActive);
+		userDeviceRefreshEnabledOpt.orElseThrow(() -> new TokenRefreshException(refreshToken.getToken(),
+				"Refresh blocked for the device. Please login through a different device"));
 	}
 }

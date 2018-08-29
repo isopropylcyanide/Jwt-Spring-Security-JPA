@@ -209,9 +209,13 @@ public class AuthService {
 				"database. Please login again"));
 
 		//token should not be expired else error.
+		refreshTokenOpt.ifPresent(refreshTokenService::verifyExpiration);
+
 		//user device shouldn't be blocked for refresh
+		refreshTokenOpt.ifPresent(userDeviceService::verifyRefreshAvailability);
+
 		//if all good, generate a new jwt, update the count of usage
-//		refreshTokenOpt.get().getExpiryDate()
+
 
 		return null;
 	}

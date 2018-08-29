@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.service;
 
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.repository.RefreshTokenRepository;
@@ -71,4 +72,15 @@ public class RefreshTokenService {
 		refreshToken.setRefreshCount(0L);
 		return refreshToken;
 	}
+
+	/**
+	 * Verify whether the token provided has expired or not on the basis of the current
+	 * server time and/or throw error otherwise
+	 */
+	public void verifyExpiration(RefreshToken token) {
+		if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+			throw new TokenRefreshException(token.getToken(), "Expired token. Please issue a new request");
+		}
+	}
+
 }
