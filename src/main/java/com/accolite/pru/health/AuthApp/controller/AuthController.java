@@ -128,6 +128,7 @@ public class AuthController {
 	 * password. Sends the Acknowledgement after changing the password to the user's
 	 * mail
 	 */
+
 	@PostMapping("/password/reset")
 	public ResponseEntity<?> resetPassword(@RequestParam(value = "token") String token,
 			@Valid @RequestBody PasswordResetRequest passwordResetRequest) {
