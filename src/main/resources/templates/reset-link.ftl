@@ -154,7 +154,7 @@
                                                                     <![endif]--> <!-- [if !mso]><!--> <a
                                                                             class="button__a"
                                                                             style="border-radius: 4px; color: #ffffff; display: block; font-family: sans-serif; font-size: 18px; font-weight: bold; mso-height-rule: exactly; line-height: 1.1; padding: 14px 18px; text-decoration: none; text-transform: none; border: 0;"
-                                                                            href="${userEmailTokenVerificationLink}"
+                                                                            href="${userResetPasswordLinkUrl}"
                                                                             target="_blank"
                                                                             rel="noopener">Reset 
                                                                         Link</a> <!--![endif]--></td>

@@ -66,50 +66,17 @@ public class MailService {
 	 * @throws MessagingException
 	 *             the messaging exception
 	 */
-	public void sendResetLink(String emailVerificationUrl, String to)
+	public void sendResetLink(String resetPasswordLinkUrl, String to)
 			throws IOException, TemplateException, MessagingException {
 		Mail mail = new Mail();
 		mail.setSubject("Email Verification [Team CEP]");
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
 		mail.getModel().put("userName", to);
-		mail.getModel().put("userEmailTokenVerificationLink", emailVerificationUrl);
+		mail.getModel().put("userResetPasswordLinkUrl", resetPasswordLinkUrl);
 
 		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
 		Template template = templateConfiguration.getTemplate("reset-link.ftl");
-		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
-		mail.setContent(mailContent);
-		send(mail);
-	}
-
-	/**
-	 * Send password changed acknowledgement to the respective user's mail.
-	 *
-	 * @param action
-	 *            the action
-	 * @param actionStatus
-	 *            the action status
-	 * @param to
-	 *            the to
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws TemplateException
-	 *             the template exception
-	 * @throws MessagingException
-	 *             the messaging exception
-	 */
-	public void sendPasswordChangedAcknowledgement(String action, String actionStatus, String to)
-			throws IOException, TemplateException, MessagingException {
-		Mail mail = new Mail();
-		mail.setSubject("Account Status Change [Team CEP]");
-		mail.setTo(to);
-		mail.setFrom(mailFrom);
-		mail.getModel().put("userName", to);
-		mail.getModel().put("action", action);
-		mail.getModel().put("actionStatus", actionStatus);
-
-		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
-		Template template = templateConfiguration.getTemplate("account-activity-change.ftl");
 		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
 		mail.setContent(mailContent);
 		send(mail);
