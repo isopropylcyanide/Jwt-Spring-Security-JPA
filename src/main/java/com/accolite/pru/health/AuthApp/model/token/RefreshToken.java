@@ -4,9 +4,9 @@ import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
 import org.hibernate.annotations.NaturalId;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,7 +15,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import java.time.Instant;
 
-@Entity(name = "JWT_REFRESH_TOKEN")
+@Entity(name = "REFRESH_TOKEN")
 public class RefreshToken extends DateAudit {
 
 	@Id
@@ -28,8 +28,8 @@ public class RefreshToken extends DateAudit {
 	@NaturalId(mutable = true)
 	private String token;
 
-	@OneToOne(targetEntity = UserDevice.class, fetch = FetchType.LAZY)
-	@JoinColumn(nullable = false, name = "USER_DEVICE_ID")
+	@OneToOne(optional = false, cascade = CascadeType.ALL)
+	@JoinColumn(name = "USER_DEVICE_ID", unique = true)
 	private UserDevice userDevice;
 
 	@Column(name = "REFRESH_COUNT")

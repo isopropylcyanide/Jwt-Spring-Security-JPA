@@ -38,8 +38,7 @@ public class UserDevice extends DateAudit {
 	@Column(name = "DEVICE_ID")
 	private String deviceId;
 
-	@OneToOne(targetEntity = RefreshToken.class, fetch = FetchType.LAZY)
-	@JoinColumn(nullable = false, name = "REFRESH_TOKEN")
+	@OneToOne(optional = false, mappedBy = "userDevice")
 	private RefreshToken refreshToken;
 
 	@Column(name = "IS_REFRESH_ACTIVE")

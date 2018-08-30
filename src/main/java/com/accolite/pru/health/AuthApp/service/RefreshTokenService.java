@@ -5,6 +5,7 @@ import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.repository.RefreshTokenRepository;
 import com.accolite.pru.health.AuthApp.util.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 @Service
 public class RefreshTokenService {
 
+	@Autowired
 	private RefreshTokenRepository refreshTokenRepository;
 
 	@Value("${app.token.refresh.duration}")

@@ -197,8 +197,7 @@ public class AuthService {
 		userDevice.setUser(currentUser);
 		userDevice.setRefreshToken(refreshToken);
 		refreshToken.setUserDevice(userDevice);
-		userDeviceService.save(userDevice);
-		refreshTokenService.save(refreshToken);
+		refreshToken = refreshTokenService.save(refreshToken);
 		return Optional.ofNullable(refreshToken);
 	}
 
