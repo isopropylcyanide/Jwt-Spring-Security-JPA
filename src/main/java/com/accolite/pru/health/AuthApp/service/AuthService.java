@@ -231,8 +231,9 @@ public class AuthService {
 	public void logoutUser(CustomUserDetails customUserDetails, LogOutRequest logOutRequest) {
 		String deviceId = logOutRequest.getDeviceInfo().getDeviceId();
 		Optional<UserDevice> userDeviceOpt = userDeviceService.findByDeviceId(deviceId);
-		logger.info("Removing refresh token associated with device: " + userDeviceOpt.get());
+		logger.info("Removing refresh token associated with device [" + userDeviceOpt + "]");
 		Optional<Long> refreshTokenIdOpt = userDeviceOpt.map(UserDevice::getRefreshToken).map(RefreshToken::getId);
 		refreshTokenIdOpt.ifPresent(refreshTokenService::deleteById);
+
 	}
 }
