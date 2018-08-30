@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -55,9 +54,6 @@ public class User extends DateAudit {
 
 	@Column(name = "IS_ACTIVE", nullable = false)
 	private Boolean active;
-
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
-	private PasswordResetToken passwordResetToken;
 
 	@ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
 	@JoinTable(name = "USER_AUTHORITY", joinColumns = {
@@ -104,14 +100,6 @@ public class User extends DateAudit {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public PasswordResetToken getPasswordResetToken() {
-		return passwordResetToken;
-	}
-
-	public void setPasswordResetToken(PasswordResetToken passwordResetToken) {
-		this.passwordResetToken = passwordResetToken;
 	}
 
 	public String getUsername() {
