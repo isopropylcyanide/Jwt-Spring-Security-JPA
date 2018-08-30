@@ -49,6 +49,10 @@ public class RefreshToken extends DateAudit {
 		this.expiryDate = expiryDate;
 	}
 
+	public void incrementRefreshCount() {
+		refreshCount = refreshCount + 1;
+	}
+
 	public Long getId() {
 		return id;
 	}

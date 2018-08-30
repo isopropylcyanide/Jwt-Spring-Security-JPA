@@ -91,4 +91,13 @@ public class RefreshTokenService {
 	public void deleteByUserDevice(UserDevice userDevice) {
 		refreshTokenRepository.deleteByUserDevice(userDevice);
 	}
+
+	/**
+	 * Increase the count of the token usage in the database. Useful for
+	 * audit purposes
+	 */
+	public void increaseCount(RefreshToken refreshToken) {
+		refreshToken.incrementRefreshCount();
+		save(refreshToken);
+	}
 }

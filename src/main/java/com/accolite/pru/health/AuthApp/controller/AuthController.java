@@ -186,7 +186,7 @@ public class AuthController {
 	 * Log the user out from the app/device. Release the refresh token associated with the
 	 * user device.
 	 */
-	@GetMapping("/logout")
+	@PostMapping("/logout")
 	public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails customUserDetails,
 			@Valid @RequestBody LogOutRequest logOutRequest) {
 		authService.logoutUser(customUserDetails, logOutRequest);

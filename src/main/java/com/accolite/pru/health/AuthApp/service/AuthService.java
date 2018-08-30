@@ -215,13 +215,10 @@ public class AuthService {
 		refreshTokenOpt.orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Missing refresh token in " +
 				"database. Please login again"));
 
-		//token should not be expired else error.
 		refreshTokenOpt.ifPresent(refreshTokenService::verifyExpiration);
-
-		//user device shouldn't be blocked for refresh
 		refreshTokenOpt.ifPresent(userDeviceService::verifyRefreshAvailability);
-
-		//if all good, generate a new jwt from the underlying user, update the count of usage
+		//increase the refresh count of the token
+		refreshTokenOpt.ifPresent(refreshTokenService::increaseCount);
 		return refreshTokenOpt.map(RefreshToken::getUserDevice)
 				.map(UserDevice::getUser)
 				.map(User::getId).map(this::generateTokenFromUserId);
