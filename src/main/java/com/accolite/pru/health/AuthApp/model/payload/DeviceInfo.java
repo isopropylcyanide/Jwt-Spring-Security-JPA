@@ -3,11 +3,12 @@ package com.accolite.pru.health.AuthApp.model.payload;
 import com.accolite.pru.health.AuthApp.model.DeviceType;
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class DeviceInfo {
 
-	@NotNull(message = "Device id cannot be null")
+	@NotBlank(message = "Device id cannot be null")
 	private String deviceId;
 
 	@NotNull(message = "Device type cannot be null")
