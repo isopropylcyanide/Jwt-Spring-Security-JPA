@@ -35,7 +35,7 @@ public class UserDevice extends DateAudit {
 	@Column(name = "NOTIFICATION_TOKEN")
 	private String notificationToken;
 
-	@Column(name = "DEVICE_ID")
+	@Column(name = "DEVICE_ID", unique = true, nullable = false)
 	private String deviceId;
 
 	@OneToOne(optional = false, mappedBy = "userDevice")
