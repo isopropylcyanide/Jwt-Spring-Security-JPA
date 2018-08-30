@@ -68,4 +68,8 @@ public class UserService {
 		return userRepository.existsByUsername(username);
 	}
 
+	public void resetPassword(String mailId, String encodedPassword) {
+		userRepository.resetPassword(mailId, encodedPassword);
+	}
+
 }
