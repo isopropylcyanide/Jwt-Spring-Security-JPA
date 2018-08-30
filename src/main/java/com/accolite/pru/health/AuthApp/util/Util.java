@@ -18,7 +18,7 @@ public class Util {
 		return false == value;
 	}
 
-	public String generateResetLinkToken() {
+	public static String generateResetLinkToken() {
 		return UUID.randomUUID().toString();
 	}
 }
