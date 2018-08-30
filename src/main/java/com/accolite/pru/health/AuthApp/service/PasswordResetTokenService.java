@@ -27,29 +27,24 @@ public class PasswordResetTokenService {
 	@Autowired
 	UserService userService;
 
-	public void addToken(PasswordResetToken passwordResetToken) {
+	public void saveToken(PasswordResetToken passwordResetToken) {
 		passwordResetTokenRepository.save(passwordResetToken);
 	}
 
 	/**
-	 * Gets the password reset token.
-	 *
-	 * 1) Set the metadata for token and return it
-	 * 
-	 * @param mailId
-	 *            the mail id
-	 * @return the password reset token
+	 * Set the metadata for password reset token and return it to password reset
+	 * service
 	 */
 	public PasswordResetToken getPasswordResetToken(String mailId) {
 		PasswordResetToken passwordResetToken = new PasswordResetToken();
-		Util util = new Util();
-		String token = util.generateResetLinkToken();
+		String token = Util.generateResetLinkToken();
 		passwordResetToken.setToken(token);
 		Optional<User> userOpt = userService.findByEmail(mailId);
 		User user = userOpt.get();
 		passwordResetToken.setUser(user);
+		logger.info(user);
 		passwordResetToken.setExpiryTime(Instant.now().plusMillis(expiration));
-		addToken(passwordResetToken);
+		saveToken(passwordResetToken);
 		return passwordResetToken;
 	}
 
@@ -58,8 +53,7 @@ public class PasswordResetTokenService {
 	}
 
 	public User findUserByToken(String token) {
-		Long id = passwordResetTokenRepository.findUserIdByToken(token);
-		Optional<User> userOpt = userService.findById(id);
+		Optional<User> userOpt = userService.findByToken(token);
 		User user = userOpt.get();
 		return user;
 	}

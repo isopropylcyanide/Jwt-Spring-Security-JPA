@@ -68,8 +68,18 @@ public class UserService {
 		return userRepository.existsByUsername(username);
 	}
 
+	/**
+	 * Update the password for given mail id
+	 */
 	public void resetPassword(String mailId, String encodedPassword) {
 		userRepository.resetPassword(mailId, encodedPassword);
+	}
+
+	/**
+	 * Find the user by token
+	 */
+	public Optional<User> findByToken(String token) {
+		return Optional.ofNullable(userRepository.findByToken(token));
 	}
 
 }

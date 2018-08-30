@@ -24,4 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	@Modifying
 	@Query(value = "update USER set PASSWORD = :password where EMAIL= :email", nativeQuery = true)
 	public void resetPassword(@Param("email") String email, @Param("password") String password);
+
+	@Query(value = "SELECT * from user where user.user_id=(select user_id from password_reset_token t where t.token_name=:token)", nativeQuery = true)
+	User findByToken(@Param("token") String token);
 }
