@@ -51,20 +51,7 @@ public class MailService {
 	}
 
 	/**
-	 * Send reset link.
-	 *
-	 * 1) Send the reset link to the respective user's mail
-	 * 
-	 * @param emailVerificationUrl
-	 *            the email verification url
-	 * @param to
-	 *            the to
-	 * @throws IOException
-	 *             Signals that an I/O exception has occurred.
-	 * @throws TemplateException
-	 *             the template exception
-	 * @throws MessagingException
-	 *             the messaging exception
+	 * Setting the mail parameters.Send the reset link to the respective user's mail
 	 */
 	public void sendResetLink(String resetPasswordLinkUrl, String to)
 			throws IOException, TemplateException, MessagingException {
