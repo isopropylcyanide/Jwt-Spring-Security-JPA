@@ -88,8 +88,8 @@ public class RefreshTokenService {
 	/**
 	 * Delete the refresh token associated with the user device
 	 */
-	public void deleteByUserDevice(UserDevice userDevice) {
-		refreshTokenRepository.deleteByUserDevice(userDevice);
+	public void deleteById(Long id) {
+		refreshTokenRepository.deleteById(id);
 	}
 
 	/**

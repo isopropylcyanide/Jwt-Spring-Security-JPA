@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 public class DeviceInfo {
 
-	@NotBlank(message = "Device id cannot be null")
+	@NotBlank(message = "Device id cannot be blank")
 	private String deviceId;
 
 	@NotNull(message = "Device type cannot be null")
