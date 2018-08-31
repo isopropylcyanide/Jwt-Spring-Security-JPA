@@ -5,7 +5,6 @@ import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
-import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
@@ -97,7 +96,7 @@ public class AuthService {
 
 	/**
 	 * Confirms the user verification based on the token expiry and mark the user as active.
-	 * If user is already registered, save the unnecessary database calls.
+	 * If user is already verified, save the unnecessary database calls.
 	 */
 	public Optional<User> confirmEmailRegistration(String emailToken) {
 		Optional<EmailVerificationToken> emailVerificationTokenOpt =
@@ -105,25 +104,21 @@ public class AuthService {
 		emailVerificationTokenOpt.orElseThrow(() ->
 				new ResourceNotFoundException("Token", "Email verification", emailToken));
 
-		Optional<User> registeredUser = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
-		Boolean userAlreadyVerified =
-				emailVerificationTokenOpt.map(EmailVerificationToken::getUser)
-						.map(User::getEmailVerified).filter(Util::isTrue).orElse(false);
+		Optional<User> registeredUserOpt = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
 
-		if (userAlreadyVerified) {
+		Boolean isUserAlreadyVerified = emailVerificationTokenOpt.map(EmailVerificationToken::getUser)
+				.map(User::getEmailVerified).filter(Util::isTrue).orElse(false);
+
+		if (isUserAlreadyVerified) {
 			logger.info("User [" + emailToken + "] already registered.");
-			return registeredUser;
+			return registeredUserOpt;
 		}
 		emailVerificationTokenOpt.ifPresent(emailVerificationTokenService::verifyExpiration);
-
-		emailVerificationTokenOpt.ifPresent(token -> {
-			token.setTokenStatus(TokenStatus.STATUS_CONFIRMED);
-			emailVerificationTokenService.save(token);
-			User user = registeredUser.get();
-			user.setEmailVerified(true);
-			userService.save(user);
-		});
-		return registeredUser;
+		emailVerificationTokenOpt.ifPresent(EmailVerificationToken::confirmStatus);
+		emailVerificationTokenOpt.ifPresent(emailVerificationTokenService::save);
+		registeredUserOpt.ifPresent(User::confirmVerification);
+		registeredUserOpt.ifPresent(userService::save);
+		return registeredUserOpt;
 	}
 
 	/**

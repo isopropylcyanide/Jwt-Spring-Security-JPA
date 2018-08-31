@@ -34,7 +34,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.Optional;
 
 @RestController
@@ -101,22 +100,17 @@ public class AuthController {
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest,
 			WebRequest request) {
 		Optional<User> registeredUserOpt = authService.registerUser(registrationRequest);
-		registeredUserOpt.orElseThrow(() -> new UserRegistrationException("Couldn't register user [" + registrationRequest +
-				"]"));
-		User registeredUser = registeredUserOpt.get();
+		registeredUserOpt.orElseThrow(() -> new UserRegistrationException(registrationRequest.getEmail(),
+				"Missing user object in database"));
 		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth" +
 				"/registrationConfirmation");
 
 		OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent =
-				new OnUserRegistrationCompleteEvent(registeredUser, urlBuilder);
+				new OnUserRegistrationCompleteEvent(registeredUserOpt.get(), urlBuilder);
 		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
-		logger.info("Registered User returned [API[: " + registeredUser);
-		URI location = ServletUriComponentsBuilder
-				.fromCurrentContextPath().path("/api/user/me")
-				.buildAndExpand(registeredUser.getEmail()).toUri();
-
-		return ResponseEntity.created(location).body(new ApiResponse("User registered successfully. Check your email" +
+		registeredUserOpt.ifPresent(user -> logger.info("Registered User returned [API[: " + user));
+		return ResponseEntity.ok(new ApiResponse("User registered successfully. Check your email" +
 				" for verification", true));
 	}
 
@@ -130,12 +124,7 @@ public class AuthController {
 		Optional<User> verifiedUserOpt = authService.confirmEmailRegistration(token);
 		verifiedUserOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", token,
 				"Failed to confirm. Please generate a new email verification request"));
-
-		User verifiedUser = verifiedUserOpt.get();
-		URI location = ServletUriComponentsBuilder
-				.fromCurrentContextPath().path("/api/user/me")
-				.buildAndExpand(verifiedUser.getEmail()).toUri();
-		return ResponseEntity.created(location).body(new ApiResponse("User verified successfully", true));
+		return ResponseEntity.ok(new ApiResponse("User verified successfully", true));
 	}
 
 	/**
