@@ -115,8 +115,7 @@ public class AuthController {
 		passwordResetTokenOpt.orElseThrow(
 				() -> new PasswordResetLinkException("Couldn't generate link [" + passwordResetLinkRequest + "]"));
 		PasswordResetToken passwordResetToken = passwordResetTokenOpt.get();
-		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/auth" + "/password/reset");
+		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/password/reset");
 		OnGenerateResetLinkEvent generateResetLinkMailEvent = new OnGenerateResetLinkEvent(passwordResetToken,
 				urlBuilder);
 		applicationEventPublisher.publishEvent(generateResetLinkMailEvent);
@@ -133,7 +132,8 @@ public class AuthController {
 	public ResponseEntity<?> resetPassword(@RequestParam(value = "token") String token,
 			@Valid @RequestBody PasswordResetRequest passwordResetRequest) {
 		Optional<User> userOpt = passwordResetService.resetPassword(passwordResetRequest.getPassword(), token);
-		userOpt.orElseThrow(() -> new PasswordResetException("Couldn't reset password [" + passwordResetRequest + "]"));
+		userOpt.orElseThrow(
+				() -> new PasswordResetException(userOpt.get().getEmail(), "Error in creating new password"));
 		User user = userOpt.get();
 		OnUserAccountChangeEvent onPasswordChangeEvent = new OnUserAccountChangeEvent(user, "Reset Password",
 				"Changed Successfully");
