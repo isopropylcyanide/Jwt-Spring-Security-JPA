@@ -1,19 +1,21 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.exception.AppException;
-import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
-import com.accolite.pru.health.AuthApp.model.Role;
-import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.TokenStatus;
 import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.model.UserDevice;
+import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
+import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +25,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class AuthService {
@@ -37,7 +36,11 @@ public class AuthService {
 	@Autowired
 	private RoleService roleService;
 
-	private static final Logger logger = Logger.getLogger(AuthService.class);
+	@Autowired
+	private JwtTokenProvider tokenProvider;
+
+	@Autowired
+	private RefreshTokenService refreshTokenService;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -48,43 +51,25 @@ public class AuthService {
 	@Autowired
 	private EmailVerificationTokenService emailVerificationTokenService;
 
+	@Autowired
+	private UserDeviceService userDeviceService;
+
+	private static final Logger logger = Logger.getLogger(AuthService.class);
+
 	/**
 	 * Registers a new user in the database by performing a series of quick checks.
 	 * @return A user object if successfully created
 	 */
 	public Optional<User> registerUser(RegistrationRequest newRegistrationRequest) {
 		String newRegistrationRequestEmail = newRegistrationRequest.getEmail();
-		Boolean emailAlreadyExists = emailAlreadyExists(newRegistrationRequestEmail);
-		if (emailAlreadyExists) {
+		if (emailAlreadyExists(newRegistrationRequestEmail)) {
 			logger.error("Email already exists: " + newRegistrationRequestEmail);
 			throw new ResourceAlreadyInUseException("Email", "Address", newRegistrationRequestEmail);
 		}
 		logger.info("Trying to register new user [" + newRegistrationRequestEmail + "]");
-		User newUser = new User();
-		Boolean isNewUserAsAdmin = newRegistrationRequest.getRegisterAsAdmin();
-		newUser.setEmail(newRegistrationRequestEmail);
-		newUser.setPassword(passwordEncoder.encode(newRegistrationRequest.getPassword()));
-		newUser.setUsername(newRegistrationRequestEmail);
-		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
-		newUser.setActive(true);
-		newUser.setEmailVerified(false);
+		User newUser = userService.createUser(newRegistrationRequest);
 		User registeredNewUser = userService.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
-	}
-
-	/**
-	 * Performs a quick check to see what roles the new user could benefit from
-	 * @return list of roles for the new user
-	 */
-	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
-		Set<Role> newUserRoles = new HashSet<>();
-		newUserRoles.add(roleService.findByRole(RoleName.ROLE_USER).orElseThrow(() -> new AppException("ROLE_USER " +
-				" is not set in database.")));
-		if (isAdmin) {
-			newUserRoles.add(roleService.findByRole(RoleName.ROLE_ADMIN).orElseThrow(() -> new AppException(
-					"ROLE_ADMIN" + "not set in database.")));
-		}
-		return newUserRoles;
 	}
 
 	/**
@@ -103,7 +88,6 @@ public class AuthService {
 		return userService.existsByUsername(username);
 	}
 
-
 	/**
 	 * Authenticate user and log them in given a loginRequest
 	 */
@@ -116,28 +100,22 @@ public class AuthService {
 	 * Confirms the user verification based on the token expiry and mark the user as active.
 	 * If user is already registered, save the unnecessary database calls.
 	 */
-	public Optional<User> confirmRegistration(String emailToken) {
+	public Optional<User> confirmEmailRegistration(String emailToken) {
 		Optional<EmailVerificationToken> emailVerificationTokenOpt =
 				emailVerificationTokenService.findByToken(emailToken);
 		emailVerificationTokenOpt.orElseThrow(() ->
 				new ResourceNotFoundException("Token", "Email verification", emailToken));
 
 		Optional<User> registeredUser = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
-		//if user is already verified
 		Boolean userAlreadyVerified =
 				emailVerificationTokenOpt.map(EmailVerificationToken::getUser)
 						.map(User::getEmailVerified).filter(Util::isTrue).orElse(false);
 
 		if (userAlreadyVerified) {
-			logger.info("User [" + registeredUser + "] already registered.");
+			logger.info("User [" + emailToken + "] already registered.");
 			return registeredUser;
 		}
-		Optional<Instant> validEmailTokenOpt =
-				emailVerificationTokenOpt.map(EmailVerificationToken::getExpiryDate)
-						.filter(dt -> dt.compareTo(Instant.now()) >= 0);
-
-		validEmailTokenOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", emailToken,
-				"Expired token. Please issue a new request"));
+		emailVerificationTokenOpt.ifPresent(emailVerificationTokenService::verifyExpiration);
 
 		emailVerificationTokenOpt.ifPresent(token -> {
 			token.setTokenStatus(TokenStatus.STATUS_CONFIRMED);
@@ -190,5 +168,72 @@ public class AuthService {
 		currentUser.setPassword(newPassword);
 		userService.save(currentUser);
 		return Optional.ofNullable(currentUser);
+	}
+
+	/**
+	 * Generates a JWT token for the validated client
+	 */
+	public String generateToken(CustomUserDetails customUserDetails) {
+		return tokenProvider.generateToken(customUserDetails);
+	}
+
+	/**
+	 * Generates a JWT token for the validated client by userId
+	 */
+	public String generateTokenFromUserId(Long userId) {
+		return tokenProvider.generateTokenFromUserId(userId);
+	}
+
+	/**
+	 * Creates and persists the refresh token for the user device. If device exists
+	 * already, we don't care. Unused devices with expired tokens should be cleaned
+	 * with a cron job. The generated token would be encapsulated within the jwt.
+	 */
+	public Optional<RefreshToken> createAndPersistRefreshTokenForDevice(Authentication authentication,
+			LoginRequest loginRequest) {
+		User currentUser = (User) authentication.getPrincipal();
+		RefreshToken refreshToken = refreshTokenService.createRefreshToken();
+		UserDevice userDevice = userDeviceService.createUserDevice(loginRequest.getDeviceInfo());
+		userDevice.setUser(currentUser);
+		userDevice.setRefreshToken(refreshToken);
+		refreshToken.setUserDevice(userDevice);
+		refreshToken = refreshTokenService.save(refreshToken);
+		return Optional.ofNullable(refreshToken);
+	}
+
+	/**
+	 * Refresh the expired jwt token using a refresh token and device info. The
+	 * * refresh token is mapped to a specific device and if it is unexpired, can help
+	 * * generate a new jwt. If the refresh token is inactive for a device or it is expired,
+	 * * throw appropriate errors.
+	 */
+	public Optional<String> refreshJwtToken(TokenRefreshRequest tokenRefreshRequest) {
+		//tokenFromDb's device info should match this one
+		String requestRefreshToken = tokenRefreshRequest.getRefreshToken();
+		Optional<RefreshToken> refreshTokenOpt =
+				refreshTokenService.findByToken(requestRefreshToken);
+		refreshTokenOpt.orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Missing refresh token in " +
+				"database. Please login again"));
+
+		refreshTokenOpt.ifPresent(refreshTokenService::verifyExpiration);
+		refreshTokenOpt.ifPresent(userDeviceService::verifyRefreshAvailability);
+		//increase the refresh count of the token
+		refreshTokenOpt.ifPresent(refreshTokenService::increaseCount);
+		return refreshTokenOpt.map(RefreshToken::getUserDevice)
+				.map(UserDevice::getUser)
+				.map(User::getId).map(this::generateTokenFromUserId);
+	}
+
+	/**
+	 * Log the given user out and delete the refresh token associated with it. If no device
+	 * is associated with it, fail silently
+	 */
+	public void logoutUser(CustomUserDetails customUserDetails, LogOutRequest logOutRequest) {
+		String deviceId = logOutRequest.getDeviceInfo().getDeviceId();
+		Optional<UserDevice> userDeviceOpt = userDeviceService.findByDeviceId(deviceId);
+		logger.info("Removing refresh token associated with device [" + userDeviceOpt + "]");
+		Optional<Long> refreshTokenIdOpt = userDeviceOpt.map(UserDevice::getRefreshToken).map(RefreshToken::getId);
+		refreshTokenIdOpt.ifPresent(refreshTokenService::deleteById);
+
 	}
 }

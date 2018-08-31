@@ -1,16 +1,22 @@
 package com.accolite.pru.health.AuthApp.controller;
 
+import com.accolite.pru.health.AuthApp.annotation.CurrentUser;
 import com.accolite.pru.health.AuthApp.event.OnRegenerateEmailVerificationEvent;
 import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UserLoginException;
 import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
+import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
+import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import org.apache.log4j.Logger;
@@ -40,27 +46,53 @@ public class AuthController {
 	@Autowired
 	private AuthService authService;
 
-	private static final Logger logger = Logger.getLogger(AuthController.class);
-
 	@Autowired
 	private JwtTokenProvider tokenProvider;
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 
+	private static final Logger logger = Logger.getLogger(AuthController.class);
+
 	/**
-	 * Entry point for the user log in
+	 * Checks is a given email is in use or not.
+	 */
+	@GetMapping("/checkEmailInUse")
+	public ResponseEntity<?> checkEmailInUse(@RequestParam("email") String email) {
+		Boolean emailExists = authService.emailAlreadyExists(email);
+		return ResponseEntity.ok(new ApiResponse(emailExists.toString(), true));
+	}
+
+	/**
+	 * Checks is a given username is in use or not.
+	 */
+	@GetMapping("/checkUsernameInUse")
+	public ResponseEntity<?> checkUsernameInUse(@RequestParam("username") String username) {
+		Boolean usernameExists = authService.usernameAlreadyExists(username);
+		return ResponseEntity.ok(new ApiResponse(usernameExists.toString(), true));
+	}
+
+
+	/**
+	 * Entry point for the user log in. Return the jwt auth token and the refresh token
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		Optional<Authentication> authenticationOpt = authService.authenticateUser(loginRequest);
 		authenticationOpt.orElseThrow(() -> new UserLoginException("Couldn't login user [" + loginRequest + "]"));
 		Authentication authentication = authenticationOpt.get();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-		logger.info("Logged in User returned [API]: " + authentication.getName());
+		logger.info("Logged in User returned [API]: " + customUserDetails.getUsername());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwtToken = tokenProvider.generateToken(authentication);
-		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken));
+		Optional<RefreshToken> refreshTokenOpt = authService.createAndPersistRefreshTokenForDevice(authentication,
+				loginRequest);
+
+		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
+		String refreshToken = refreshTokenOpt.map(RefreshToken::getToken).get();
+		String jwtToken = authService.generateToken(customUserDetails);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken,
+				tokenProvider.getExpiryDuration()));
 	}
 
 	/**
@@ -81,7 +113,6 @@ public class AuthController {
 				new OnUserRegistrationCompleteEvent(registeredUser, urlBuilder);
 		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
-		logger.info("Executing main service in thread: " + Thread.currentThread());
 		logger.info("Registered User returned [API[: " + registeredUser);
 		URI location = ServletUriComponentsBuilder
 				.fromCurrentContextPath().path("/api/user/me")
@@ -98,7 +129,7 @@ public class AuthController {
 	 */
 	@GetMapping("/registrationConfirmation")
 	public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
-		Optional<User> verifiedUserOpt = authService.confirmRegistration(token);
+		Optional<User> verifiedUserOpt = authService.confirmEmailRegistration(token);
 		verifiedUserOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", token,
 				"Failed to confirm. Please generate a new email verification request"));
 
@@ -135,4 +166,30 @@ public class AuthController {
 	}
 
 
+	/**
+	 * Refresh the expired jwt token using a refresh token for the specific device
+	 * and return a new token to the caller
+	 */
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refreshJwtToken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest) {
+		Optional<String> updatedJwtToken = authService.refreshJwtToken(tokenRefreshRequest);
+		updatedJwtToken.orElseThrow(() -> new TokenRefreshException(tokenRefreshRequest.getRefreshToken(),
+				"Unexpected error during token refresh. Please logout and login again."));
+		String refreshToken = tokenRefreshRequest.getRefreshToken();
+		logger.info("Created new Jwt Auth token: " + updatedJwtToken);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(updatedJwtToken.get(), refreshToken,
+				tokenProvider.getExpiryDuration()));
+	}
+
+
+	/**
+	 * Log the user out from the app/device. Release the refresh token associated with the
+	 * user device.
+	 */
+	@PostMapping("/logout")
+	public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails customUserDetails,
+			@Valid @RequestBody LogOutRequest logOutRequest) {
+		authService.logoutUser(customUserDetails, logOutRequest);
+		return ResponseEntity.ok(new ApiResponse("Log out successful", true));
+	}
 }

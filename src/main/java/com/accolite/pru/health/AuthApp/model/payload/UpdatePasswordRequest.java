@@ -10,7 +10,7 @@ public class UpdatePasswordRequest {
 	@NotBlank(message = "New password must not be blank")
 	private String newPassword;
 
-	public UpdatePasswordRequest(@NotBlank String oldPassword, @NotBlank String newPassword) {
+	public UpdatePasswordRequest(String oldPassword, String newPassword) {
 		this.oldPassword = oldPassword;
 		this.newPassword = newPassword;
 	}
