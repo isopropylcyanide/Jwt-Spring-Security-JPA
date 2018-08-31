@@ -132,8 +132,7 @@ public class AuthController {
 	public ResponseEntity<?> resetPassword(@RequestParam(value = "token") String token,
 			@Valid @RequestBody PasswordResetRequest passwordResetRequest) {
 		Optional<User> userOpt = passwordResetService.resetPassword(passwordResetRequest.getPassword(), token);
-		userOpt.orElseThrow(
-				() -> new PasswordResetException(userOpt.get().getEmail(), "Error in creating new password"));
+		userOpt.orElseThrow(() -> new PasswordResetException(token, "Error in creating new password"));
 		User user = userOpt.get();
 		OnUserAccountChangeEvent onPasswordChangeEvent = new OnUserAccountChangeEvent(user, "Reset Password",
 				"Changed Successfully");
