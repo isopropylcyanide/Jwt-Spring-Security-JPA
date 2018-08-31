@@ -38,11 +38,7 @@ public class AuthControllerAdvice {
 	@Autowired
 	private MessageSource messageSource;
 
-	/**
-	 * Process validation error that throw MethodArgumentNotValidException
-	 * @param ex the exception
-	 * @return the response dto
-	 */
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody

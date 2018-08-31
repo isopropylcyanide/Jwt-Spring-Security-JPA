@@ -211,7 +211,6 @@ public class AuthService {
 
 		refreshTokenOpt.ifPresent(refreshTokenService::verifyExpiration);
 		refreshTokenOpt.ifPresent(userDeviceService::verifyRefreshAvailability);
-		//increase the refresh count of the token
 		refreshTokenOpt.ifPresent(refreshTokenService::increaseCount);
 		return refreshTokenOpt.map(RefreshToken::getUserDevice)
 				.map(UserDevice::getUser)
