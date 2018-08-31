@@ -2,6 +2,7 @@ package com.accolite.pru.health.AuthApp.service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -32,6 +33,9 @@ public class MailService {
 	@Value("${spring.mail.username}")
 	private String mailFrom;
 
+	@Value("${app.token.password.reset.duration}")
+	long expiration;
+
 	private static final Logger logger = Logger.getLogger(MailService.class);
 
 	public void sendEmailVerification(String emailVerificationUrl, String to)
@@ -53,14 +57,17 @@ public class MailService {
 	/**
 	 * Setting the mail parameters.Send the reset link to the respective user's mail
 	 */
-	public void sendResetLink(String resetPasswordLinkUrl, String to)
+	public void sendResetLink(String resetPasswordLink, String to)
 			throws IOException, TemplateException, MessagingException {
+		Long expirationInMinutes = TimeUnit.MILLISECONDS.toMinutes(expiration);
+		String expirationInMinutesString = expirationInMinutes.toString();
 		Mail mail = new Mail();
 		mail.setSubject("Email Verification [Team CEP]");
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
 		mail.getModel().put("userName", to);
-		mail.getModel().put("userResetPasswordLinkUrl", resetPasswordLinkUrl);
+		mail.getModel().put("userResetPasswordLink", resetPasswordLink);
+		mail.getModel().put("expirationTime", expirationInMinutesString);
 
 		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
 		Template template = templateConfiguration.getTemplate("reset-link.ftl");

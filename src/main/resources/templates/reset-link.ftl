@@ -136,7 +136,7 @@
                                                 Hello ${userName},</h1>
                                             <p class=""
                                                style="margin: 20px 0; font-size: 16px; mso-line-height-rule: exactly; line-height: 24px;">
-                                            <span style="font-weight: 400;">Please click the below button to change your password for <strong>Customer Engagement App</strong>.The link will be valid for next 1 hour.</span><br/><br/><span
+                                            <span style="font-weight: 400;">Please click the below button to change your password for <strong>Customer Engagement App</strong>.The link will be valid for next ${expirationTime} minutes.</span><br/><br/><span
                                                 style="font-weight: 400;">
                                             <table style="border: 0; width: 100%;" cellspacing="0" cellpadding="0">
                                                 <tbody>
@@ -154,7 +154,7 @@
                                                                     <![endif]--> <!-- [if !mso]><!--> <a
                                                                             class="button__a"
                                                                             style="border-radius: 4px; color: #ffffff; display: block; font-family: sans-serif; font-size: 18px; font-weight: bold; mso-height-rule: exactly; line-height: 1.1; padding: 14px 18px; text-decoration: none; text-transform: none; border: 0;"
-                                                                            href="${userResetPasswordLinkUrl}"
+                                                                            href="${userResetPasswordLink}"
                                                                             target="_blank"
                                                                             rel="noopener">Reset 
                                                                         Link</a> <!--![endif]--></td>
