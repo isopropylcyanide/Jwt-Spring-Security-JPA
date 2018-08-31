@@ -33,10 +33,18 @@ public class PasswordResetService {
 	public Optional<PasswordResetToken> generatePasswordResetToken(String mailId) {
 		Boolean emailExists = userService.existsByEmail(mailId);
 		if (!(emailExists)) {
-			throw new ResourceNotFoundException("Address", "email id", mailId);
+			throw new ResourceNotFoundException("Email", "Address", mailId);
 		}
 		PasswordResetToken passwordResetToken = passwordResetTokenService.getPasswordResetToken(mailId);
 		return Optional.ofNullable(passwordResetToken);
+	}
+
+	/**
+	 * Checking if the token is valid
+	 */
+	public Boolean checkTokenValid(Instant expiryTime) {
+		Instant currentTime = Instant.now();
+		return currentTime.isBefore(expiryTime) ? true : false;
 	}
 
 	/**
@@ -47,18 +55,19 @@ public class PasswordResetService {
 		String encodedPassword;
 		String mailId;
 		User user;
-		Boolean tokenExists = passwordResetTokenService.existsByToken(token);
-		if (!(tokenExists)) {
+		Optional<PasswordResetToken> passwordResetTokenOpt;
+		passwordResetTokenOpt = passwordResetTokenService.findByToken(token);
+		PasswordResetToken passwordResetToken;
+		if (!passwordResetTokenOpt.isPresent()) {
 			throw new ResourceNotFoundException("Token", "Token Id", token);
 		}
-		Instant currentTime = Instant.now();
-		Instant expiryTime = passwordResetTokenService.findExpiryTimeByToken(token);
-		if (currentTime.isBefore(expiryTime)) {
+		passwordResetToken = passwordResetTokenOpt.get();
+		Instant expiryTime = passwordResetToken.getExpiryTime();
+		Boolean isTokenValid = checkTokenValid(expiryTime);
+		if (isTokenValid) {
 			user = passwordResetTokenService.findUserByToken(token);
 			mailId = user.getEmail();
 			encodedPassword = passwordEncoder.encode(newPassword);
-			logger.info("password:-------------------" + newPassword + " " + encodedPassword + "CurrentTime"
-					+ currentTime + "ExpiryTS:" + expiryTime);
 			userService.resetPassword(mailId, encodedPassword);
 		} else {
 			throw new InvalidTokenRequestException("Reset Link Token", token,

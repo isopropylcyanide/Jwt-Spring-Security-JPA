@@ -62,4 +62,8 @@ public class PasswordResetTokenService {
 		return passwordResetTokenRepository.existsByToken(token);
 	}
 
+	public Optional<PasswordResetToken> findByToken(String token) {
+		return Optional.ofNullable(passwordResetTokenRepository.findByToken(token));
+	}
+
 }
