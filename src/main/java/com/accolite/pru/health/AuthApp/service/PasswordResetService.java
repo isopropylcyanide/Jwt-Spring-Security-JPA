@@ -42,9 +42,12 @@ public class PasswordResetService {
 	/**
 	 * Checking if the token is valid
 	 */
-	public Boolean checkTokenValid(Instant expiryTime) {
+	public void verifyTokenExpiration(Instant expiryTime, String token) {
 		Instant currentTime = Instant.now();
-		return currentTime.isBefore(expiryTime) ? true : false;
+		if (currentTime.isAfter(expiryTime)) {
+			throw new InvalidTokenRequestException("Reset Link Token", token,
+					"Expired Link. Please issue a new request");
+		}
 	}
 
 	/**
@@ -54,24 +57,23 @@ public class PasswordResetService {
 	public Optional<User> resetPassword(String newPassword, String token) {
 		String encodedPassword;
 		String mailId;
-		User user;
+		Optional<User> userOpt;
+		User user = null;
 		Optional<PasswordResetToken> passwordResetTokenOpt;
 		passwordResetTokenOpt = passwordResetTokenService.findByToken(token);
+		passwordResetTokenOpt.orElseThrow(() -> new ResourceNotFoundException("Token", "Token Id", token));
 		PasswordResetToken passwordResetToken;
-		if (!passwordResetTokenOpt.isPresent()) {
-			throw new ResourceNotFoundException("Token", "Token Id", token);
-		}
-		passwordResetToken = passwordResetTokenOpt.get();
-		Instant expiryTime = passwordResetToken.getExpiryTime();
-		Boolean isTokenValid = checkTokenValid(expiryTime);
-		if (isTokenValid) {
-			user = passwordResetTokenService.findUserByToken(token);
-			mailId = user.getEmail();
-			encodedPassword = passwordEncoder.encode(newPassword);
-			userService.resetPassword(mailId, encodedPassword);
-		} else {
-			throw new InvalidTokenRequestException("Reset Link Token", token,
-					"Expired Link. Please issue a new request");
+		if (passwordResetTokenOpt.isPresent()) {
+			passwordResetToken = passwordResetTokenOpt.get();
+			Instant expiryTime = passwordResetToken.getExpiryTime();
+			verifyTokenExpiration(expiryTime, token);
+			userOpt = passwordResetTokenService.findUserByToken(token);
+			if (userOpt.isPresent()) {
+				user = userOpt.get();
+				mailId = user.getEmail();
+				encodedPassword = passwordEncoder.encode(newPassword);
+				userService.resetPassword(mailId, encodedPassword);
+			}
 		}
 		return Optional.ofNullable(user);
 	}

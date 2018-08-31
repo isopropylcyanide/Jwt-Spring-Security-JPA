@@ -52,10 +52,10 @@ public class PasswordResetTokenService {
 		return passwordResetTokenRepository.findExpiryTimeByToken(token);
 	}
 
-	public User findUserByToken(String token) {
+	public Optional<User> findUserByToken(String token) {
 		Optional<User> userOpt = userService.findByToken(token);
 		User user = userOpt.get();
-		return user;
+		return userOpt;
 	}
 
 	public Boolean existsByToken(String token) {
@@ -63,7 +63,7 @@ public class PasswordResetTokenService {
 	}
 
 	public Optional<PasswordResetToken> findByToken(String token) {
-		return Optional.ofNullable(passwordResetTokenRepository.findByToken(token));
+		return passwordResetTokenRepository.findByToken(token);
 	}
 
 }
