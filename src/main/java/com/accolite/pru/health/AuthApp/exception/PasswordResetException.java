@@ -5,11 +5,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
 public class PasswordResetException extends RuntimeException {
-	public PasswordResetException(String message) {
-		super(message);
-	}
 
-	public PasswordResetException(String message, Throwable cause) {
-		super(message, cause);
+	private String user;
+	private String message;
+
+	public PasswordResetException(String user, String message) {
+		super(String.format("Couldn't update password for [%s]: [%s])", user, message));
+		this.user = user;
+		this.message = message;
 	}
 }
