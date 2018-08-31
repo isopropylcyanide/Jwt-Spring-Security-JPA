@@ -1,6 +1,7 @@
 package com.accolite.pru.health.AuthApp.repository;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,5 +22,5 @@ public interface PasswordResetTokenRepository extends JpaRepository<PasswordRese
 	Long findUserIdByToken(@Param("token") String token);
 
 	@Query(value = "select * from password_reset_token t where t.token_name = :token", nativeQuery = true)
-	PasswordResetToken findByToken(@Param("token") String token);
+	Optional<PasswordResetToken> findByToken(@Param("token") String token);
 }
