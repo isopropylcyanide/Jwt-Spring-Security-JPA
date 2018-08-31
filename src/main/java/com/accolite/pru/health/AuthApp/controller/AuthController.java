@@ -1,6 +1,5 @@
 package com.accolite.pru.health.AuthApp.controller;
 
-import com.accolite.pru.health.AuthApp.annotation.CurrentUser;
 import com.accolite.pru.health.AuthApp.event.OnRegenerateEmailVerificationEvent;
 import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
@@ -11,7 +10,6 @@ import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
-import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
@@ -181,15 +179,4 @@ public class AuthController {
 				tokenProvider.getExpiryDuration()));
 	}
 
-
-	/**
-	 * Log the user out from the app/device. Release the refresh token associated with the
-	 * user device.
-	 */
-	@PostMapping("/logout")
-	public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails customUserDetails,
-			@Valid @RequestBody LogOutRequest logOutRequest) {
-		authService.logoutUser(customUserDetails, logOutRequest);
-		return ResponseEntity.ok(new ApiResponse("Log out successful", true));
-	}
 }

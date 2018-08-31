@@ -1,9 +1,13 @@
 package com.accolite.pru.health.AuthApp.service;
 
+import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.model.UserDevice;
+import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.repository.UserRepository;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +29,12 @@ public class UserService {
 
 	@Autowired
 	private RoleService roleService;
+
+	@Autowired
+	private UserDeviceService userDeviceService;
+
+	@Autowired
+	private RefreshTokenService refreshTokenService;
 
 	private static final Logger logger = Logger.getLogger(UserService.class);
 
@@ -98,5 +108,18 @@ public class UserService {
 		}
 		logger.info("Setting user roles: " + newUserRoles);
 		return newUserRoles;
+	}
+
+	/**
+	 * Log the given user out and delete the refresh token associated with it. If no device
+	 * is associated with it, fail silently.
+	 */
+	public void logoutUser(CustomUserDetails customUserDetails, LogOutRequest logOutRequest) {
+		String deviceId = logOutRequest.getDeviceInfo().getDeviceId();
+		Optional<UserDevice> userDeviceOpt = userDeviceService.findByDeviceId(deviceId);
+		logger.info("Removing refresh token associated with device [" + userDeviceOpt + "]");
+		userDeviceOpt.map(UserDevice::getRefreshToken)
+				.map(RefreshToken::getId)
+				.ifPresent(refreshTokenService::deleteById);
 	}
 }

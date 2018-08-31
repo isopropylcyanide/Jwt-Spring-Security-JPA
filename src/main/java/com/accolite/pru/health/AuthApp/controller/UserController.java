@@ -6,6 +6,7 @@ import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
+import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import com.accolite.pru.health.AuthApp.service.UserService;
@@ -74,5 +75,16 @@ public class UserController {
 		applicationEventPublisher.publishEvent(onUserPasswordChangeEvent);
 
 		return ResponseEntity.ok(new ApiResponse("Password changed successfully", true));
+	}
+
+	/**
+	 * Log the user out from the app/device. Release the refresh token associated with the
+	 * user device.
+	 */
+	@PostMapping("/logout")
+	public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails customUserDetails,
+			@Valid @RequestBody LogOutRequest logOutRequest) {
+		userService.logoutUser(customUserDetails, logOutRequest);
+		return ResponseEntity.ok(new ApiResponse("Log out successful", true));
 	}
 }
