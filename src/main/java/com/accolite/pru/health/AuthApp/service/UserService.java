@@ -53,11 +53,18 @@ public class UserService {
 	}
 
 	/**
-	 * Finds current logged in user in the database by email
-	 * Note: This will always return a concrete valid instance.
+	 * Finds current logged in user in the database by email Note: This will always
+	 * return a concrete valid instance.
 	 */
 	public User getLoggedInUser(String email) {
 		return findByEmail(email).get();
+	}
+
+	/**
+	 * Find a user in db by id.
+	 */
+	public Optional<User> findById(Long Id) {
+		return userRepository.findById(Id);
 	}
 
 	/**
@@ -82,7 +89,21 @@ public class UserService {
 	}
 
 	/**
-	 * Creates a new user from a request
+	 * Update the password for given mail id
+	 */
+	public void resetPassword(String mailId, String encodedPassword) {
+		userRepository.resetPassword(mailId, encodedPassword);
+	}
+
+	/**
+	 * Find the user by token
+	 */
+	public Optional<User> findByToken(String token) {
+		return Optional.ofNullable(userRepository.findByToken(token));
+	}
+
+	/**
+	 * Creates a new user from the registration request
 	 */
 	public User createUser(RegistrationRequest registerRequest) {
 		User newUser = new User();

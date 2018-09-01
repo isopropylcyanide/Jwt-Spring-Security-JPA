@@ -4,6 +4,8 @@ import com.accolite.pru.health.AuthApp.exception.AppException;
 import com.accolite.pru.health.AuthApp.exception.BadRequestException;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.MailSendException;
+import com.accolite.pru.health.AuthApp.exception.PasswordResetException;
+import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
@@ -123,7 +125,6 @@ public class AuthControllerAdvice {
 		return apiResponse;
 	}
 
-
 	@ExceptionHandler(value = UserLoginException.class)
 	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
 	@ResponseBody
@@ -148,6 +149,26 @@ public class AuthControllerAdvice {
 	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
 	@ResponseBody
 	public ApiResponse handleUserRegistrationtaException(UserRegistrationException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+	@ExceptionHandler(value = PasswordResetLinkException.class)
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	@ResponseBody
+	public ApiResponse handlePasswordResetLinkException(PasswordResetLinkException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+	@ExceptionHandler(value = PasswordResetException.class)
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	@ResponseBody
+	public ApiResponse handlePasswordResetException(PasswordResetException ex) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setSuccess(false);
 		apiResponse.setData(ex.getMessage());
@@ -184,6 +205,7 @@ public class AuthControllerAdvice {
 		return apiResponse;
 	}
 
+
 	@ExceptionHandler(value = TokenRefreshException.class)
 	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
 	@ResponseBody
@@ -193,6 +215,5 @@ public class AuthControllerAdvice {
 		apiResponse.setData(ex.getMessage());
 		return apiResponse;
 	}
-
 
 }
