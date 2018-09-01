@@ -94,6 +94,10 @@ public class User extends DateAudit {
 		isEmailVerified = user.getEmailVerified();
 	}
 
+	public void confirmVerification() {
+		setEmailVerified(true);
+	}
+
 	public Long getId() {
 		return id;
 	}

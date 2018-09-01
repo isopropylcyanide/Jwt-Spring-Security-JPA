@@ -1,9 +1,18 @@
 package com.accolite.pru.health.AuthApp.advice;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
+import com.accolite.pru.health.AuthApp.exception.AppException;
+import com.accolite.pru.health.AuthApp.exception.BadRequestException;
+import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
+import com.accolite.pru.health.AuthApp.exception.MailSendException;
+import com.accolite.pru.health.AuthApp.exception.PasswordResetException;
+import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
+import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
+import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
+import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
+import com.accolite.pru.health.AuthApp.exception.UserLoginException;
+import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
+import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -19,18 +28,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.accolite.pru.health.AuthApp.exception.AppException;
-import com.accolite.pru.health.AuthApp.exception.BadRequestException;
-import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
-import com.accolite.pru.health.AuthApp.exception.MailSendException;
-import com.accolite.pru.health.AuthApp.exception.PasswordResetException;
-import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
-import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
-import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
-import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
-import com.accolite.pru.health.AuthApp.exception.UserLoginException;
-import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
-import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class AuthControllerAdvice {
@@ -40,13 +40,7 @@ public class AuthControllerAdvice {
 	@Autowired
 	private MessageSource messageSource;
 
-	/**
-	 * Process validation error that throw MethodArgumentNotValidException
-	 * 
-	 * @param ex
-	 *            the exception
-	 * @return the response dto
-	 */
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
@@ -61,9 +55,7 @@ public class AuthControllerAdvice {
 
 	/**
 	 * Utility Method to generate localized message for a list of field errors
-	 * 
-	 * @param fieldErrors
-	 *            the field errors
+	 * @param fieldErrors the field errors
 	 * @return the list
 	 */
 	private List<String> processFieldErrors(List<FieldError> fieldErrors) {
@@ -73,9 +65,7 @@ public class AuthControllerAdvice {
 	/**
 	 * Resolve localized error message. Utiity method to generate a localized error
 	 * message
-	 * 
-	 * @param fieldError
-	 *            the field error
+	 * @param fieldError the field error
 	 * @return the string
 	 */
 	private String resolveLocalizedErrorMessage(FieldError fieldError) {
@@ -209,6 +199,17 @@ public class AuthControllerAdvice {
 	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
 	@ResponseBody
 	public ApiResponse handleUpdatePasswordException(UpdatePasswordException ex) {
+		ApiResponse apiResponse = new ApiResponse();
+		apiResponse.setSuccess(false);
+		apiResponse.setData(ex.getMessage());
+		return apiResponse;
+	}
+
+
+	@ExceptionHandler(value = TokenRefreshException.class)
+	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+	@ResponseBody
+	public ApiResponse handleTokenRefreshException(TokenRefreshException ex) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setSuccess(false);
 		apiResponse.setData(ex.getMessage());

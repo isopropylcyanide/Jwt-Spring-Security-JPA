@@ -2,6 +2,7 @@ package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public class LoginRequest {
@@ -15,10 +16,15 @@ public class LoginRequest {
 	@NotNull(message = "Login password cannot be blank")
 	private String password;
 
-	public LoginRequest(String username, String email, String password) {
+	@Valid
+	@NotNull(message = "Device info cannot be null")
+	private DeviceInfo deviceInfo;
+
+	public LoginRequest(String username, String email, String password, DeviceInfo deviceInfo) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		this.deviceInfo = deviceInfo;
 	}
 
 	public LoginRequest() {
@@ -46,5 +52,13 @@ public class LoginRequest {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public DeviceInfo getDeviceInfo() {
+		return deviceInfo;
+	}
+
+	public void setDeviceInfo(DeviceInfo deviceInfo) {
+		this.deviceInfo = deviceInfo;
 	}
 }

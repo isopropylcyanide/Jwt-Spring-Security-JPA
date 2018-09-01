@@ -1,17 +1,16 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import java.time.Instant;
-import java.util.Optional;
-
+import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
+import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.repository.PasswordResetTokenRepository;
+import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
-import com.accolite.pru.health.AuthApp.model.User;
-import com.accolite.pru.health.AuthApp.repository.PasswordResetTokenRepository;
-import com.accolite.pru.health.AuthApp.util.Util;
+import java.time.Instant;
+import java.util.Optional;
 
 @Service
 public class PasswordResetTokenService {
@@ -37,7 +36,7 @@ public class PasswordResetTokenService {
 	 */
 	public PasswordResetToken getPasswordResetToken(String mailId) {
 		PasswordResetToken passwordResetToken = new PasswordResetToken();
-		String token = Util.generateResetLinkToken();
+		String token = Util.generateRefreshToken();
 		passwordResetToken.setToken(token);
 		Optional<User> userOpt = userService.findByEmail(mailId);
 		User user = userOpt.get();

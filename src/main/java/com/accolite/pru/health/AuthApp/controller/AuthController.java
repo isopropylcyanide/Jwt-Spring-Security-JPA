@@ -1,10 +1,30 @@
 package com.accolite.pru.health.AuthApp.controller;
 
-import java.net.URI;
-import java.util.Optional;
-
-import javax.validation.Valid;
-
+import com.accolite.pru.health.AuthApp.event.OnGenerateResetLinkEvent;
+import com.accolite.pru.health.AuthApp.event.OnRegenerateEmailVerificationEvent;
+import com.accolite.pru.health.AuthApp.event.OnUserAccountChangeEvent;
+import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
+import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
+import com.accolite.pru.health.AuthApp.exception.PasswordResetException;
+import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
+import com.accolite.pru.health.AuthApp.exception.UserLoginException;
+import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
+import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
+import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
+import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
+import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
+import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
+import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
+import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
+import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
+import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
+import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
+import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
+import com.accolite.pru.health.AuthApp.service.AuthService;
+import com.accolite.pru.health.AuthApp.service.PasswordResetService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -21,27 +41,8 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.accolite.pru.health.AuthApp.event.OnGenerateResetLinkEvent;
-import com.accolite.pru.health.AuthApp.event.OnRegenerateEmailVerificationEvent;
-import com.accolite.pru.health.AuthApp.event.OnUserAccountChangeEvent;
-import com.accolite.pru.health.AuthApp.event.OnUserRegistrationCompleteEvent;
-import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
-import com.accolite.pru.health.AuthApp.exception.PasswordResetException;
-import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
-import com.accolite.pru.health.AuthApp.exception.UserLoginException;
-import com.accolite.pru.health.AuthApp.exception.UserRegistrationException;
-import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
-import com.accolite.pru.health.AuthApp.model.User;
-import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
-import com.accolite.pru.health.AuthApp.model.payload.JwtAuthenticationResponse;
-import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
-import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
-import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
-import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
-import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
-import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
-import com.accolite.pru.health.AuthApp.service.AuthService;
-import com.accolite.pru.health.AuthApp.service.PasswordResetService;
+import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -51,29 +52,55 @@ public class AuthController {
 	private AuthService authService;
 
 	@Autowired
-	PasswordResetService passwordResetService;
-
-	private static final Logger logger = Logger.getLogger(AuthController.class);
-
-	@Autowired
 	private JwtTokenProvider tokenProvider;
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
 
+	@Autowired
+	private PasswordResetService passwordResetService;
+
+	private static final Logger logger = Logger.getLogger(AuthController.class);
+
 	/**
-	 * Entry point for the user log in
+	 * Checks is a given email is in use or not.
+	 */
+	@GetMapping("/checkEmailInUse")
+	public ResponseEntity<?> checkEmailInUse(@RequestParam("email") String email) {
+		Boolean emailExists = authService.emailAlreadyExists(email);
+		return ResponseEntity.ok(new ApiResponse(emailExists.toString(), true));
+	}
+
+	/**
+	 * Checks is a given username is in use or not.
+	 */
+	@GetMapping("/checkUsernameInUse")
+	public ResponseEntity<?> checkUsernameInUse(@RequestParam("username") String username) {
+		Boolean usernameExists = authService.usernameAlreadyExists(username);
+		return ResponseEntity.ok(new ApiResponse(usernameExists.toString(), true));
+	}
+
+
+	/**
+	 * Entry point for the user log in. Return the jwt auth token and the refresh token
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 		Optional<Authentication> authenticationOpt = authService.authenticateUser(loginRequest);
 		authenticationOpt.orElseThrow(() -> new UserLoginException("Couldn't login user [" + loginRequest + "]"));
 		Authentication authentication = authenticationOpt.get();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
-		logger.info("Logged in User returned [API]: " + authentication.getName());
+		logger.info("Logged in User returned [API]: " + customUserDetails.getUsername());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String jwtToken = tokenProvider.generateToken(authentication);
-		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken));
+		Optional<RefreshToken> refreshTokenOpt = authService.createAndPersistRefreshTokenForDevice(authentication,
+				loginRequest);
+
+		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
+		String refreshToken = refreshTokenOpt.map(RefreshToken::getToken).get();
+		String jwtToken = authService.generateToken(customUserDetails);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken,
+				tokenProvider.getExpiryDuration()));
 	}
 
 	/**
@@ -84,23 +111,18 @@ public class AuthController {
 	public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest,
 			WebRequest request) {
 		Optional<User> registeredUserOpt = authService.registerUser(registrationRequest);
-		registeredUserOpt.orElseThrow(
-				() -> new UserRegistrationException("Couldn't register user [" + registrationRequest + "]"));
-		User registeredUser = registeredUserOpt.get();
-		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/auth" + "/registrationConfirmation");
+		registeredUserOpt.orElseThrow(() -> new UserRegistrationException(registrationRequest.getEmail(),
+				"Missing user object in database"));
+		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth" +
+				"/registrationConfirmation");
 
-		OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent = new OnUserRegistrationCompleteEvent(
-				registeredUser, urlBuilder);
+		OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent =
+				new OnUserRegistrationCompleteEvent(registeredUserOpt.get(), urlBuilder);
 		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
-		logger.info("Executing main service in thread: " + Thread.currentThread());
-		logger.info("Registered User returned [API[: " + registeredUser);
-		URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/me")
-				.buildAndExpand(registeredUser.getEmail()).toUri();
-
-		return ResponseEntity.created(location)
-				.body(new ApiResponse("User registered successfully. Check your email" + " for verification", true));
+		registeredUserOpt.ifPresent(user -> logger.info("Registered User returned [API[: " + user));
+		return ResponseEntity.ok(new ApiResponse("User registered successfully. Check your email" +
+				" for verification", true));
 	}
 
 	/**
@@ -146,14 +168,10 @@ public class AuthController {
 	 */
 	@GetMapping("/registrationConfirmation")
 	public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
-		Optional<User> verifiedUserOpt = authService.confirmRegistration(token);
+		Optional<User> verifiedUserOpt = authService.confirmEmailRegistration(token);
 		verifiedUserOpt.orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", token,
 				"Failed to confirm. Please generate a new email verification request"));
-
-		User verifiedUser = verifiedUserOpt.get();
-		URI location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/me")
-				.buildAndExpand(verifiedUser.getEmail()).toUri();
-		return ResponseEntity.created(location).body(new ApiResponse("User verified successfully", true));
+		return ResponseEntity.ok(new ApiResponse("User verified successfully", true));
 	}
 
 	/**
@@ -181,4 +199,18 @@ public class AuthController {
 		return ResponseEntity.ok(new ApiResponse("Email verification resent successfully", true));
 	}
 
+	/**
+	 * Refresh the expired jwt token using a refresh token for the specific device
+	 * and return a new token to the caller
+	 */
+	@PostMapping("/refresh")
+	public ResponseEntity<?> refreshJwtToken(@Valid @RequestBody TokenRefreshRequest tokenRefreshRequest) {
+		Optional<String> updatedJwtToken = authService.refreshJwtToken(tokenRefreshRequest);
+		updatedJwtToken.orElseThrow(() -> new TokenRefreshException(tokenRefreshRequest.getRefreshToken(),
+				"Unexpected error during token refresh. Please logout and login again."));
+		String refreshToken = tokenRefreshRequest.getRefreshToken();
+		logger.info("Created new Jwt Auth token: " + updatedJwtToken);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(updatedJwtToken.get(), refreshToken,
+				tokenProvider.getExpiryDuration()));
+	}
 }

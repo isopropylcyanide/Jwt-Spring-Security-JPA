@@ -51,6 +51,10 @@ public class EmailVerificationToken extends DateAudit {
 		this.expiryDate = expiryDate;
 	}
 
+	public void confirmStatus() {
+		setTokenStatus(TokenStatus.STATUS_CONFIRMED);
+	}
+
 	public Long getId() {
 		return id;
 	}

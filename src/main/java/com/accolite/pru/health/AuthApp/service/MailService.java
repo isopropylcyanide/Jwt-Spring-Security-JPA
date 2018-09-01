@@ -109,7 +109,6 @@ public class MailService {
 		helper.setText(mail.getContent(), true);
 		helper.setSubject(mail.getSubject());
 		helper.setFrom(mail.getFrom());
-		logger.info("Sending mail service in thread: " + Thread.currentThread());
 		mailSender.send(message);
 	}
 
