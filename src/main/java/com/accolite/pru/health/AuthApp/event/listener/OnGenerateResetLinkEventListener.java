@@ -1,22 +1,19 @@
 package com.accolite.pru.health.AuthApp.event.listener;
 
-import java.io.IOException;
-
-import javax.mail.MessagingException;
-
+import com.accolite.pru.health.AuthApp.event.OnGenerateResetLinkEvent;
+import com.accolite.pru.health.AuthApp.exception.MailSendException;
+import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
+import com.accolite.pru.health.AuthApp.model.User;
+import com.accolite.pru.health.AuthApp.service.MailService;
+import freemarker.template.TemplateException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.accolite.pru.health.AuthApp.event.OnGenerateResetLinkEvent;
-import com.accolite.pru.health.AuthApp.exception.MailSendException;
-import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
-import com.accolite.pru.health.AuthApp.model.User;
-import com.accolite.pru.health.AuthApp.service.MailService;
-
-import freemarker.template.TemplateException;
+import javax.mail.MessagingException;
+import java.io.IOException;
 
 @Component
 public class OnGenerateResetLinkEventListener implements ApplicationListener<OnGenerateResetLinkEvent> {
@@ -26,8 +23,8 @@ public class OnGenerateResetLinkEventListener implements ApplicationListener<OnG
 	private static final Logger logger = Logger.getLogger(OnGenerateResetLinkEventListener.class);
 
 	/**
-	 * As soon as a forgot password link is clicked and email id is entered, Reset
-	 * password link will be sent to respective mail via this event
+	 * As soon as a forgot password link is clicked and a valid email id is entered,
+	 * Reset password link will be sent to respective mail via this event
 	 */
 	@Override
 	@Async

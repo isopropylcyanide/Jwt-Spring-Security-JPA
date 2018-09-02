@@ -1,12 +1,9 @@
 package com.accolite.pru.health.AuthApp.service;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
+import com.accolite.pru.health.AuthApp.model.Mail;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,11 +12,11 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import com.accolite.pru.health.AuthApp.model.Mail;
-
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class MailService {
@@ -34,7 +31,7 @@ public class MailService {
 	private String mailFrom;
 
 	@Value("${app.token.password.reset.duration}")
-	long expiration;
+	private Long expiration;
 
 	private static final Logger logger = Logger.getLogger(MailService.class);
 
@@ -62,7 +59,7 @@ public class MailService {
 		Long expirationInMinutes = TimeUnit.MILLISECONDS.toMinutes(expiration);
 		String expirationInMinutesString = expirationInMinutes.toString();
 		Mail mail = new Mail();
-		mail.setSubject("Email Verification [Team CEP]");
+		mail.setSubject("Password Reset Link [Team CEP]");
 		mail.setTo(to);
 		mail.setFrom(mailFrom);
 		mail.getModel().put("userName", to);

@@ -10,7 +10,7 @@ public class PasswordResetException extends RuntimeException {
 	private String message;
 
 	public PasswordResetException(String user, String message) {
-		super(String.format("Couldn't update password for [%s]: [%s])", user, message));
+		super(String.format("Couldn't reset password for [%s]: [%s])", user, message));
 		this.user = user;
 		this.message = message;
 	}

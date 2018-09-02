@@ -70,7 +70,7 @@ public class RefreshTokenService {
 	public RefreshToken createRefreshToken() {
 		RefreshToken refreshToken = new RefreshToken();
 		refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-		refreshToken.setToken(Util.generateRefreshToken());
+		refreshToken.setToken(Util.generateRandomUuid());
 		refreshToken.setRefreshCount(0L);
 		return refreshToken;
 	}

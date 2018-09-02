@@ -36,7 +36,7 @@ public class PasswordResetTokenService {
 	 */
 	public PasswordResetToken getPasswordResetToken(String mailId) {
 		PasswordResetToken passwordResetToken = new PasswordResetToken();
-		String token = Util.generateRefreshToken();
+		String token = Util.generateRandomUuid();
 		passwordResetToken.setToken(token);
 		Optional<User> userOpt = userService.findByEmail(mailId);
 		User user = userOpt.get();

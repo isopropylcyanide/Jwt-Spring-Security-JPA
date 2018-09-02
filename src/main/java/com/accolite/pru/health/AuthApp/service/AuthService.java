@@ -216,4 +216,5 @@ public class AuthService {
 				.map(UserDevice::getUser)
 				.map(User::getId).map(this::generateTokenFromUserId);
 	}
+
 }

@@ -21,7 +21,7 @@ public class Util {
 	/**
 	 * Generate a random UUID
 	 */
-	public static String generateRefreshToken() {
+	public static String generateRandomUuid() {
 		return UUID.randomUUID().toString();
 	}
 }
