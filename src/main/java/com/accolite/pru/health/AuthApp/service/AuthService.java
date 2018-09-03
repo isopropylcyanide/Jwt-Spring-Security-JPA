@@ -1,13 +1,17 @@
 package com.accolite.pru.health.AuthApp.service;
 
+import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
 import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
 import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
+import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
+import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
+import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
@@ -51,6 +55,9 @@ public class AuthService {
 
 	@Autowired
 	private UserDeviceService userDeviceService;
+
+	@Autowired
+	private PasswordResetTokenService passwordResetTokenService;
 
 	private static final Logger logger = Logger.getLogger(AuthService.class);
 
@@ -217,4 +224,35 @@ public class AuthService {
 				.map(User::getId).map(this::generateTokenFromUserId);
 	}
 
+	/**
+	 * Generates a password reset token from the given reset request
+	 */
+	public Optional<PasswordResetToken> generatePasswordResetToken(PasswordResetLinkRequest passwordResetLinkRequest) {
+		String email = passwordResetLinkRequest.getEmail();
+		Optional<User> userOpt = userService.findByEmail(email);
+		userOpt.orElseThrow(() -> new PasswordResetLinkException(email, "No matching user found for the given " +
+				"request"));
+		PasswordResetToken passwordResetToken = passwordResetTokenService.createToken();
+		userOpt.ifPresent(passwordResetToken::setUser);
+		passwordResetTokenService.save(passwordResetToken);
+		return Optional.ofNullable(passwordResetToken);
+	}
+
+	/**
+	 * Reset a password given a reset request and return the updated user
+	 */
+	public Optional<User> resetPassword(PasswordResetRequest passwordResetRequest) {
+		String token = passwordResetRequest.getToken();
+		Optional<PasswordResetToken> passwordResetTokenOpt = passwordResetTokenService.findByToken(token);
+		passwordResetTokenOpt.orElseThrow(() -> new ResourceNotFoundException("Password Reset Token", "Token Id",
+				token));
+
+		passwordResetTokenOpt.ifPresent(passwordResetTokenService::verifyExpiration);
+		final String encodedPassword = passwordEncoder.encode(passwordResetRequest.getPassword());
+
+		Optional<User> userOpt = passwordResetTokenOpt.map(PasswordResetToken::getUser);
+		userOpt.ifPresent(user -> user.setPassword(encodedPassword));
+		userOpt.ifPresent(userService::save);
+		return userOpt;
+	}
 }

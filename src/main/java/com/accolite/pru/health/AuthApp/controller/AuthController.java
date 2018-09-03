@@ -24,7 +24,6 @@ import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
 import com.accolite.pru.health.AuthApp.service.AuthService;
-import com.accolite.pru.health.AuthApp.service.PasswordResetService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -56,9 +55,6 @@ public class AuthController {
 
 	@Autowired
 	private ApplicationEventPublisher applicationEventPublisher;
-
-	@Autowired
-	private PasswordResetService passwordResetService;
 
 	private static final Logger logger = Logger.getLogger(AuthController.class);
 
@@ -126,16 +122,15 @@ public class AuthController {
 	}
 
 	/**
-	 * Entry point for getting reset link to reset password.Receives the mail
-	 * id.Sends it to service to check if it exists. Sends the link for resetting
-	 * the password to that mailid
+	 * Receives the reset link request and publishes an event to send email id containing
+	 * the reset link if the request is valid
 	 */
 	@PostMapping("/password/resetlink")
 	public ResponseEntity<?> resetLink(@Valid @RequestBody PasswordResetLinkRequest passwordResetLinkRequest) {
-		Optional<PasswordResetToken> passwordResetTokenOpt = passwordResetService
-				.generatePasswordResetToken(passwordResetLinkRequest.getEmail());
-		passwordResetTokenOpt.orElseThrow(
-				() -> new PasswordResetLinkException("Couldn't generate link [" + passwordResetLinkRequest + "]"));
+		Optional<PasswordResetToken> passwordResetTokenOpt = authService
+				.generatePasswordResetToken(passwordResetLinkRequest);
+		passwordResetTokenOpt.orElseThrow(() -> new PasswordResetLinkException(passwordResetLinkRequest.getEmail(),
+				"Couldn't create a valid token"));
 		PasswordResetToken passwordResetToken = passwordResetTokenOpt.get();
 		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/password/reset");
 		OnGenerateResetLinkEvent generateResetLinkMailEvent = new OnGenerateResetLinkEvent(passwordResetToken,
@@ -145,18 +140,17 @@ public class AuthController {
 	}
 
 	/**
-	 * Entry point for reset password.Receives the new password and confirm
-	 * password. Sends the Acknowledgement after changing the password to the user's
-	 * mail
+	 * Receives a new passwordResetRequest and sends the acknowledgement after
+	 * changing the password to the user's mail through the event.
 	 */
 
 	@PostMapping("/password/reset")
-	public ResponseEntity<?> resetPassword(@RequestParam(value = "token") String token,
-			@Valid @RequestBody PasswordResetRequest passwordResetRequest) {
-		Optional<User> userOpt = passwordResetService.resetPassword(passwordResetRequest.getPassword(), token);
-		userOpt.orElseThrow(() -> new PasswordResetException(token, "Error in creating new password"));
-		User user = userOpt.get();
-		OnUserAccountChangeEvent onPasswordChangeEvent = new OnUserAccountChangeEvent(user, "Reset Password",
+	public ResponseEntity<?> resetPassword(@Valid @RequestBody PasswordResetRequest passwordResetRequest) {
+		Optional<User> userOpt = authService.resetPassword(passwordResetRequest);
+		userOpt.orElseThrow(() -> new PasswordResetException(passwordResetRequest.getToken(), "Error in resetting " +
+				"password"));
+		User changedUser = userOpt.get();
+		OnUserAccountChangeEvent onPasswordChangeEvent = new OnUserAccountChangeEvent(changedUser, "Reset Password",
 				"Changed Successfully");
 		applicationEventPublisher.publishEvent(onPasswordChangeEvent);
 		return ResponseEntity.ok(new ApiResponse("Password changed successfully", true));

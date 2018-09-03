@@ -1,11 +1,18 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 public class PasswordResetLinkRequest {
 
-	@NotNull(message = "Email cannot be blank")
-	String email;
+	@NotBlank(message = "Email cannot be blank")
+	private String email;
+
+	public PasswordResetLinkRequest(String email) {
+		this.email = email;
+	}
+
+	public PasswordResetLinkRequest() {
+	}
 
 	public String getEmail() {
 		return email;

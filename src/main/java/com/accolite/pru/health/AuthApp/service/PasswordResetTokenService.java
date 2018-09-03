@@ -1,7 +1,7 @@
 package com.accolite.pru.health.AuthApp.service;
 
+import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
-import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.repository.PasswordResetTokenRepository;
 import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
@@ -26,43 +26,39 @@ public class PasswordResetTokenService {
 	@Autowired
 	UserService userService;
 
-	public void saveToken(PasswordResetToken passwordResetToken) {
-		passwordResetTokenRepository.save(passwordResetToken);
+	/**
+	 * Saves the given password reset token
+	 */
+	public PasswordResetToken save(PasswordResetToken passwordResetToken) {
+		return passwordResetTokenRepository.save(passwordResetToken);
 	}
 
 	/**
-	 * Set the metadata for password reset token and return it to password reset
-	 * service
+	 * Finds a token in the database given its naturalId
 	 */
-	public PasswordResetToken getPasswordResetToken(String mailId) {
-		PasswordResetToken passwordResetToken = new PasswordResetToken();
-		String token = Util.generateRandomUuid();
-		passwordResetToken.setToken(token);
-		Optional<User> userOpt = userService.findByEmail(mailId);
-		User user = userOpt.get();
-		passwordResetToken.setUser(user);
-		logger.info(user);
-		passwordResetToken.setExpiryTime(Instant.now().plusMillis(expiration));
-		saveToken(passwordResetToken);
-		return passwordResetToken;
-	}
-
-	public Instant findExpiryTimeByToken(String token) {
-		return passwordResetTokenRepository.findExpiryTimeByToken(token);
-	}
-
-	public Optional<User> findUserByToken(String token) {
-		Optional<User> userOpt = userService.findByToken(token);
-		User user = userOpt.get();
-		return userOpt;
-	}
-
-	public Boolean existsByToken(String token) {
-		return passwordResetTokenRepository.existsByToken(token);
-	}
-
 	public Optional<PasswordResetToken> findByToken(String token) {
 		return passwordResetTokenRepository.findByToken(token);
 	}
 
+	/**
+	 * Creates and returns a new password token to which a user must be associated
+	 */
+	public PasswordResetToken createToken() {
+		PasswordResetToken passwordResetToken = new PasswordResetToken();
+		String token = Util.generateRandomUuid();
+		passwordResetToken.setToken(token);
+		passwordResetToken.setExpiryDate(Instant.now().plusMillis(expiration));
+		return passwordResetToken;
+	}
+
+	/**
+	 * Verify whether the token provided has expired or not on the basis of the current
+	 * server time and/or throw error otherwise
+	 */
+	public void verifyExpiration(PasswordResetToken token) {
+		if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
+			throw new InvalidTokenRequestException("Password Reset Token", token.getToken(),
+					"Expired token. Please issue a new request");
+		}
+	}
 }

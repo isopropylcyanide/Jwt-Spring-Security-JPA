@@ -1,13 +1,25 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 public class PasswordResetRequest {
-	@NotNull(message = "Password cannot be blank")
-	String password;
+	@NotBlank(message = "Password cannot be blank")
+	private String password;
 
-	@NotNull(message = "Confirm Password cannot be blank")
-	String confirmPassword;
+	@NotBlank(message = "Confirm Password cannot be blank")
+	private String confirmPassword;
+
+	@NotBlank(message = "Token has to be supplied along with a password reset request")
+	private String token;
+
+	public PasswordResetRequest() {
+	}
+
+	public PasswordResetRequest(String password, String confirmPassword, String token) {
+		this.password = password;
+		this.confirmPassword = confirmPassword;
+		this.token = token;
+	}
 
 	public String getConfirmPassword() {
 		return confirmPassword;
@@ -25,4 +37,11 @@ public class PasswordResetRequest {
 		this.password = password;
 	}
 
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
 }
