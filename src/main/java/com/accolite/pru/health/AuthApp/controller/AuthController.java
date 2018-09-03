@@ -123,7 +123,8 @@ public class AuthController {
 
 	/**
 	 * Receives the reset link request and publishes an event to send email id containing
-	 * the reset link if the request is valid
+	 * the reset link if the request is valid. In future the deeplink should open within
+	 * the app itself.
 	 */
 	@PostMapping("/password/resetlink")
 	public ResponseEntity<?> resetLink(@Valid @RequestBody PasswordResetLinkRequest passwordResetLinkRequest) {
