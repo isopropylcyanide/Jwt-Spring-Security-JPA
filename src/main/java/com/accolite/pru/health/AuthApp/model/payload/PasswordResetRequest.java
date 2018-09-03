@@ -1,8 +1,12 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
+import com.accolite.pru.health.AuthApp.validation.annotation.PasswordsMatch;
+
 import javax.validation.constraints.NotBlank;
 
+@PasswordsMatch(allowNull = false)
 public class PasswordResetRequest {
+
 	@NotBlank(message = "Password cannot be blank")
 	private String password;
 

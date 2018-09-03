@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -46,31 +46,31 @@ public class AuthControllerAdvice {
 	@ResponseBody
 	public ApiResponse processValidationError(MethodArgumentNotValidException ex) {
 		BindingResult result = ex.getBindingResult();
-		List<FieldError> fieldErrors = result.getFieldErrors();
+		List<ObjectError> allErrors = result.getAllErrors();
 		ApiResponse response = new ApiResponse();
 		response.setSuccess(false);
-		response.setData(processFieldErrors(fieldErrors).stream().collect(Collectors.joining("\n")));
+		response.setData(processAllErrors(allErrors).stream().collect(Collectors.joining("\n")));
 		return response;
 	}
 
 	/**
 	 * Utility Method to generate localized message for a list of field errors
-	 * @param fieldErrors the field errors
+	 * @param allErrors the field errors
 	 * @return the list
 	 */
-	private List<String> processFieldErrors(List<FieldError> fieldErrors) {
-		return fieldErrors.stream().map(this::resolveLocalizedErrorMessage).collect(Collectors.toList());
+	private List<String> processAllErrors(List<ObjectError> allErrors) {
+		return allErrors.stream().map(this::resolveLocalizedErrorMessage).collect(Collectors.toList());
 	}
 
 	/**
 	 * Resolve localized error message. Utiity method to generate a localized error
 	 * message
-	 * @param fieldError the field error
+	 * @param objectError the field error
 	 * @return the string
 	 */
-	private String resolveLocalizedErrorMessage(FieldError fieldError) {
+	private String resolveLocalizedErrorMessage(ObjectError objectError) {
 		Locale currentLocale = LocaleContextHolder.getLocale();
-		String localizedErrorMessage = messageSource.getMessage(fieldError, currentLocale);
+		String localizedErrorMessage = messageSource.getMessage(objectError, currentLocale);
 		logger.info(localizedErrorMessage);
 		return localizedErrorMessage;
 	}
