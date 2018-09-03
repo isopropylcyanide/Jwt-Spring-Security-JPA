@@ -88,8 +88,8 @@ public class MailService {
 		mail.getModel().put("actionStatus", actionStatus);
 
 		templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
-		Template t = templateConfiguration.getTemplate("account-activity-change.ftl");
-		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(t, mail.getModel());
+		Template template = templateConfiguration.getTemplate("account-activity-change.ftl");
+		String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
 		mail.setContent(mailContent);
 		send(mail);
 	}
