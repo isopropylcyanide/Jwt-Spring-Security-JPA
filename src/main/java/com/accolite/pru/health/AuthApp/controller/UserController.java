@@ -10,6 +10,9 @@ import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import com.accolite.pru.health.AuthApp.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,6 +28,10 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
+@Api(value = "User Rest API", description = "Defines endpoints for the logged in user. It's " +
+		"secured by default ")
+
+
 public class UserController {
 
 	private static final Logger logger = Logger.getLogger(UserController.class);
@@ -43,6 +50,7 @@ public class UserController {
 	 */
 	@GetMapping("/me")
 	@PreAuthorize("hasRole('USER')")
+	@ApiOperation(value = "Returns the current user profile")
 	public ResponseEntity<?> getUserProfile(@CurrentUser CustomUserDetails currentUser) {
 		logger.info("Inside secured resource with user");
 		logger.info(currentUser.getEmail() + " has role: " + currentUser.getRoles());
@@ -54,6 +62,7 @@ public class UserController {
 	 */
 	@GetMapping("/admins")
 	@PreAuthorize("hasRole('ADMIN')")
+	@ApiOperation(value = "Returns the list of configured admins. Requires ADMIN Access")
 	public ResponseEntity<?> getAllAdmins() {
 		logger.info("Inside secured resource with admin");
 		return ResponseEntity.ok("Hello. This is about admins");
@@ -65,8 +74,10 @@ public class UserController {
 	 */
 	@PostMapping("/password/update")
 	@PreAuthorize("hasRole('USER')")
+	@ApiOperation(value = "Allows the user to change his password once logged in by supplying the correct current " +
+			"password")
 	public ResponseEntity<?> updateUserPassword(@CurrentUser CustomUserDetails customUserDetails,
-			@Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+			@ApiParam(value = "The UpdatePasswordRequest payload") @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
 		User updatedUser = authService.updatePassword(customUserDetails, updatePasswordRequest)
 				.orElseThrow(() -> new UpdatePasswordException("--Empty--", "No such user present."));
 
@@ -82,8 +93,9 @@ public class UserController {
 	 * user device.
 	 */
 	@PostMapping("/logout")
+	@ApiOperation(value = "Logs the specified user device and clears the refresh tokens associated with it")
 	public ResponseEntity<?> logoutUser(@CurrentUser CustomUserDetails customUserDetails,
-			@Valid @RequestBody LogOutRequest logOutRequest) {
+			@ApiParam(value = "The LogOutRequest payload") @Valid @RequestBody LogOutRequest logOutRequest) {
 		userService.logoutUser(customUserDetails, logOutRequest);
 		return ResponseEntity.ok(new ApiResponse("Log out successful", true));
 	}
