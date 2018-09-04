@@ -1,17 +1,17 @@
 package com.accolite.pru.health.AuthApp.validation.validator;
 
 import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
-import com.accolite.pru.health.AuthApp.validation.annotation.PasswordsMatch;
+import com.accolite.pru.health.AuthApp.validation.annotation.MatchPassword;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class PasswordsMatchValidator implements ConstraintValidator<PasswordsMatch, PasswordResetRequest> {
+public class MatchPasswordValidator implements ConstraintValidator<MatchPassword, PasswordResetRequest> {
 
 	private Boolean allowNull;
 
 	@Override
-	public void initialize(PasswordsMatch constraintAnnotation) {
+	public void initialize(MatchPassword constraintAnnotation) {
 		allowNull = constraintAnnotation.allowNull();
 	}
 
