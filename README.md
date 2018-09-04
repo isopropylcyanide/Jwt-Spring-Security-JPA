@@ -1,5 +1,5 @@
 ## Jwt-Spring-Security-JPA ##
-<a href="https://sourcerer.io/isopropylcyanide"><img src="https://img.shields.io/badge/Java-50%20commits-orange.svg" alt=""></a>
+<a href="https://sourcerer.io/isopropylcyanide"><img src="https://img.shields.io/badge/Java-187%20commits-orange.svg" alt=""></a>
 
 A demo project explaining the backend authentication using JWT (Json Web Token) authentication using Spring Security &amp; MySQL JPA.
 There's support for the following features:
