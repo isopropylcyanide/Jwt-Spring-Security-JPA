@@ -1,19 +1,30 @@
 ## Jwt-Spring-Security-JPA ##
 <a href="https://sourcerer.io/isopropylcyanide"><img src="https://img.shields.io/badge/Java-50%20commits-orange.svg" alt=""></a>
 
-A demo project explaining the backend authentication using JWT (Json Web Token) authentication using Spring Security &amp; MySQL JPA
+A demo project explaining the backend authentication using JWT (Json Web Token) authentication using Spring Security &amp; MySQL JPA.
+There's support for the following features:
 
-
+* Conventional email/username based registration with admin support
+* Conventional Login using Spring Security and generation of JWT token
+* Multiple device login and logout support
+* Support for expiration bases email verification. Mail is sent upon registration. 
+* Resend the email confirmation email if old one expires
+* Support for password updation once logged in
+* Support for forgot-password functionality with password reset token sent to mail.
+* Supports admin protected urls leveraging Spring security
+* API to refresh JWT tokens once the temporary JWT expires. 
+* API to check availability of username/email during registration.
 
 ![](https://cdn-images-1.medium.com/max/1334/1*7T41R0dSLEzssIXPHpvimQ.png)
 
+![image](https://user-images.githubusercontent.com/12872673/45046897-24ded880-b095-11e8-8930-7b678e2843bb.png)
 
 
 ---
 
 ## JWT ##
 JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
-![image](https://user-images.githubusercontent.com/12872673/44461592-20470880-a62f-11e8-8597-0a0f79b5ef92.png)
+
 
 
 ## Exception Handling ##
@@ -25,6 +36,11 @@ The app throws custom exceptions wherever necessary which are captured through a
 * UserLoginException
 * UserRegistrationException
 * MethodArgumentNotValidException
+* UserLogoutException
+* TokenRefreshException
+* UpdatePasswordException
+* PasswordResetException
+* PasswordResetLinkException
 
 Moreover, entities are validated using JSR-303 Validation constraints. 
 
@@ -50,6 +66,10 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 	+ open `src/main/resources/application.properties` file.
 
 	+ change `spring.datasource.username` and `spring.datasource.password` properties as per your mysql installation
+	
+	+ open `src/main/resources/mail.properties` file.
+
+	+ change `spring.mail.username` and `spring.mail.password properties as per your mail installation
 
 4. **Run the app**
 
@@ -82,7 +102,7 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 
 2. **Logging in a valid user**
 ---
-![image](https://user-images.githubusercontent.com/12872673/44460953-b6c5fa80-a62c-11e8-929e-affe4df964c4.png)
+![image](https://user-images.githubusercontent.com/12872673/45047478-c155aa80-b096-11e8-96e8-d7872a92ee03.png)
 
 3. **Logging in an invalid user**
 ---
@@ -95,4 +115,20 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 4. **Accessing admin resource with invalid permissions/token**
 ---
 ![image](https://user-images.githubusercontent.com/12872673/44461159-68fdc200-a62d-11e8-9a8c-95a9c84d52cd.png)
+
+5. **Logging out the user device**
+---
+![image](https://user-images.githubusercontent.com/12872673/45047550-f3ffa300-b096-11e8-8520-3eae03b6ef78.png)
+
+6. **Resetting the password**
+---
+![image](https://user-images.githubusercontent.com/12872673/45047624-3628e480-b097-11e8-944f-c88b1cd0c231.png)
+
+7. **Refreshing the authentication token**
+---
+![image](https://user-images.githubusercontent.com/12872673/45047676-5bb5ee00-b097-11e8-84d4-2dbbe1489157.png)
+
+8. **Confirming the user email verification token**
+---
+![image](https://user-images.githubusercontent.com/12872673/45047715-76886280-b097-11e8-9ea6-e0c649eb6cbd.png)
 
