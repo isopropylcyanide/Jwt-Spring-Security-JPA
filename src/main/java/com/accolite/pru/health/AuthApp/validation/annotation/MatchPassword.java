@@ -1,6 +1,6 @@
 package com.accolite.pru.health.AuthApp.validation.annotation;
 
-import com.accolite.pru.health.AuthApp.validation.validator.PasswordsMatchValidator;
+import com.accolite.pru.health.AuthApp.validation.validator.MatchPasswordValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -13,9 +13,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = PasswordsMatchValidator.class)
+@Constraint(validatedBy = MatchPasswordValidator.class)
 @Documented
-public @interface PasswordsMatch {
+public @interface MatchPassword {
 	String message() default "The new passwords must match";
 
 	Class<?>[] groups() default {};
