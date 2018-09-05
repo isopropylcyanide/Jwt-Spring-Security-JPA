@@ -17,6 +17,10 @@ There's support for the following features:
 
 ![](https://cdn-images-1.medium.com/max/1334/1*7T41R0dSLEzssIXPHpvimQ.png)
 
+---
+
+## Swagger Docs ##
+The project has been configured with a basic Swagger docket that exposes the commonly used API's along with the expected params.
 ![image](https://user-images.githubusercontent.com/12872673/45046897-24ded880-b095-11e8-8930-7b678e2843bb.png)
 
 
