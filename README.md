@@ -1,5 +1,6 @@
 ## Jwt-Spring-Security-JPA ##
-<a href="https://sourcerer.io/isopropylcyanide"><img src="https://img.shields.io/badge/Java-187%20commits-orange.svg" alt=""></a>
+
+<a href="https://sourcerer.io/isopropylcyanide"><img src="https://avatars0.githubusercontent.com/u/12872673?v=4" height="50px" width="50px" alt=""/></a>
 
 A demo project explaining the backend authentication using JWT (Json Web Token) authentication using Spring Security &amp; MySQL JPA.
 There's support for the following features:
@@ -95,6 +96,13 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 	```
 
 	Any new user who signs up to the app is assigned the `ROLE_USER` by default.
+
+---
+
+### Contribution ###
+* Please fork the project and adapt it to your use case.
+* Submit a pull request.
+* The project is in a nascent stage. As such any issues you find should be reported in the issues section.
 
 ---
 ## Demo Screens ##
