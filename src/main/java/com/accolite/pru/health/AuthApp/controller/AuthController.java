@@ -20,6 +20,7 @@ import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
 import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
+import com.accolite.pru.health.AuthApp.model.payload.social.FacebookLoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.social.FacebookRegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
@@ -101,9 +102,33 @@ public class AuthController {
 		logger.info("Logged in User returned [API]: " + customUserDetails.getUsername());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		Optional<RefreshToken> refreshTokenOpt = authService.createAndPersistRefreshTokenForDevice(authentication,
-				loginRequest);
+				loginRequest.getDeviceInfo());
 
 		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + loginRequest + "]"));
+		String refreshToken = refreshTokenOpt.map(RefreshToken::getToken).get();
+		String jwtToken = authService.generateToken(customUserDetails);
+		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken,
+				tokenProvider.getExpiryDuration()));
+	}
+
+	/**
+	 * Entry point for the user log in. Return the jwt auth token and the refresh token
+	 */
+	@PostMapping("/login/facebook")
+	@ApiOperation(value = "Logs the Facebook user in to the system and return the auth tokens")
+	public ResponseEntity<?> authenticateFacebookUser(@ApiParam(value = "The FacebookLoginRequest payload") @Valid @RequestBody FacebookLoginRequest fbLoginRequest) {
+		Optional<Authentication> authenticationOpt = authService.authenticateFacebookUser(fbLoginRequest);
+		authenticationOpt.orElseThrow(() -> new UserLoginException("Couldn't login user [" + fbLoginRequest + "]"));
+		Authentication authentication = authenticationOpt.get();
+		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+		logger.info("Logged in User returned [API]: " + customUserDetails.getUsername());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		Optional<RefreshToken> refreshTokenOpt =
+				authService.createAndPersistRefreshTokenForDevice(authentication,
+						fbLoginRequest.getDeviceInfo());
+
+		refreshTokenOpt.orElseThrow(() -> new UserLoginException("Couldn't create refresh token for: [" + fbLoginRequest + "]"));
 		String refreshToken = refreshTokenOpt.map(RefreshToken::getToken).get();
 		String jwtToken = authService.generateToken(customUserDetails);
 		return ResponseEntity.ok(new JwtAuthenticationResponse(jwtToken, refreshToken,
@@ -139,8 +164,7 @@ public class AuthController {
 	 */
 	@PostMapping("/register/facebook")
 	@ApiOperation(value = "Registers the user and publishes an event to generate the email verification")
-	public ResponseEntity<?> registerFacebookUser(@ApiParam(value = "The Facebook RegistrationRequest payload") @Valid @RequestBody FacebookRegistrationRequest fbRegistrationRequest,
-			WebRequest request) {
+	public ResponseEntity<?> registerFacebookUser(@ApiParam(value = "The Facebook RegistrationRequest payload") @Valid @RequestBody FacebookRegistrationRequest fbRegistrationRequest) {
 		Optional<User> fbRegisteredUserOpt = authService.registerFacebookUser(fbRegistrationRequest);
 		fbRegisteredUserOpt.orElseThrow(() -> new UserRegistrationException(fbRegistrationRequest.getEmail(),
 				"Error registering user. Missing user object in database."));

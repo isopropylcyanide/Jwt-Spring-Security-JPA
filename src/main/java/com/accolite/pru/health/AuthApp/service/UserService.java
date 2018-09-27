@@ -154,4 +154,12 @@ public class UserService {
 				.map(RefreshToken::getId)
 				.ifPresent(refreshTokenService::deleteById);
 	}
+
+	/**
+	 * Returns a user from the database with an email matching either the conventional
+	 * email or the associated facebook email if any
+	 */
+	public Optional<User> findByEmailOrAssociatedEmail(String email) {
+		return userRepository.findByEmailOrAssociatedEmail(email);
+	}
 }

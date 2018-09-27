@@ -9,12 +9,14 @@ import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
+import com.accolite.pru.health.AuthApp.model.payload.DeviceInfo;
 import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
 import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
+import com.accolite.pru.health.AuthApp.model.payload.social.FacebookLoginRequest;
 import com.accolite.pru.health.AuthApp.model.payload.social.FacebookRegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.social.FacebookUser;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
@@ -220,10 +222,10 @@ public class AuthService {
 	 * with a cron job. The generated token would be encapsulated within the jwt.
 	 */
 	public Optional<RefreshToken> createAndPersistRefreshTokenForDevice(Authentication authentication,
-			LoginRequest loginRequest) {
+			DeviceInfo deviceInfo) {
 		User currentUser = (User) authentication.getPrincipal();
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken();
-		UserDevice userDevice = userDeviceService.createUserDevice(loginRequest.getDeviceInfo());
+		UserDevice userDevice = userDeviceService.createUserDevice(deviceInfo);
 		userDevice.setUser(currentUser);
 		userDevice.setRefreshToken(refreshToken);
 		refreshToken.setUserDevice(userDevice);
@@ -283,5 +285,21 @@ public class AuthService {
 		userOpt.ifPresent(user -> user.setPassword(encodedPassword));
 		userOpt.ifPresent(userService::save);
 		return userOpt;
+	}
+
+	/**
+	 * Authenticate a facebook user given his email. The search email could either be through a
+	 * social email or the conventional email. Create a manual authentication object and return
+	 */
+	public Optional<Authentication> authenticateFacebookUser(FacebookLoginRequest fbLoginRequest) {
+		Optional<User> associatedUserOpt = userService.findByEmailOrAssociatedEmail(fbLoginRequest.getEmail());
+		return associatedUserOpt
+				.map(CustomUserDetails::new)
+				.map(user -> new UsernamePasswordAuthenticationToken(
+								user,
+								user.getPassword(),
+								user.getAuthorities()
+						)
+				);
 	}
 }
