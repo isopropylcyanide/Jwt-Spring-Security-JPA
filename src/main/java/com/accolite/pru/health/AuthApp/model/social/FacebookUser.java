@@ -15,8 +15,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import java.time.Instant;
 
-@Entity(name = "FACEBOOK_LOGIN")
-public class FacebookLogin extends DateAudit {
+@Entity(name = "FACEBOOK_USER")
+public class FacebookUser extends DateAudit {
 
 	@Id
 	@Column(name = "FB_ID")
@@ -38,10 +38,10 @@ public class FacebookLogin extends DateAudit {
 	@Column(name = "ASSOC_EMAIL", unique = true)
 	private String associatedEmail;
 
-	public FacebookLogin() {
+	public FacebookUser() {
 	}
 
-	public FacebookLogin(Long id, String accessToken, Instant tokenExpiry, User user, String associatedEmail) {
+	public FacebookUser(Long id, String accessToken, Instant tokenExpiry, User user, String associatedEmail) {
 		this.id = id;
 		this.accessToken = accessToken;
 		this.tokenExpiry = tokenExpiry;

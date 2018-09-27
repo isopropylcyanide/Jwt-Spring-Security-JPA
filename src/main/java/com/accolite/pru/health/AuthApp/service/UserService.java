@@ -8,6 +8,7 @@ import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.social.FacebookRegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.repository.UserRepository;
 import org.apache.log4j.Logger;
@@ -102,6 +103,26 @@ public class UserService {
 		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
 		newUser.setActive(true);
 		newUser.setEmailVerified(false);
+		newUser.setSocialLoginEnabled(false);
+		newUser.setFacebookUser(null);
+		return newUser;
+	}
+
+	/**
+	 * Creates a new user from the facebook registration request. The token is the password
+	 * here. We are free to choose any dummy value as the auth has been done already!
+	 * We mark the social login status as true to indicate
+	 */
+	public User createUser(FacebookRegistrationRequest fbRegisterRequest) {
+		User newUser = new User();
+		Boolean isNewUserAsAdmin = fbRegisterRequest.getRegisterAsAdmin();
+		newUser.setEmail(fbRegisterRequest.getEmail());
+		newUser.setPassword(passwordEncoder.encode(fbRegisterRequest.getToken()));
+		newUser.setUsername(fbRegisterRequest.getEmail());
+		newUser.addRoles(getRolesForNewUser(isNewUserAsAdmin));
+		newUser.setActive(true);
+		newUser.setEmailVerified(false);
+		newUser.setSocialLoginEnabled(true);
 		return newUser;
 	}
 

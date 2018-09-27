@@ -20,6 +20,7 @@ import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
 import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
+import com.accolite.pru.health.AuthApp.model.payload.social.FacebookRegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
@@ -128,6 +129,29 @@ public class AuthController {
 		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
 
 		registeredUserOpt.ifPresent(user -> logger.info("Registered User returned [API[: " + user));
+		return ResponseEntity.ok(new ApiResponse("User registered successfully. Check your email" +
+				" for verification", true));
+	}
+
+	/**
+	 * Entry point for the user registration process through a facebook social login.
+	 * On successful registration, publish an event to generate email verification token.
+	 */
+	@PostMapping("/register/facebook")
+	@ApiOperation(value = "Registers the user and publishes an event to generate the email verification")
+	public ResponseEntity<?> registerFacebookUser(@ApiParam(value = "The Facebook RegistrationRequest payload") @Valid @RequestBody FacebookRegistrationRequest fbRegistrationRequest,
+			WebRequest request) {
+		Optional<User> fbRegisteredUserOpt = authService.registerFacebookUser(fbRegistrationRequest);
+		fbRegisteredUserOpt.orElseThrow(() -> new UserRegistrationException(fbRegistrationRequest.getEmail(),
+				"Error registering user. Missing user object in database."));
+		UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth" +
+				"/registrationConfirmation");
+
+		OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent =
+				new OnUserRegistrationCompleteEvent(fbRegisteredUserOpt.get(), urlBuilder);
+		applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
+
+		fbRegisteredUserOpt.ifPresent(user -> logger.info("Facebook Registered User returned [API[: " + user));
 		return ResponseEntity.ok(new ApiResponse("User registered successfully. Check your email" +
 				" for verification", true));
 	}

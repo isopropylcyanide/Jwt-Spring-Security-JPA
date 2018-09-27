@@ -1,7 +1,7 @@
 package com.accolite.pru.health.AuthApp.model;
 
 import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
-import com.accolite.pru.health.AuthApp.model.social.FacebookLogin;
+import com.accolite.pru.health.AuthApp.model.social.FacebookUser;
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 import org.hibernate.annotations.NaturalId;
 
@@ -67,9 +67,9 @@ public class User extends DateAudit {
 	@Column(name = "IS_SOCIAL_LOGIN_ENABLED", nullable = false)
 	private Boolean isSocialLoginEnabled;
 
-	@OneToOne(targetEntity = FacebookLogin.class, fetch = FetchType.EAGER)
+	@OneToOne(targetEntity = FacebookUser.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "FB_ID")
-	private FacebookLogin facebookLogin;
+	private FacebookUser facebookUser;
 
 	public void addRole(Role role) {
 		roles.add(role);
@@ -177,10 +177,36 @@ public class User extends DateAudit {
 		isEmailVerified = emailVerified;
 	}
 
+	public Boolean getSocialLoginEnabled() {
+		return isSocialLoginEnabled;
+	}
+
+	public void setSocialLoginEnabled(Boolean socialLoginEnabled) {
+		isSocialLoginEnabled = socialLoginEnabled;
+	}
+
+	public FacebookUser getFacebookUser() {
+		return facebookUser;
+	}
+
+	public void setFacebookUser(FacebookUser facebookUser) {
+		this.facebookUser = facebookUser;
+	}
+
 	@Override
 	public String toString() {
-		return "User{" + "id=" + id + ", email='" + email + '\'' + ", username='" + username + '\'' + ", password='"
-				+ password + '\'' + ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", active="
-				+ active + ", roles=" + roles + ", isEmailVerified=" + isEmailVerified + '}';
+		return "User{" +
+				"id=" + id +
+				", email='" + email + '\'' +
+				", username='" + username + '\'' +
+				", password='" + password + '\'' +
+				", firstName='" + firstName + '\'' +
+				", lastName='" + lastName + '\'' +
+				", active=" + active +
+				", roles=" + roles +
+				", isEmailVerified=" + isEmailVerified +
+				", isSocialLoginEnabled=" + isSocialLoginEnabled +
+				", facebookUser=" + facebookUser +
+				'}';
 	}
 }

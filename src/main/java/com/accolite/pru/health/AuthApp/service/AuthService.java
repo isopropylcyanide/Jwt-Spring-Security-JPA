@@ -15,6 +15,8 @@ import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
 import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
 import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
+import com.accolite.pru.health.AuthApp.model.payload.social.FacebookRegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.social.FacebookUser;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
@@ -59,6 +61,9 @@ public class AuthService {
 	@Autowired
 	private PasswordResetTokenService passwordResetTokenService;
 
+	@Autowired
+	private FacebookUserService facebookUserService;
+
 	private static final Logger logger = Logger.getLogger(AuthService.class);
 
 	/**
@@ -73,6 +78,30 @@ public class AuthService {
 		}
 		logger.info("Trying to register new user [" + newRegistrationRequestEmail + "]");
 		User newUser = userService.createUser(newRegistrationRequest);
+		User registeredNewUser = userService.save(newUser);
+		return Optional.ofNullable(registeredNewUser);
+	}
+
+	/**
+	 * Registers a new user in the database given a social login request. If the email matches
+	 * in the database, we throw an exception and request user to merge the accounts by logging in
+	 * from his email. Else, we carry on the normal registration flow and encode the token
+	 * as a password. [Remember] The user is already authenticated at the client side and the
+	 * token is the proof that we simply submit to.
+	 * @return A user object if successfully created
+	 */
+	public Optional<User> registerFacebookUser(FacebookRegistrationRequest newFbRegistrationRequest) {
+		String newRegistrationRequestEmail = newFbRegistrationRequest.getEmail();
+		if (emailAlreadyExists(newRegistrationRequestEmail)) {
+			logger.error("Matching email already exists!  " + newRegistrationRequestEmail);
+			throw new ResourceAlreadyInUseException("Associated Facebook Email", "Address",
+					newRegistrationRequestEmail);
+		}
+		logger.info("Trying to register new facebook user [" + newRegistrationRequestEmail + "]");
+		User newUser = userService.createUser(newFbRegistrationRequest);
+		FacebookUser facebookUser = facebookUserService.createUser(newFbRegistrationRequest);
+		facebookUser.setUser(newUser);
+		newUser.setFacebookUser(facebookUser);
 		User registeredNewUser = userService.save(newUser);
 		return Optional.ofNullable(registeredNewUser);
 	}
