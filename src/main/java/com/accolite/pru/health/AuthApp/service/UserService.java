@@ -77,10 +77,10 @@ public class UserService {
 	}
 
 	/**
-	 * Check is the user exists given the email: naturalId
+	 * Check if the user exists given the email in both social as well as conventional
 	 */
 	public Boolean existsByEmail(String email) {
-		return userRepository.existsByEmail(email);
+		return userRepository.existsByEmail(email) != 0;
 	}
 
 	/**

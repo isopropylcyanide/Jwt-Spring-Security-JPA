@@ -11,7 +11,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 	Optional<User> findByUsername(String username);
 
-	Boolean existsByEmail(String email);
+	@Query(value = "SELECT COUNT(*) from USER U where not exists ( select u.*" +
+			" from User u left join facebook_user f on u.fb_id = f.fb_id where u.email != :email and f.assoc_email " +
+			"!= :email )", nativeQuery = true)
+	Long existsByEmail(@Param("email") String email);
 
 	@Query(value = "select U.* from user U join Facebook_User F on U.fb_id = F.fb_id "
 			+ "	where U.email like :email or F.assoc_email like :email", nativeQuery = true)
