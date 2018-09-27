@@ -51,7 +51,7 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 
 ---
 
-## Steps to Setup the Spring Boot Back end app (polling-app-server)
+## Steps to Setup the Spring Boot Back end app
 
 1. **Clone the application**
 
