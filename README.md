@@ -31,7 +31,6 @@ The project has been configured with a basic Swagger docket that exposes the com
 JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
 
 
-
 ## Exception Handling ##
 The app throws custom exceptions wherever necessary which are captured through a controller advice. It then returns the appropriate error response to the caller
 * AppException
@@ -74,7 +73,7 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 	
 	+ open `src/main/resources/mail.properties` file.
 
-	+ change `spring.mail.username` and `spring.mail.password properties as per your mail installation
+	+ change `spring.mail.username` and `spring.mail.password` properties as per your mail installation
 
 4. **Run the app**
 
@@ -84,7 +83,7 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 	mvn spring-boot:run
 	```
 
-	The server will start on port 9004. Token default expiration is 600000ms i.e 10ms.
+	The server will start on port 9004. Token default expiration is 600000ms i.e 10 minutes.
 	```
 5. **Add the default Roles**
 	
