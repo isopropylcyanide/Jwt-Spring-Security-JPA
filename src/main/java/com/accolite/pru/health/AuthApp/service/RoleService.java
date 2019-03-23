@@ -12,21 +12,25 @@ import java.util.Optional;
 @Service
 public class RoleService {
 
-	@Autowired
-	private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-	/**
-	 * Find role in the database by name
-	 */
-	public Optional<Role> findByRole(RoleName roleName) {
-		return roleRepository.findByRole(roleName);
-	}
+    @Autowired
+    public RoleService(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
 
-	/**
-	 * Find all roles from the database
-	 */
-	public Collection<Role> findAll() {
-		return roleRepository.findAll();
-	}
+    /**
+     * Find role in the database by name
+     */
+    public Optional<Role> findByRole(RoleName roleName) {
+        return roleRepository.findByRole(roleName);
+    }
+
+    /**
+     * Find all roles from the database
+     */
+    public Collection<Role> findAll() {
+        return roleRepository.findAll();
+    }
 
 }

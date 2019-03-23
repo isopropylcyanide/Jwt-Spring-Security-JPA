@@ -24,9 +24,6 @@ public class SwaggerConfig {
 				.apiInfo(metaInfo());
 	}
 
-	/**
-	 * Return the meta info about the API. This should reflect
-	 */
 	private ApiInfo metaInfo() {
 		return new ApiInfoBuilder()
 				.description("Backend API For the Auth/User Service")

@@ -38,8 +38,12 @@ public class AuthControllerAdvice {
 
 	private static final Logger logger = Logger.getLogger(AuthControllerAdvice.class);
 
+	private final MessageSource messageSource;
+
 	@Autowired
-	private MessageSource messageSource;
+	public AuthControllerAdvice(MessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
 
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
@@ -149,7 +153,7 @@ public class AuthControllerAdvice {
 	@ExceptionHandler(value = UserRegistrationException.class)
 	@ResponseStatus(HttpStatus.EXPECTATION_FAILED)
 	@ResponseBody
-	public ApiResponse handleUserRegistrationtaException(UserRegistrationException ex) {
+	public ApiResponse handleUserRegistrationException(UserRegistrationException ex) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setSuccess(false);
 		apiResponse.setData(ex.getMessage());
