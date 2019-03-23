@@ -106,14 +106,13 @@ public class UserService {
 	}
 
 	/**
-	 * Performs a quick check to see what roles the new user could benefit from
+	 * Performs a quick check to see what roles the new user could be assigned to.
 	 * @return list of roles for the new user
 	 */
-	private Set<Role> getRolesForNewUser(Boolean isAdmin) {
+	private Set<Role> getRolesForNewUser(Boolean isToBeMadeAdmin) {
 		Set<Role> newUserRoles = new HashSet<>(roleService.findAll());
-		Role adminRole = new Role(RoleName.ROLE_ADMIN);
-		if (!isAdmin) {
-			newUserRoles.remove(adminRole);
+		if (!isToBeMadeAdmin){
+		newUserRoles.removeIf(Role::isAdminRole);
 		}
 		logger.info("Setting user roles: " + newUserRoles);
 		return newUserRoles;
