@@ -36,6 +36,13 @@ public class UserDeviceService {
     }
 
     /**
+     * Find the user device info by user id
+     */
+    public Optional<UserDevice> findByUserId(Long userId) {
+        return userDeviceRepository.findByUserId(userId);
+    }
+
+    /**
      * Find the user device info by refresh token
      */
     public Optional<UserDevice> findByRefreshToken(RefreshToken refreshToken) {

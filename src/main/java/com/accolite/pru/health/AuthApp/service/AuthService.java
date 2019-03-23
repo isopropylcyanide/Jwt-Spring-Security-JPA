@@ -18,7 +18,6 @@ import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
-import com.accolite.pru.health.AuthApp.util.Util;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -110,26 +109,22 @@ public class AuthService {
      * If user is already verified, save the unnecessary database calls.
      */
     public Optional<User> confirmEmailRegistration(String emailToken) {
-        Optional<EmailVerificationToken> emailVerificationTokenOpt =
-                emailVerificationTokenService.findByToken(emailToken);
-        emailVerificationTokenOpt.orElseThrow(() ->
-                new ResourceNotFoundException("Token", "Email verification", emailToken));
+        EmailVerificationToken emailVerificationToken = emailVerificationTokenService.findByToken(emailToken)
+                .orElseThrow(() -> new ResourceNotFoundException("Token", "Email verification", emailToken));
 
-        Optional<User> registeredUserOpt = emailVerificationTokenOpt.map(EmailVerificationToken::getUser);
-
-        Boolean isUserAlreadyVerified = emailVerificationTokenOpt.map(EmailVerificationToken::getUser)
-                .map(User::getEmailVerified).filter(Util::isTrue).orElse(false);
-
-        if (isUserAlreadyVerified) {
+        User registeredUser = emailVerificationToken.getUser();
+        if (registeredUser.getEmailVerified()) {
             logger.info("User [" + emailToken + "] already registered.");
-            return registeredUserOpt;
+            return Optional.of(registeredUser);
         }
-        emailVerificationTokenOpt.ifPresent(emailVerificationTokenService::verifyExpiration);
-        emailVerificationTokenOpt.ifPresent(EmailVerificationToken::confirmStatus);
-        emailVerificationTokenOpt.ifPresent(emailVerificationTokenService::save);
-        registeredUserOpt.ifPresent(User::confirmVerification);
-        registeredUserOpt.ifPresent(userService::save);
-        return registeredUserOpt;
+
+        emailVerificationTokenService.verifyExpiration(emailVerificationToken);
+        emailVerificationToken.setConfirmedStatus();
+        emailVerificationTokenService.save(emailVerificationToken);
+
+        registeredUser.markVerificationConfirmed();
+        userService.save(registeredUser);
+        return Optional.of(registeredUser);
     }
 
     /**
@@ -150,7 +145,7 @@ public class AuthService {
     /**
      * Validates the password of the current logged in user with the given password
      */
-    public Boolean currentPasswordMatches(User currentUser, String password) {
+    private Boolean currentPasswordMatches(User currentUser, String password) {
         return passwordEncoder.matches(password, currentUser.getPassword());
     }
 
@@ -183,7 +178,7 @@ public class AuthService {
     /**
      * Generates a JWT token for the validated client by userId
      */
-    public String generateTokenFromUserId(Long userId) {
+    private String generateTokenFromUserId(Long userId) {
         return tokenProvider.generateTokenFromUserId(userId);
     }
 
@@ -191,11 +186,17 @@ public class AuthService {
      * Creates and persists the refresh token for the user device. If device exists
      * already, we don't care. Unused devices with expired tokens should be cleaned
      * with a cron job. The generated token would be encapsulated within the jwt.
+     * Remove the existing refresh token as the old one should not remain valid.
      */
     public Optional<RefreshToken> createAndPersistRefreshTokenForDevice(Authentication authentication, LoginRequest loginRequest) {
         User currentUser = (User) authentication.getPrincipal();
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken();
+        userDeviceService.findByUserId(currentUser.getId())
+                .map(UserDevice::getRefreshToken)
+                .map(RefreshToken::getId)
+                .ifPresent(refreshTokenService::deleteById);
+
         UserDevice userDevice = userDeviceService.createUserDevice(loginRequest.getDeviceInfo());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken();
         userDevice.setUser(currentUser);
         userDevice.setRefreshToken(refreshToken);
         refreshToken.setUserDevice(userDevice);
