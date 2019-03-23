@@ -17,9 +17,8 @@ import java.io.IOException;
 @Component
 public class OnUserAccountChangeListener implements ApplicationListener<OnUserAccountChangeEvent> {
 
-    private final MailService mailService;
-
     private static final Logger logger = Logger.getLogger(OnUserAccountChangeListener.class);
+    private final MailService mailService;
 
     @Autowired
     public OnUserAccountChangeListener(MailService mailService) {

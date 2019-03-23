@@ -18,9 +18,8 @@ import java.io.IOException;
 @Component
 public class OnRegenerateEmailVerificationListener implements ApplicationListener<OnRegenerateEmailVerificationEvent> {
 
-    private final MailService mailService;
-
     private static final Logger logger = Logger.getLogger(OnRegenerateEmailVerificationListener.class);
+    private final MailService mailService;
 
     @Autowired
     public OnRegenerateEmailVerificationListener(MailService mailService) {

@@ -18,11 +18,9 @@ import java.io.IOException;
 @Component
 public class OnUserRegistrationCompleteListener implements ApplicationListener<OnUserRegistrationCompleteEvent> {
 
-    private final EmailVerificationTokenService emailVerificationTokenService;
-
-    private final MailService mailService;
-
     private static final Logger logger = Logger.getLogger(OnUserRegistrationCompleteListener.class);
+    private final EmailVerificationTokenService emailVerificationTokenService;
+    private final MailService mailService;
 
     @Autowired
     public OnUserRegistrationCompleteListener(EmailVerificationTokenService emailVerificationTokenService, MailService mailService) {

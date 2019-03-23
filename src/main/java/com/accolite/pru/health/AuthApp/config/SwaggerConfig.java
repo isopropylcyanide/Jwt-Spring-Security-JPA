@@ -14,22 +14,22 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 public class SwaggerConfig {
 
-	@Bean
-	public Docket productApi() {
-		return new Docket(DocumentationType.SWAGGER_2)
-				.select()
-				.apis(RequestHandlerSelectors.basePackage("com.accolite.pru.health.AuthApp"))
-				.paths(PathSelectors.regex("/api.*"))
-				.build()
-				.apiInfo(metaInfo());
-	}
+    @Bean
+    public Docket productApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.accolite.pru.health.AuthApp"))
+                .paths(PathSelectors.regex("/api.*"))
+                .build()
+                .apiInfo(metaInfo());
+    }
 
-	private ApiInfo metaInfo() {
-		return new ApiInfoBuilder()
-				.description("Backend API For the Auth/User Service")
-				.title("Auth/User API")
-				.version("Unreleased [WIP]")
-				.build();
-	}
+    private ApiInfo metaInfo() {
+        return new ApiInfoBuilder()
+                .description("Backend API For the Auth/User Service")
+                .title("Auth/User API")
+                .version("Unreleased [WIP]")
+                .build();
+    }
 
 }

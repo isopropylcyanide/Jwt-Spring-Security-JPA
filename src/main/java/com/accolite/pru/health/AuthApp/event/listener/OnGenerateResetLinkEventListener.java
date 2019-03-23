@@ -18,9 +18,8 @@ import java.io.IOException;
 @Component
 public class OnGenerateResetLinkEventListener implements ApplicationListener<OnGenerateResetLinkEvent> {
 
-    private final MailService mailService;
-
     private static final Logger logger = Logger.getLogger(OnGenerateResetLinkEventListener.class);
+    private final MailService mailService;
 
     @Autowired
     public OnGenerateResetLinkEventListener(MailService mailService) {

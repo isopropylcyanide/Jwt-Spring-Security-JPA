@@ -17,12 +17,10 @@ import java.util.UUID;
 @Service
 public class EmailVerificationTokenService {
 
+    private static final Logger logger = Logger.getLogger(EmailVerificationTokenService.class);
     private final EmailVerificationTokenRepository emailVerificationTokenRepository;
-
     @Value("${app.token.email.verification.duration}")
     private Long emailVerificationTokenExpiryDuration;
-
-    private static final Logger logger = Logger.getLogger(EmailVerificationTokenService.class);
 
     @Autowired
     public EmailVerificationTokenService(EmailVerificationTokenRepository emailVerificationTokenRepository) {

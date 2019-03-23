@@ -15,9 +15,8 @@ import java.util.Optional;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
-
     private static final Logger logger = Logger.getLogger(CustomUserDetailsService.class);
+    private final UserRepository userRepository;
 
     @Autowired
     public CustomUserDetailsService(UserRepository userRepository) {

@@ -62,20 +62,6 @@ public class User extends DateAudit {
     @Column(name = "IS_EMAIL_VERIFIED", nullable = false)
     private Boolean isEmailVerified;
 
-    public void addRole(Role role) {
-        roles.add(role);
-        role.getUserList().add(this);
-    }
-
-    public void addRoles(Set<Role> roles) {
-        roles.forEach(this::addRole);
-    }
-
-    public void removeRole(Role role) {
-        roles.remove(role);
-        role.getUserList().remove(this);
-    }
-
     public User() {
         super();
     }
@@ -90,6 +76,20 @@ public class User extends DateAudit {
         active = user.getActive();
         roles = user.getRoles();
         isEmailVerified = user.getEmailVerified();
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
+        role.getUserList().add(this);
+    }
+
+    public void addRoles(Set<Role> roles) {
+        roles.forEach(this::addRole);
+    }
+
+    public void removeRole(Role role) {
+        roles.remove(role);
+        role.getUserList().remove(this);
     }
 
     public void markVerificationConfirmed() {

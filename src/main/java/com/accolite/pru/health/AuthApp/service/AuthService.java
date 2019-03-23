@@ -31,23 +31,15 @@ import java.util.Optional;
 @Service
 public class AuthService {
 
-    private final UserService userService;
-
-    private final JwtTokenProvider tokenProvider;
-
-    private final RefreshTokenService refreshTokenService;
-
-    private final PasswordEncoder passwordEncoder;
-
-    private final AuthenticationManager authenticationManager;
-
-    private final EmailVerificationTokenService emailVerificationTokenService;
-
-    private final UserDeviceService userDeviceService;
-
-    private final PasswordResetTokenService passwordResetTokenService;
-
     private static final Logger logger = Logger.getLogger(AuthService.class);
+    private final UserService userService;
+    private final JwtTokenProvider tokenProvider;
+    private final RefreshTokenService refreshTokenService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final EmailVerificationTokenService emailVerificationTokenService;
+    private final UserDeviceService userDeviceService;
+    private final PasswordResetTokenService passwordResetTokenService;
 
     @Autowired
     public AuthService(UserService userService, JwtTokenProvider tokenProvider, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailVerificationTokenService emailVerificationTokenService, UserDeviceService userDeviceService, PasswordResetTokenService passwordResetTokenService) {

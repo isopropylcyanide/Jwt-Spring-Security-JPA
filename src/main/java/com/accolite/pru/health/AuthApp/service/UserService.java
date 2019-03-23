@@ -21,17 +21,12 @@ import java.util.Set;
 @Service
 public class UserService {
 
-    private final PasswordEncoder passwordEncoder;
-
-    private final UserRepository userRepository;
-
-    private final RoleService roleService;
-
-    private final UserDeviceService userDeviceService;
-
-    private final RefreshTokenService refreshTokenService;
-
     private static final Logger logger = Logger.getLogger(UserService.class);
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleService roleService;
+    private final UserDeviceService userDeviceService;
+    private final RefreshTokenService refreshTokenService;
 
     @Autowired
     public UserService(PasswordEncoder passwordEncoder, UserRepository userRepository, RoleService roleService, UserDeviceService userDeviceService, RefreshTokenService refreshTokenService) {
