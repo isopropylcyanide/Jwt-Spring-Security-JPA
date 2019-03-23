@@ -211,7 +211,6 @@ public class AuthService {
      * * throw appropriate errors.
      */
     public Optional<String> refreshJwtToken(TokenRefreshRequest tokenRefreshRequest) {
-        //tokenFromDb's device info should match this one
         String requestRefreshToken = tokenRefreshRequest.getRefreshToken();
 
         return Optional.of(refreshTokenService.findByToken(requestRefreshToken)

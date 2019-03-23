@@ -1,7 +1,6 @@
 package com.accolite.pru.health.AuthApp.service;
 
 import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
-import com.accolite.pru.health.AuthApp.model.UserDevice;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.repository.RefreshTokenRepository;
 import com.accolite.pru.health.AuthApp.util.Util;
@@ -26,38 +25,10 @@ public class RefreshTokenService {
     }
 
     /**
-     * Find a refresh token based on the id
-     */
-    public Optional<RefreshToken> findById(Long id) {
-        return refreshTokenRepository.findById(id);
-    }
-
-    /**
-     * Find the refresh token string based on the id
-     */
-    public Optional<String> findTokenById(Long id) {
-        return refreshTokenRepository.findTokenById(id);
-    }
-
-    /**
      * Find a refresh token based on the natural id i.e the token itself
      */
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
-    }
-
-    /**
-     * Finds the user device the refreshed token is attached to using the id
-     */
-    public Optional<UserDevice> findUserDeviceById(Long id) {
-        return refreshTokenRepository.findUserDeviceById(id);
-    }
-
-    /**
-     * Finds the user device the refreshed token is attached to with the natural id
-     */
-    public Optional<UserDevice> findUserDeviceByToken(String token) {
-        return refreshTokenRepository.findUserDeviceByToken(token);
     }
 
     /**

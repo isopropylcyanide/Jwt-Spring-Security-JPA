@@ -1,5 +1,6 @@
 package com.accolite.pru.health.AuthApp.service;
 
+import com.accolite.pru.health.AuthApp.annotation.CurrentUser;
 import com.accolite.pru.health.AuthApp.exception.UserLogoutException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.Role;
@@ -115,12 +116,13 @@ public class UserService {
 
     /**
      * Log the given user out and delete the refresh token associated with it. If no device
-     * is associated with it, fail silently.
+     * id is found matching the database for the given user, throw a log out exception.
      */
-    public void logoutUser(CustomUserDetails customUserDetails, LogOutRequest logOutRequest) {
+    public void logoutUser(@CurrentUser CustomUserDetails currentUser, LogOutRequest logOutRequest) {
         String deviceId = logOutRequest.getDeviceInfo().getDeviceId();
-        UserDevice userDevice = userDeviceService.findByDeviceId(deviceId)
-                .orElseThrow(() -> new UserLogoutException(logOutRequest.getDeviceInfo().getDeviceId(), "Invalid device Id supplied. No matching user device found"));
+        UserDevice userDevice = userDeviceService.findByUserId(currentUser.getId())
+                .filter(device -> device.getDeviceId().equals(deviceId))
+                .orElseThrow(() -> new UserLogoutException(logOutRequest.getDeviceInfo().getDeviceId(), "Invalid device Id supplied. No matching device found for the given user "));
 
         logger.info("Removing refresh token associated with device [" + userDevice + "]");
         refreshTokenService.deleteById(userDevice.getRefreshToken().getId());

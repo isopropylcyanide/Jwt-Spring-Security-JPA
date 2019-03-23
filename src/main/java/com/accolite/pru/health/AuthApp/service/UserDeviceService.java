@@ -21,21 +21,6 @@ public class UserDeviceService {
     }
 
     /**
-     * Find the user device info by id
-     */
-    public Optional<UserDevice> findById(Long id) {
-        return userDeviceRepository.findById(id);
-    }
-
-    /**
-     * Find the user device info by id. Assuming only one deviceId per device
-     * as logout clears the refresh token associated with the device.
-     */
-    public Optional<UserDevice> findByDeviceId(String deviceId) {
-        return userDeviceRepository.findByDeviceId(deviceId);
-    }
-
-    /**
      * Find the user device info by user id
      */
     public Optional<UserDevice> findByUserId(Long userId) {
@@ -48,21 +33,6 @@ public class UserDeviceService {
     public Optional<UserDevice> findByRefreshToken(RefreshToken refreshToken) {
         return userDeviceRepository.findByRefreshToken(refreshToken);
     }
-
-    /**
-     * Finds the refresh token associated with the user_device
-     */
-    public Optional<RefreshToken> findRefreshTokenById(Long id) {
-        return userDeviceRepository.findRefreshTokenById(id);
-    }
-
-    /**
-     * Save the userDevice instance to the repository
-     */
-    public UserDevice save(UserDevice userDevice) {
-        return userDeviceRepository.save(userDevice);
-    }
-
 
     /**
      * Creates a new user device and set the user to the current device
@@ -80,7 +50,7 @@ public class UserDeviceService {
      * Check whether the user device corresponding to the token has refresh enabled and
      * throw appropriate errors to the client
      */
-    public void verifyRefreshAvailability(RefreshToken refreshToken) {
+    void verifyRefreshAvailability(RefreshToken refreshToken) {
         UserDevice userDevice = findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new TokenRefreshException(refreshToken.getToken(), "No device found for the matching token. Please login again"));
 

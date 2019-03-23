@@ -24,6 +24,9 @@ public class MailService {
 
     private final Configuration templateConfiguration;
 
+    @Value("${app.velocity.templates.location}")
+    private String basePackagePath;
+
     @Value("${spring.mail.username}")
     private String mailFrom;
 
@@ -45,7 +48,7 @@ public class MailService {
         mail.getModel().put("userName", to);
         mail.getModel().put("userEmailTokenVerificationLink", emailVerificationUrl);
 
-        templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
+        templateConfiguration.setClassForTemplateLoading(getClass(), basePackagePath);
         Template template = templateConfiguration.getTemplate("email-verification.ftl");
         String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
         mail.setContent(mailContent);
@@ -67,7 +70,7 @@ public class MailService {
         mail.getModel().put("userResetPasswordLink", resetPasswordLink);
         mail.getModel().put("expirationTime", expirationInMinutesString);
 
-        templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
+        templateConfiguration.setClassForTemplateLoading(getClass(), basePackagePath);
         Template template = templateConfiguration.getTemplate("reset-link.ftl");
         String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
         mail.setContent(mailContent);
@@ -88,7 +91,7 @@ public class MailService {
         mail.getModel().put("action", action);
         mail.getModel().put("actionStatus", actionStatus);
 
-        templateConfiguration.setClassForTemplateLoading(getClass(), "/templates/");
+        templateConfiguration.setClassForTemplateLoading(getClass(), basePackagePath);
         Template template = templateConfiguration.getTemplate("account-activity-change.ftl");
         String mailContent = FreeMarkerTemplateUtils.processTemplateIntoString(template, mail.getModel());
         mail.setContent(mailContent);
