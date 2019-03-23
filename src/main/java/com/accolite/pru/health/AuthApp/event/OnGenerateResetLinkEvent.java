@@ -1,34 +1,35 @@
 package com.accolite.pru.health.AuthApp.event;
 
+import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
-
 public class OnGenerateResetLinkEvent extends ApplicationEvent {
-	private UriComponentsBuilder redirectUrl;
-	private PasswordResetToken passwordResetToken;
 
-	public OnGenerateResetLinkEvent(PasswordResetToken passwordResetToken, UriComponentsBuilder redirectUrl) {
-		super(passwordResetToken);
-		this.passwordResetToken = passwordResetToken;
-		this.redirectUrl = redirectUrl;
-	}
+    private transient UriComponentsBuilder redirectUrl;
 
-	public PasswordResetToken getPasswordResetToken() {
-		return passwordResetToken;
-	}
+    private transient PasswordResetToken passwordResetToken;
 
-	public void setPasswordResetToken(PasswordResetToken passwordResetToken) {
-		this.passwordResetToken = passwordResetToken;
-	}
+    public OnGenerateResetLinkEvent(PasswordResetToken passwordResetToken, UriComponentsBuilder redirectUrl) {
+        super(passwordResetToken);
+        this.passwordResetToken = passwordResetToken;
+        this.redirectUrl = redirectUrl;
+    }
 
-	public UriComponentsBuilder getRedirectUrl() {
-		return redirectUrl;
-	}
+    public PasswordResetToken getPasswordResetToken() {
+        return passwordResetToken;
+    }
 
-	public void setRedirectUrl(UriComponentsBuilder redirectUrl) {
-		this.redirectUrl = redirectUrl;
-	}
+    public void setPasswordResetToken(PasswordResetToken passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
+    }
+
+    public UriComponentsBuilder getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    public void setRedirectUrl(UriComponentsBuilder redirectUrl) {
+        this.redirectUrl = redirectUrl;
+    }
 
 }

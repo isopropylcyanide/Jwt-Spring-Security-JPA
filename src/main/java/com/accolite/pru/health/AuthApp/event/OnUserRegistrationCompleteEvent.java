@@ -6,29 +6,28 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 public class OnUserRegistrationCompleteEvent extends ApplicationEvent {
 
-	private UriComponentsBuilder redirectUrl;
-	private User user;
+    private transient UriComponentsBuilder redirectUrl;
+    private User user;
 
-	public OnUserRegistrationCompleteEvent(
-			User user, UriComponentsBuilder redirectUrl) {
-		super(user);
-		this.user = user;
-		this.redirectUrl = redirectUrl;
-	}
+    public OnUserRegistrationCompleteEvent(User user, UriComponentsBuilder redirectUrl) {
+        super(user);
+        this.user = user;
+        this.redirectUrl = redirectUrl;
+    }
 
-	public UriComponentsBuilder getRedirectUrl() {
-		return redirectUrl;
-	}
+    public UriComponentsBuilder getRedirectUrl() {
+        return redirectUrl;
+    }
 
-	public void setRedirectUrl(UriComponentsBuilder redirectUrl) {
-		this.redirectUrl = redirectUrl;
-	}
+    public void setRedirectUrl(UriComponentsBuilder redirectUrl) {
+        this.redirectUrl = redirectUrl;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

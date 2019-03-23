@@ -15,12 +15,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityDevConfig extends WebSecurityConfigurerAdapter {
 
-	private static final Logger logger = Logger.getLogger(WebSecurityDevConfig.class);
+    private static final Logger logger = Logger.getLogger(WebSecurityDevConfig.class);
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		logger.info("Loaded inside a dev only");
-		http.authorizeRequests()
-				.anyRequest().permitAll();
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        logger.info("Loaded inside a dev only");
+        http.authorizeRequests()
+                .anyRequest().permitAll();
+    }
 }

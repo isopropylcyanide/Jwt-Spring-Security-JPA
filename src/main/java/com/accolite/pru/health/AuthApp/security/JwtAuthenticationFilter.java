@@ -20,54 +20,51 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	@Value("${app.jwt.header}")
-	private String tokenRequestHeader;
+    private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class);
+    @Value("${app.jwt.header}")
+    private String tokenRequestHeader;
+    @Value("${app.jwt.header.prefix}")
+    private String tokenRequestHeaderPrefix;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
-	@Value("${app.jwt.header.prefix}")
-	private String tokenRequestHeaderPrefix;
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
-	private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class);
+    /**
+     * Filter the incoming request for a valid token in the request header
+     */
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String jwt = getJwtFromRequest(request);
 
-	@Autowired
-	private JwtTokenProvider jwtTokenProvider;
+            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+                Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
 
-	@Autowired
-	private CustomUserDetailsService customUserDetailsService;
+                UserDetails userDetails = customUserDetailsService.loadUserById(userId);
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        } catch (Exception ex) {
+            log.error("Failed to set user authentication in security context: ", ex);
+        }
 
-	/**
-	 * Filter the incoming request for a valid token in the request header
-	 */
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-			FilterChain filterChain) throws ServletException, IOException {
-		try {
-			String jwt = getJwtFromRequest(request);
+        filterChain.doFilter(request, response);
+    }
 
-			if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-				Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
-
-				UserDetails userDetails = customUserDetailsService.loadUserById(userId);
-				UsernamePasswordAuthenticationToken authentication =
-						new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-			}
-		} catch (Exception ex) {
-			log.error("Failed to set user authentication in security context: ", ex);
-		}
-
-		filterChain.doFilter(request, response);
-	}
-
-	/**
-	 * Extract the token from the Authorization request header
-	 */
-	private String getJwtFromRequest(HttpServletRequest request) {
-		String bearerToken = request.getHeader(tokenRequestHeader);
-		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(tokenRequestHeaderPrefix)) {
-			log.info("Extracted Token: " + bearerToken);
-			return bearerToken.replace(tokenRequestHeaderPrefix, "");
-		}
-		return null;
-	}
+    /**
+     * Extract the token from the Authorization request header
+     */
+    private String getJwtFromRequest(HttpServletRequest request) {
+        String bearerToken = request.getHeader(tokenRequestHeader);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(tokenRequestHeaderPrefix)) {
+            log.info("Extracted Token: " + bearerToken);
+            return bearerToken.replace(tokenRequestHeaderPrefix, "");
+        }
+        return null;
+    }
 }

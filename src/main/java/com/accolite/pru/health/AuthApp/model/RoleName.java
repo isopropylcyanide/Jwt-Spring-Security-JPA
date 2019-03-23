@@ -5,13 +5,13 @@ package com.accolite.pru.health.AuthApp.model;
  */
 public enum RoleName {
 
-	/**
-	 * Role admin authority role.
-	 */
-	ROLE_ADMIN,
+    /**
+     * Role admin authority role.
+     */
+    ROLE_ADMIN,
 
-	/**
-	 * Role user authority role.
-	 */
-	ROLE_USER
+    /**
+     * Role user authority role.
+     */
+    ROLE_USER
 }
