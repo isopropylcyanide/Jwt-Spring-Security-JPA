@@ -68,7 +68,7 @@ public class AuthController {
     @GetMapping("/checkEmailInUse")
     public ResponseEntity checkEmailInUse(@ApiParam(value = "Email id to check against") @RequestParam("email") String email) {
         Boolean emailExists = authService.emailAlreadyExists(email);
-        return ResponseEntity.ok(new ApiResponse(emailExists.toString(), true));
+        return ResponseEntity.ok(new ApiResponse(true, emailExists.toString()));
     }
 
     /**
@@ -79,7 +79,7 @@ public class AuthController {
     public ResponseEntity checkUsernameInUse(@ApiParam(value = "Username to check against") @RequestParam(
             "username") String username) {
         Boolean usernameExists = authService.usernameAlreadyExists(username);
-        return ResponseEntity.ok(new ApiResponse(usernameExists.toString(), true));
+        return ResponseEntity.ok(new ApiResponse(true, usernameExists.toString()));
     }
 
 
@@ -120,7 +120,7 @@ public class AuthController {
                     OnUserRegistrationCompleteEvent onUserRegistrationCompleteEvent = new OnUserRegistrationCompleteEvent(user, urlBuilder);
                     applicationEventPublisher.publishEvent(onUserRegistrationCompleteEvent);
                     logger.info("Registered User returned [API[: " + user);
-                    return ResponseEntity.ok(new ApiResponse("User registered successfully. Check your email for verification", true));
+                    return ResponseEntity.ok(new ApiResponse(true, "User registered successfully. Check your email for verification"));
                 })
                 .orElseThrow(() -> new UserRegistrationException(registrationRequest.getEmail(), "Missing user object in database"));
     }
@@ -141,7 +141,7 @@ public class AuthController {
                     OnGenerateResetLinkEvent generateResetLinkMailEvent = new OnGenerateResetLinkEvent(passwordResetToken,
                             urlBuilder);
                     applicationEventPublisher.publishEvent(generateResetLinkMailEvent);
-                    return ResponseEntity.ok(new ApiResponse("Password reset link sent successfully", true));
+                    return ResponseEntity.ok(new ApiResponse(true, "Password reset link sent successfully"));
                 })
                 .orElseThrow(() -> new PasswordResetLinkException(passwordResetLinkRequest.getEmail(), "Couldn't create a valid token"));
     }
@@ -161,7 +161,7 @@ public class AuthController {
                     OnUserAccountChangeEvent onPasswordChangeEvent = new OnUserAccountChangeEvent(changedUser, "Reset Password",
                             "Changed Successfully");
                     applicationEventPublisher.publishEvent(onPasswordChangeEvent);
-                    return ResponseEntity.ok(new ApiResponse("Password changed successfully", true));
+                    return ResponseEntity.ok(new ApiResponse(true, "Password changed successfully"));
                 })
                 .orElseThrow(() -> new PasswordResetException(passwordResetRequest.getToken(), "Error in resetting password"));
     }
@@ -175,7 +175,7 @@ public class AuthController {
     public ResponseEntity confirmRegistration(@ApiParam(value = "the token that was sent to the user email") @RequestParam("token") String token) {
 
         return authService.confirmEmailRegistration(token)
-                .map(user -> ResponseEntity.ok(new ApiResponse("User verified successfully", true)))
+                .map(user -> ResponseEntity.ok(new ApiResponse(true, "User verified successfully")))
                 .orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", token, "Failed to confirm. Please generate a new email verification request"));
     }
 
@@ -200,7 +200,7 @@ public class AuthController {
                     UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/registrationConfirmation");
                     OnRegenerateEmailVerificationEvent regenerateEmailVerificationEvent = new OnRegenerateEmailVerificationEvent(registeredUser, urlBuilder, newEmailToken);
                     applicationEventPublisher.publishEvent(regenerateEmailVerificationEvent);
-                    return ResponseEntity.ok(new ApiResponse("Email verification resent successfully", true));
+                    return ResponseEntity.ok(new ApiResponse(true, "Email verification resent successfully"));
                 })
                 .orElseThrow(() -> new InvalidTokenRequestException("Email Verification Token", existingToken, "No user associated with this request. Re-verification denied"));
     }

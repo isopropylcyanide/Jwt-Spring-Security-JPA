@@ -82,7 +82,7 @@ public class UserController {
                 .map(updatedUser -> {
                     OnUserAccountChangeEvent onUserPasswordChangeEvent = new OnUserAccountChangeEvent(updatedUser, "Update Password", "Change successful");
                     applicationEventPublisher.publishEvent(onUserPasswordChangeEvent);
-                    return ResponseEntity.ok(new ApiResponse("Password changed successfully", true));
+                    return ResponseEntity.ok(new ApiResponse(true, "Password changed successfully"));
                 })
                 .orElseThrow(() -> new UpdatePasswordException("--Empty--", "No such user present."));
     }
@@ -96,6 +96,6 @@ public class UserController {
     public ResponseEntity logoutUser(@CurrentUser CustomUserDetails customUserDetails,
                                      @ApiParam(value = "The LogOutRequest payload") @Valid @RequestBody LogOutRequest logOutRequest) {
         userService.logoutUser(customUserDetails, logOutRequest);
-        return ResponseEntity.ok(new ApiResponse("Log out successful", true));
+        return ResponseEntity.ok(new ApiResponse(true, "Log out successful"));
     }
 }
