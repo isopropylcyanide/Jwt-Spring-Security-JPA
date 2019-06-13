@@ -86,7 +86,7 @@ public class JwtTokenProvider {
             throw new InvalidTokenRequestException("JWT", authToken, "Malformed jwt token");
         } catch (ExpiredJwtException ex) {
             logger.error("Expired JWT token");
-            throw new InvalidTokenRequestException("JWT", authToken, "Token expired. Refresh required.");
+            throw new InvalidTokenRequestException("JWT", authToken, "Token expired. Refresh required");
         } catch (UnsupportedJwtException ex) {
             logger.error("Unsupported JWT token");
             throw new InvalidTokenRequestException("JWT", authToken, "Unsupported JWT token");
