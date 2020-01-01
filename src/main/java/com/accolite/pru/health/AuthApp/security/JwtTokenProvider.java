@@ -75,9 +75,10 @@ public class JwtTokenProvider {
      * Validates if a token has the correct unmalformed signature and is not expired or unsupported.
      */
     public boolean validateToken(String authToken) {
+        boolean isTokenVerified = false;
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
-            return true;
+            isTokenVerified = true;
         } catch (SignatureException ex) {
             logger.error("Invalid JWT signature");
             throw new InvalidTokenRequestException("JWT", authToken, "Incorrect signature");
@@ -93,6 +94,8 @@ public class JwtTokenProvider {
         } catch (IllegalArgumentException ex) {
             logger.error("JWT claims string is empty.");
             throw new InvalidTokenRequestException("JWT", authToken, "Illegal argument token");
+        }finally {
+            return isTokenVerified;
         }
     }
 
