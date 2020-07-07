@@ -10,6 +10,7 @@
 
     <name>AuthApp</name>
     <description>Demo project for Spring Boot</description>
+    <url>https://github.com/isopropylcyanide/Jwt-Spring-Security-JPA</url>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -18,10 +19,43 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <developers>
+        <developer>
+            <name>Aman Garg</name>
+            <email>amangargcse@outlook.com</email>
+            <timezone>5</timezone>
+            <id>isopropylcyanide</id>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>Apache 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <developerConnection>scm:git:git@github.com:isopropylcyanide/Jwt-Spring-Security-JPA.git
+        </developerConnection>
+        <connection>scm:git@github.com:isopropylcyanide/Jwt-Spring-Security-JPA.git</connection>
+        <url>https://github.com/isopropylcyanide/Jwt-Spring-Security-JPA/tree/master</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/isopropylcyanide/Jwt-Spring-Security-JPA/issues</url>
+    </issueManagement>
+
     <properties>
+        <!--Build-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+
+        <!--Build-->
         <jjwt.version>0.9.1</jjwt.version>
         <log4j.version>1.2.17</log4j.version>
         <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
