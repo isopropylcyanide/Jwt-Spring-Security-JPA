@@ -13,14 +13,13 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
+    private final String jwtSecret;
+    private final long jwtExpirationInMs;
 
-    @Value("${app.jwt.expiration}")
-    private Long jwtExpirationInMs;
-
-    @Value("${app.jwt.claims.refresh.name}")
-    private String jwtClaimRefreshName;
+    public JwtTokenProvider(@Value("${app.jwt.secret}") String jwtSecret, @Value("${app.jwt.expiration}") long jwtExpirationInMs) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpirationInMs = jwtExpirationInMs;
+    }
 
     /**
      * Generates a token from a principal object. Embed the refresh token in the jwt
@@ -78,7 +77,7 @@ public class JwtTokenProvider {
      * Return the jwt expiration for the client so that they can execute
      * the refresh token logic appropriately
      */
-    public Long getExpiryDuration() {
+    public long getExpiryDuration() {
         return jwtExpirationInMs;
     }
 }

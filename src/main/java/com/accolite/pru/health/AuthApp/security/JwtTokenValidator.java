@@ -19,14 +19,12 @@ import java.util.Date;
 public class JwtTokenValidator {
 
     private static final Logger logger = Logger.getLogger(JwtTokenValidator.class);
-
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
-
+    private final String jwtSecret;
     private final LoggedOutJwtTokenCache loggedOutTokenCache;
 
     @Autowired
-    public JwtTokenValidator(LoggedOutJwtTokenCache loggedOutTokenCache) {
+    public JwtTokenValidator(@Value("${app.jwt.secret}") String jwtSecret, LoggedOutJwtTokenCache loggedOutTokenCache) {
+        this.jwtSecret = jwtSecret;
         this.loggedOutTokenCache = loggedOutTokenCache;
     }
 
