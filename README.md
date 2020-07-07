@@ -1,8 +1,9 @@
 ## Jwt-Spring-Security-JPA ##
 
-<a href="https://sourcerer.io/isopropylcyanide"><img src="https://avatars0.githubusercontent.com/u/12872673?v=4" height="50px" width="50px" alt=""/></a>
+![Travis (.org)](https://img.shields.io/travis/isopropylcyanide/Jwt-Spring-Security-JPA)
+![GitHub](https://img.shields.io/github/license/isopropylcyanide/Jwt-Spring-Security-JPA?color=blue)
 
-A demo project explaining the backend authentication using JWT (Json Web Token) authentication using Spring Security &amp; MySQL JPA.
+#### A demo project explaining the backend authentication using JWT (Json Web Token) authentication using Spring Security &amp; MySQL JPA.
 There's support for the following features:
 
 * Conventional email/username based registration with admin support
