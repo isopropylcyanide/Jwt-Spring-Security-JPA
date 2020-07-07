@@ -10,6 +10,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,7 +52,7 @@ public class JwtTokenValidatorTest {
     @Test
     public void testValidateTokenThrowsExceptionWhenTokenIsExpired() throws InterruptedException {
         String token = tokenProvider.generateTokenFromUserId(123L);
-        Thread.sleep(jwtExpiryInMs);
+        TimeUnit.MILLISECONDS.sleep(jwtExpiryInMs);
         OnUserLogoutSuccessEvent logoutEvent = stubLogoutEvent("U1", token);
         when(loggedOutTokenCache.getLogoutEventForToken(token)).thenReturn(logoutEvent);
 

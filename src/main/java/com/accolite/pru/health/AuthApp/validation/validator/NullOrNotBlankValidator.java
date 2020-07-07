@@ -9,6 +9,7 @@ public class NullOrNotBlankValidator implements ConstraintValidator<NullOrNotBla
 
     @Override
     public void initialize(NullOrNotBlank parameters) {
+        //no-op
     }
 
     @Override

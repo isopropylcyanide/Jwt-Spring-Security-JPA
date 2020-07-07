@@ -10,7 +10,7 @@ public class OnUserLogoutSuccessEvent extends ApplicationEvent {
 
     private final String userEmail;
     private final String token;
-    private final LogOutRequest logOutRequest;
+    private final transient LogOutRequest logOutRequest;
     private final Date eventTime;
 
     public OnUserLogoutSuccessEvent(String userEmail, String token, LogOutRequest logOutRequest) {
