@@ -1,15 +1,9 @@
 package com.accolite.pru.health.AuthApp.security;
 
-import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,16 +13,13 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private static final Logger logger = Logger.getLogger(JwtTokenProvider.class);
+    private final String jwtSecret;
+    private final long jwtExpirationInMs;
 
-    @Value("${app.jwt.secret}")
-    private String jwtSecret;
-
-    @Value("${app.jwt.expiration}")
-    private Long jwtExpirationInMs;
-
-    @Value("${app.jwt.claims.refresh.name}")
-    private String jwtClaimRefreshName;
+    public JwtTokenProvider(@Value("${app.jwt.secret}") String jwtSecret, @Value("${app.jwt.expiration}") long jwtExpirationInMs) {
+        this.jwtSecret = jwtSecret;
+        this.jwtExpirationInMs = jwtExpirationInMs;
+    }
 
     /**
      * Generates a token from a principal object. Embed the refresh token in the jwt
@@ -58,7 +49,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-
     /**
      * Returns the user id encapsulated within the token
      */
@@ -72,38 +62,22 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Validates if a token has the correct unmalformed signature and is not expired or unsupported.
+     * Returns the user id encapsulated within the token
      */
-    public boolean validateToken(String authToken) {
-        boolean isTokenVerified = false;
-        try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
-            isTokenVerified = true;
-        } catch (SignatureException ex) {
-            logger.error("Invalid JWT signature");
-            throw new InvalidTokenRequestException("JWT", authToken, "Incorrect signature");
-        } catch (MalformedJwtException ex) {
-            logger.error("Invalid JWT token");
-            throw new InvalidTokenRequestException("JWT", authToken, "Malformed jwt token");
-        } catch (ExpiredJwtException ex) {
-            logger.error("Expired JWT token");
-            throw new InvalidTokenRequestException("JWT", authToken, "Token expired. Refresh required");
-        } catch (UnsupportedJwtException ex) {
-            logger.error("Unsupported JWT token");
-            throw new InvalidTokenRequestException("JWT", authToken, "Unsupported JWT token");
-        } catch (IllegalArgumentException ex) {
-            logger.error("JWT claims string is empty.");
-            throw new InvalidTokenRequestException("JWT", authToken, "Illegal argument token");
-        }finally {
-            return isTokenVerified;
-        }
+    public Date getTokenExpiryFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getExpiration();
     }
 
     /**
      * Return the jwt expiration for the client so that they can execute
      * the refresh token logic appropriately
      */
-    public Long getExpiryDuration() {
+    public long getExpiryDuration() {
         return jwtExpirationInMs;
     }
 }

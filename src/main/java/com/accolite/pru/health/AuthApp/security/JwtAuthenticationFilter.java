@@ -21,12 +21,18 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger log = Logger.getLogger(JwtAuthenticationFilter.class);
+
     @Value("${app.jwt.header}")
     private String tokenRequestHeader;
+
     @Value("${app.jwt.header.prefix}")
     private String tokenRequestHeaderPrefix;
+
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private JwtTokenValidator jwtTokenValidator;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -40,12 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+            if (StringUtils.hasText(jwt) && jwtTokenValidator.validateToken(jwt)) {
                 Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
 
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, jwt, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

@@ -2,6 +2,7 @@ package com.accolite.pru.health.AuthApp.controller;
 
 import com.accolite.pru.health.AuthApp.annotation.CurrentUser;
 import com.accolite.pru.health.AuthApp.event.OnUserAccountChangeEvent;
+import com.accolite.pru.health.AuthApp.event.OnUserLogoutSuccessEvent;
 import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.payload.ApiResponse;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -96,6 +98,10 @@ public class UserController {
     public ResponseEntity logoutUser(@CurrentUser CustomUserDetails customUserDetails,
                                      @ApiParam(value = "The LogOutRequest payload") @Valid @RequestBody LogOutRequest logOutRequest) {
         userService.logoutUser(customUserDetails, logOutRequest);
+        Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
+
+        OnUserLogoutSuccessEvent logoutSuccessEvent = new OnUserLogoutSuccessEvent(customUserDetails.getEmail(), credentials.toString(), logOutRequest);
+        applicationEventPublisher.publishEvent(logoutSuccessEvent);
         return ResponseEntity.ok(new ApiResponse(true, "Log out successful"));
     }
 }

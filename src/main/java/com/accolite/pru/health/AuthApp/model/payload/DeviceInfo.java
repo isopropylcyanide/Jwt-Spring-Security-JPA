@@ -54,4 +54,13 @@ public class DeviceInfo {
     public void setNotificationToken(String notificationToken) {
         this.notificationToken = notificationToken;
     }
+
+    @Override
+    public String toString() {
+        return "DeviceInfo{" +
+                "deviceId='" + deviceId + '\'' +
+                ", deviceType=" + deviceType +
+                ", notificationToken='" + notificationToken + '\'' +
+                '}';
+    }
 }
