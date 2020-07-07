@@ -27,6 +27,7 @@
         <spring.boot.version>2.0.4.RELEASE</spring.boot.version>
         <freemarker.version>2.3.28</freemarker.version>
         <swagger.version>2.9.2</swagger.version>
+        <expiring.map.version>0.5.9</expiring.map.version>
     </properties>
 
     <dependencies>
@@ -34,14 +35,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -52,16 +56,19 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
         </dependency>
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -73,20 +80,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
-        </dependency>
-
-        <!--Dev tools-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <version>${spring.boot.version}</version>
-        </dependency>
-
-        <!--Actuator-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-            <version>${spring.boot.version}</version>
         </dependency>
 
         <!--Jwt-->
@@ -130,6 +123,12 @@
             <version>${swagger.version}</version>
         </dependency>
 
+        <!--Expiring Map-->
+        <dependency>
+            <groupId>net.jodah</groupId>
+            <artifactId>expiringmap</artifactId>
+            <version>${expiring.map.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -140,6 +139,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>

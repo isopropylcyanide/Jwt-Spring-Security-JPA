@@ -58,27 +58,17 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-
     /**
-     * Returns the user id encapsulated within the token
-     */
-    public Long getUserIdFromJWT(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
-                .parseClaimsJws(token)
-                .getBody();
-
-        return Long.parseLong(claims.getSubject());
-    }
-
-    /**
-     * Validates if a token has the correct unmalformed signature and is not expired or unsupported.
+     * Validates if a token satisfies the following properties
+     * - Signature is not malformed
+     * - Token hasn't expired
+     * - Token is supported
+     * - Token has not recently been logged out.
      */
     public boolean validateToken(String authToken) {
-        boolean isTokenVerified = false;
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
-            isTokenVerified = true;
+            return true;
         } catch (SignatureException ex) {
             logger.error("Invalid JWT signature");
             throw new InvalidTokenRequestException("JWT", authToken, "Incorrect signature");
@@ -94,9 +84,31 @@ public class JwtTokenProvider {
         } catch (IllegalArgumentException ex) {
             logger.error("JWT claims string is empty.");
             throw new InvalidTokenRequestException("JWT", authToken, "Illegal argument token");
-        }finally {
-            return isTokenVerified;
         }
+    }
+
+    /**
+     * Returns the user id encapsulated within the token
+     */
+    public Long getUserIdFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return Long.parseLong(claims.getSubject());
+    }
+
+    /**
+     * Returns the user id encapsulated within the token
+     */
+    public Date getTokenExpiryFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getExpiration();
     }
 
     /**

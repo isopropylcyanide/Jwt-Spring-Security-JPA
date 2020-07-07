@@ -38,7 +38,6 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
 
-
     /**
      * Creates and returns a new refresh token
      */
