@@ -38,10 +38,10 @@ public class DeviceInfo {
     public DeviceInfo() {
     }
 
-    public DeviceInfo(String deviceId, DeviceType deviceTypem, String notificationToken) {
+    public DeviceInfo(String deviceId, DeviceType deviceType, String notificationToken) {
         this.deviceId = deviceId;
-        deviceType = deviceType;
-        notificationToken = notificationToken;
+        this.deviceType = deviceType;
+        this.notificationToken = notificationToken;
     }
 
     public String getDeviceId() {
