@@ -75,7 +75,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Returns the user id encapsulated within the token
+     * Returns the token expiration date encapsulated within the token
      */
     public Date getTokenExpiryFromJWT(String token) {
         Claims claims = Jwts.parser()
