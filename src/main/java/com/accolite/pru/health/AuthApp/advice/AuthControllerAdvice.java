@@ -111,7 +111,7 @@ public class AuthControllerAdvice {
     }
 
     @ExceptionHandler(value = ResourceAlreadyInUseException.class)
-    @ResponseStatus(HttpStatus.IM_USED)
+    @ResponseStatus(HttpStatus.CONFLICT)
     @ResponseBody
     public ApiResponse handleResourceAlreadyInUseException(ResourceAlreadyInUseException ex, WebRequest request) {
         return new ApiResponse(false, ex.getMessage(), ex.getClass().getName(), resolvePathFromWebRequest(request));
