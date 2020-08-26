@@ -9,6 +9,7 @@ There's support for the following features:
 * Conventional email/username based registration with admin support
 * Conventional Login using Spring Security and generation of JWT token
 * Multiple device login and logout support
+* In memory store for blacklisting logged out tokens
 * Support for expiration bases email verification. Mail is sent upon registration. 
 * Resend the email confirmation email if old one expires
 * Support for password updation once logged in
@@ -60,7 +61,7 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 	cd AuthApp
 	```
 
-2. **Create MySQL database**
+2. **Create a MySQL database**
 
 	```bash
 	create database login_db
@@ -102,7 +103,6 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 ### Contribution ###
 * Please fork the project and adapt it to your use case.
 * Submit a pull request.
-* The project is in a nascent stage. As such any issues you find should be reported in the issues section.
 
 ---
 ## Demo Screens ##
