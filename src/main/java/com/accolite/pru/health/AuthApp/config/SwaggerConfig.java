@@ -30,6 +30,7 @@ public class SwaggerConfig {
     @Bean
     public Docket productApi() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .ignoredParameterTypes(CurrentUser.class)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.accolite.pru.health.AuthApp"))
                 .paths(PathSelectors.regex("/api.*"))
