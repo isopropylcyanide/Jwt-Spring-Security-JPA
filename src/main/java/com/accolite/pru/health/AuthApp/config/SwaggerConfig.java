@@ -22,6 +22,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import com.accolite.pru.health.AuthApp.annotation.CurrentUser;
 
 @EnableSwagger2
 @Configuration
@@ -30,6 +31,7 @@ public class SwaggerConfig {
     @Bean
     public Docket productApi() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .ignoredParameterTypes(CurrentUser.class)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.accolite.pru.health.AuthApp"))
                 .paths(PathSelectors.regex("/api.*"))
