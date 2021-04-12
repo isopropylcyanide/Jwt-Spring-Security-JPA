@@ -79,10 +79,17 @@ Moreover, entities are validated using JSR-303 Validation constraints.
 
 4. **Run the app**
 
-	You can run the spring boot app by typing the following command -
+	You can run the spring boot app by typing the following operating system specific command -
+	
+	For UNIX/Linux based operating systems,
 
 	```bash
-	mvn spring-boot:run
+	./mvnw spring-boot:run
+	```
+	For Windows based operating systems,
+
+	```bash
+	mvnw.cmd spring-boot:run
 	```
 
 	The server will start on port 9004. Token default expiration is 600000ms i.e 10 minutes.
