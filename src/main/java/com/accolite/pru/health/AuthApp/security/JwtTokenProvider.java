@@ -18,10 +18,15 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -40,11 +45,17 @@ public class JwtTokenProvider {
      */
     public String generateToken(CustomUserDetails customUserDetails) {
         Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
+        String authorities = customUserDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
         return Jwts.builder()
                 .setSubject(Long.toString(customUserDetails.getId()))
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(expiryDate))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .claim("authorities", authorities)
                 .compact();
     }
 
@@ -92,5 +103,15 @@ public class JwtTokenProvider {
      */
     public long getExpiryDuration() {
         return jwtExpirationInMs;
+    }
+
+    public List<GrantedAuthority> getAuthoritiesFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(jwtSecret)
+                .parseClaimsJws(token)
+                .getBody();
+        return Arrays.stream(claims.get("authorities").toString().split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 }
