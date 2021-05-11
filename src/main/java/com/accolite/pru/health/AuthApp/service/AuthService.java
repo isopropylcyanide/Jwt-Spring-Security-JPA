@@ -13,21 +13,12 @@
  */
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
-import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
-import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
-import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
-import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
+import com.accolite.pru.health.AuthApp.exception.*;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
-import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
-import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
-import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
-import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
-import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
-import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
+import com.accolite.pru.health.AuthApp.model.payload.*;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
@@ -227,7 +218,8 @@ public class AuthService {
                 })
                 .map(RefreshToken::getUserDevice)
                 .map(UserDevice::getUser)
-                .map(User::getId).map(this::generateTokenFromUserId))
+                .map(CustomUserDetails::new)
+                .map(this::generateToken))
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Missing refresh token in database.Please login again"));
     }
 
