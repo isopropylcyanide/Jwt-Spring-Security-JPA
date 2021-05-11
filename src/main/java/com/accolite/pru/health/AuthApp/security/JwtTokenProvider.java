@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
+    private static final String AUTHORITIES_CLAIM = "authorities";
     private final String jwtSecret;
     private final long jwtExpirationInMs;
 
@@ -45,17 +46,13 @@ public class JwtTokenProvider {
      */
     public String generateToken(CustomUserDetails customUserDetails) {
         Instant expiryDate = Instant.now().plusMillis(jwtExpirationInMs);
-        String authorities = customUserDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+        String authorities = getUserAuthorities(customUserDetails);
         return Jwts.builder()
                 .setSubject(Long.toString(customUserDetails.getId()))
                 .setIssuedAt(Date.from(Instant.now()))
                 .setExpiration(Date.from(expiryDate))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .claim("authorities", authorities)
+                .claim(AUTHORITIES_CLAIM, authorities)
                 .compact();
     }
 
@@ -105,13 +102,28 @@ public class JwtTokenProvider {
         return jwtExpirationInMs;
     }
 
+    /**
+     * Return the jwt authorities claim encapsulated within the token
+     */
     public List<GrantedAuthority> getAuthoritiesFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
-        return Arrays.stream(claims.get("authorities").toString().split(","))
+        return Arrays.stream(claims.get(AUTHORITIES_CLAIM).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * Private helper method to extract user authorities.
+     */
+    private String getUserAuthorities(CustomUserDetails customUserDetails) {
+        return customUserDetails
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+    }
+
 }
