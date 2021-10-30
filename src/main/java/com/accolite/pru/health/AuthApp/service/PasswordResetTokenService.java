@@ -60,16 +60,8 @@ public class PasswordResetTokenService {
      * associated and persists in the token repository.
      */
     public Optional<PasswordResetToken> createToken(User user) {
-        String tokenID = Util.generateRandomUuid();
-        PasswordResetToken token = new PasswordResetToken();
-        token.setToken(tokenID);
-        token.setExpiryDate(Instant.now().plusMillis(expiration));
-        token.setClaimed(false);
-        token.setActive(true);
-        token.setUser(user);
-
-        repository.save(token);
-        return Optional.of(token);
+        PasswordResetToken token = createTokenWithUser(user);
+        return Optional.of(repository.save(token));
     }
 
     /**
@@ -97,7 +89,6 @@ public class PasswordResetTokenService {
             throw new InvalidTokenRequestException("Password Reset Token", token.getToken(),
                     "Expired token. Please issue a new request");
         }
-        //todo add test
         if (!token.getActive()) {
             throw new InvalidTokenRequestException("Password Reset Token", token.getToken(),
                     "Token was marked inactive");
@@ -112,5 +103,16 @@ public class PasswordResetTokenService {
             throw new InvalidTokenRequestException("Password Reset Token", token.getToken(),
                     "Token is invalid for the given user " + requestEmail);
         }
+    }
+
+    PasswordResetToken createTokenWithUser(User user) {
+        String tokenID = Util.generateRandomUuid();
+        PasswordResetToken token = new PasswordResetToken();
+        token.setToken(tokenID);
+        token.setExpiryDate(Instant.now().plusMillis(expiration));
+        token.setClaimed(false);
+        token.setActive(true);
+        token.setUser(user);
+        return token;
     }
 }

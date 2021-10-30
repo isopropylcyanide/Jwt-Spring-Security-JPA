@@ -383,6 +383,8 @@ VALUES ('ROLE_ADMIN');
 * Remember, the project is a demo and should not be used into production directly.
 * Please fork the project and adapt it to your use case.
 * Submit a pull request with proper motivation and test plan.
-* Postman collection dump available [here](https://gist.github.com/isopropylcyanide/a4e8556814dbf28dc3320be59785b807)
+* Postman collection dump available [here](https://gist.github.com/isopropylcyanide/a4e8556814dbf28dc3320be59785b807))
+* Not everything is in scope for this demo project. Feel free to fork the project and extend the functionality.
+* Project is equipped with a JUnit but lacks tests in most places. Would really appreciate your contributions here.
 
 ---
