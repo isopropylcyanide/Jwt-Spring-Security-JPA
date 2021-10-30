@@ -17,16 +17,14 @@ import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.Role;
 import com.accolite.pru.health.AuthApp.model.RoleName;
 import com.accolite.pru.health.AuthApp.model.User;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class JwtTokenProviderTest {
 
@@ -35,34 +33,31 @@ public class JwtTokenProviderTest {
 
     private JwtTokenProvider tokenProvider;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    void setUp() {
         MockitoAnnotations.initMocks(this);
         this.tokenProvider = new JwtTokenProvider(jwtSecret, jwtExpiryInMs);
     }
 
     @Test
-    public void testGetUserIdFromJWT() {
+    void testGetUserIdFromJWT() {
         String token = tokenProvider.generateToken(stubCustomUser());
         assertEquals(100, tokenProvider.getUserIdFromJWT(token).longValue());
     }
 
     @Test
-    public void testGetTokenExpiryFromJWT() {
+    void testGetTokenExpiryFromJWT() {
         String token = tokenProvider.generateTokenFromUserId(120L);
         assertNotNull(tokenProvider.getTokenExpiryFromJWT(token));
     }
 
     @Test
-    public void testGetExpiryDuration() {
+    void testGetExpiryDuration() {
         assertEquals(jwtExpiryInMs, tokenProvider.getExpiryDuration());
     }
 
     @Test
-    public void testGetAuthoritiesFromJWT() {
+    void testGetAuthoritiesFromJWT() {
         String token = tokenProvider.generateToken(stubCustomUser());
         assertNotNull(tokenProvider.getAuthoritiesFromJWT(token));
     }

@@ -62,6 +62,7 @@
         <freemarker.version>2.3.28</freemarker.version>
         <swagger.version>2.9.2</swagger.version>
         <expiring.map.version>0.5.9</expiring.map.version>
+        <junit.version>5.7.1</junit.version>
 
         <!--Sonar / Code Coverage-->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -172,6 +173,14 @@
             <artifactId>expiringmap</artifactId>
             <version>${expiring.map.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.1</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
