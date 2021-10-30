@@ -240,16 +240,22 @@ public class AuthService {
 
     /**
      * Reset a password given a reset request and return the updated user
+     * The reset token must match the email for the user and cannot be used again
+     * Since a user could have requested password multiple times, multiple tokens
+     * would be generated. Hence, we need to invalidate all the existing password
+     * reset tokens prior to changing the user password.
      */
-    public Optional<User> resetPassword(PasswordResetRequest passwordResetRequest) {
-        String token = passwordResetRequest.getToken();
-        PasswordResetToken passwordResetToken = passwordResetTokenService.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Password Reset Token", "Token Id", token));
+    public Optional<User> resetPassword(PasswordResetRequest request) {
+        String tokenID = request.getToken();
+        PasswordResetToken token = passwordResetTokenService.findByToken(tokenID)
+                .orElseThrow(() -> new ResourceNotFoundException("Password Reset Token", "Token Id", tokenID));
 
-        passwordResetTokenService.verifyExpiration(passwordResetToken);
-        final String encodedPassword = passwordEncoder.encode(passwordResetRequest.getPassword());
+        passwordResetTokenService.verifyExpiration(token);
+        passwordResetTokenService.matchEmail(token, request.getEmail());
 
-        return Optional.of(passwordResetToken)
+        final String encodedPassword = passwordEncoder.encode(request.getConfirmPassword());
+
+        return Optional.of(token)
                 .map(PasswordResetToken::getUser)
                 .map(user -> {
                     user.setPassword(encodedPassword);
