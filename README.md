@@ -72,19 +72,6 @@ mvnw.cmd spring-boot:run # For Windows based operating systems
  - The server will start on `server.port:9004` and will create the tables for you.
  - Every run of the app will reset your state. To not do that, modify `spring.jpa.hibernate.ddl-auto: update`
 
-
-<h4> Add the default Roles </h4>
-
- - The spring boot app uses role based authorization powered by spring security
- - Tables should have been created by default upon the first startup.
- - Please execute the following sql queries in the database to insert the `USER` and `ADMIN` roles.
- - Any new user who signs up to the app is assigned the `ROLE_USER` by default.
-
-```sql
-INSERT INTO `login_db.role` (ROLE_NAME) VALUES ('ROLE_USER');
-INSERT INTO `login_db.role` (ROLE_NAME) VALUES ('ROLE_ADMIN');
-```
-
 ---
 
 ## API ##
@@ -359,6 +346,19 @@ curl --location --request GET 'localhost:9004/api/auth/checkEmailInUse?email=ama
 </details>
 
 ---
+
+<h3> Roles </h3>
+
+- The spring boot app uses role based authorization powered by spring security
+- Tables and role data should have been created by default upon the first startup.
+- Any new user who signs up to the app is assigned the `ROLE_USER` by default.
+- In case the role entries aren't created, please execute the following sql queries in the database to insert the `USER` and `ADMIN` roles.
+
+```sql
+INSERT INTO `login_db.role` (ROLE_NAME) VALUES ('ROLE_USER');
+INSERT INTO `login_db.role` (ROLE_NAME) VALUES ('ROLE_ADMIN');
+```
+
 
 ### Contribution ###
 * Remember, the project is a demo and should not be used into production directly.
