@@ -13,12 +13,21 @@
  */
 package com.accolite.pru.health.AuthApp.service;
 
-import com.accolite.pru.health.AuthApp.exception.*;
+import com.accolite.pru.health.AuthApp.exception.PasswordResetLinkException;
+import com.accolite.pru.health.AuthApp.exception.ResourceAlreadyInUseException;
+import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
+import com.accolite.pru.health.AuthApp.exception.TokenRefreshException;
+import com.accolite.pru.health.AuthApp.exception.UpdatePasswordException;
 import com.accolite.pru.health.AuthApp.model.CustomUserDetails;
 import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
 import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.UserDevice;
-import com.accolite.pru.health.AuthApp.model.payload.*;
+import com.accolite.pru.health.AuthApp.model.payload.LoginRequest;
+import com.accolite.pru.health.AuthApp.model.payload.PasswordResetLinkRequest;
+import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
+import com.accolite.pru.health.AuthApp.model.payload.RegistrationRequest;
+import com.accolite.pru.health.AuthApp.model.payload.TokenRefreshRequest;
+import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
@@ -43,10 +52,10 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final EmailVerificationTokenService emailVerificationTokenService;
     private final UserDeviceService userDeviceService;
-    private final PasswordResetTokenService passwordResetTokenService;
+    private final PasswordResetTokenService passwordResetService;
 
     @Autowired
-    public AuthService(UserService userService, JwtTokenProvider tokenProvider, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailVerificationTokenService emailVerificationTokenService, UserDeviceService userDeviceService, PasswordResetTokenService passwordResetTokenService) {
+    public AuthService(UserService userService, JwtTokenProvider tokenProvider, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailVerificationTokenService emailVerificationTokenService, UserDeviceService userDeviceService, PasswordResetTokenService passwordResetService) {
         this.userService = userService;
         this.tokenProvider = tokenProvider;
         this.refreshTokenService = refreshTokenService;
@@ -54,7 +63,7 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
         this.emailVerificationTokenService = emailVerificationTokenService;
         this.userDeviceService = userDeviceService;
-        this.passwordResetTokenService = passwordResetTokenService;
+        this.passwordResetService = passwordResetService;
     }
 
     /**
@@ -229,27 +238,23 @@ public class AuthService {
     public Optional<PasswordResetToken> generatePasswordResetToken(PasswordResetLinkRequest passwordResetLinkRequest) {
         String email = passwordResetLinkRequest.getEmail();
         return userService.findByEmail(email)
-                .map(user -> {
-                    PasswordResetToken passwordResetToken = passwordResetTokenService.createToken();
-                    passwordResetToken.setUser(user);
-                    passwordResetTokenService.save(passwordResetToken);
-                    return Optional.of(passwordResetToken);
-                })
+                .map(passwordResetService::createToken)
                 .orElseThrow(() -> new PasswordResetLinkException(email, "No matching user found for the given request"));
     }
 
     /**
      * Reset a password given a reset request and return the updated user
+     * The reset token must match the email for the user and cannot be used again
+     * Since a user could have requested password multiple times, multiple tokens
+     * would be generated. Hence, we need to invalidate all the existing password
+     * reset tokens prior to changing the user password.
      */
-    public Optional<User> resetPassword(PasswordResetRequest passwordResetRequest) {
-        String token = passwordResetRequest.getToken();
-        PasswordResetToken passwordResetToken = passwordResetTokenService.findByToken(token)
-                .orElseThrow(() -> new ResourceNotFoundException("Password Reset Token", "Token Id", token));
+    public Optional<User> resetPassword(PasswordResetRequest request) {
+        PasswordResetToken token = passwordResetService.getValidToken(request);
+        final String encodedPassword = passwordEncoder.encode(request.getConfirmPassword());
 
-        passwordResetTokenService.verifyExpiration(passwordResetToken);
-        final String encodedPassword = passwordEncoder.encode(passwordResetRequest.getPassword());
-
-        return Optional.of(passwordResetToken)
+        return Optional.of(token)
+                .map(passwordResetService::claimToken)
                 .map(PasswordResetToken::getUser)
                 .map(user -> {
                     user.setPassword(encodedPassword);

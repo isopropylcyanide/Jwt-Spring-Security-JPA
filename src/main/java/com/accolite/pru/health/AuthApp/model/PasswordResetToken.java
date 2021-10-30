@@ -13,6 +13,7 @@
  */
 package com.accolite.pru.health.AuthApp.model;
 
+import com.accolite.pru.health.AuthApp.model.audit.DateAudit;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.Column;
@@ -27,7 +28,7 @@ import javax.persistence.SequenceGenerator;
 import java.time.Instant;
 
 @Entity(name = "PASSWORD_RESET_TOKEN")
-public class PasswordResetToken {
+public class PasswordResetToken extends DateAudit {
 
     @Id
     @Column(name = "TOKEN_ID")
@@ -45,6 +46,12 @@ public class PasswordResetToken {
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "USER_ID")
     private User user;
+
+    @Column(name = "IS_ACTIVE", nullable = false)
+    private Boolean active;
+
+    @Column(name = "IS_CLAIMED", nullable = false)
+    private Boolean claimed;
 
     public PasswordResetToken(Long id, String token, Instant expiryDate, User user) {
         this.id = id;
@@ -80,4 +87,19 @@ public class PasswordResetToken {
         this.token = token;
     }
 
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Boolean getClaimed() {
+        return claimed;
+    }
+
+    public void setClaimed(Boolean claimed) {
+        this.claimed = claimed;
+    }
 }

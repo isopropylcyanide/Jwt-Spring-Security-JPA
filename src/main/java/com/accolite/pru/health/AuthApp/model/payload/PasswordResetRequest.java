@@ -23,7 +23,11 @@ import javax.validation.constraints.NotBlank;
 @ApiModel(value = "Password reset Request", description = "The password reset request payload")
 public class PasswordResetRequest {
 
-    @NotBlank(message = "Password cannot be blank")
+    @NotBlank(message = "The email for which the password needs to be reset can not be empty")
+    @ApiModelProperty(value = "The user email", required = true, allowableValues = "NonEmpty String")
+    private String email;
+
+    @NotBlank(message = "New password cannot be blank")
     @ApiModelProperty(value = "New user password", required = true, allowableValues = "NonEmpty String")
     private String password;
 
@@ -32,25 +36,20 @@ public class PasswordResetRequest {
             allowableValues = "NonEmpty String matching the password")
     private String confirmPassword;
 
-    @NotBlank(message = "Token has to be supplied along with a password reset request")
+    @NotBlank(message = "Password reset token for the specified email has to be supplied")
     @ApiModelProperty(value = "Reset token received in mail", required = true, allowableValues = "NonEmpty String")
     private String token;
 
-    public PasswordResetRequest() {
+    public String getEmail() {
+        return email;
     }
 
-    public PasswordResetRequest(String password, String confirmPassword, String token) {
-        this.password = password;
-        this.confirmPassword = confirmPassword;
-        this.token = token;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getConfirmPassword() {
         return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 
     public String getPassword() {
