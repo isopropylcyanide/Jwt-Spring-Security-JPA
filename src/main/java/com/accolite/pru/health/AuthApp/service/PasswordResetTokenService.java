@@ -16,6 +16,7 @@ package com.accolite.pru.health.AuthApp.service;
 import com.accolite.pru.health.AuthApp.exception.InvalidTokenRequestException;
 import com.accolite.pru.health.AuthApp.exception.ResourceNotFoundException;
 import com.accolite.pru.health.AuthApp.model.PasswordResetToken;
+import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
 import com.accolite.pru.health.AuthApp.repository.PasswordResetTokenRepository;
 import com.accolite.pru.health.AuthApp.util.Util;
@@ -25,26 +26,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PasswordResetTokenService {
 
-    private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final PasswordResetTokenRepository repository;
 
     @Value("${app.token.password.reset.duration}")
     private Long expiration;
 
     @Autowired
-    public PasswordResetTokenService(PasswordResetTokenRepository passwordResetTokenRepository) {
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
-    }
-
-    /**
-     * Saves the given password reset token
-     */
-    public PasswordResetToken save(PasswordResetToken passwordResetToken) {
-        return passwordResetTokenRepository.save(passwordResetToken);
+    public PasswordResetTokenService(PasswordResetTokenRepository repository) {
+        this.repository = repository;
     }
 
     /**
@@ -53,23 +47,45 @@ public class PasswordResetTokenService {
      */
     public PasswordResetToken getValidToken(PasswordResetRequest request) {
         String tokenID = request.getToken();
-        PasswordResetToken token = passwordResetTokenRepository.findByToken(tokenID)
+        PasswordResetToken token = repository.findByToken(tokenID)
                 .orElseThrow(() -> new ResourceNotFoundException("Password Reset Token", "Token Id", tokenID));
 
-        verifyExpiration(token);
         matchEmail(token, request.getEmail());
+        verifyExpiration(token);
         return token;
     }
 
     /**
-     * Creates and returns a new password token to which a user must be associated
+     * Creates and returns a new password token to which a user must be
+     * associated and persists in the token repository.
      */
-    public PasswordResetToken createToken() {
-        PasswordResetToken passwordResetToken = new PasswordResetToken();
-        String token = Util.generateRandomUuid();
-        passwordResetToken.setToken(token);
-        passwordResetToken.setExpiryDate(Instant.now().plusMillis(expiration));
-        return passwordResetToken;
+    public Optional<PasswordResetToken> createToken(User user) {
+        String tokenID = Util.generateRandomUuid();
+        PasswordResetToken token = new PasswordResetToken();
+        token.setToken(tokenID);
+        token.setExpiryDate(Instant.now().plusMillis(expiration));
+        token.setClaimed(false);
+        token.setActive(true);
+        token.setUser(user);
+
+        repository.save(token);
+        return Optional.of(token);
+    }
+
+    /**
+     * Mark this password reset token as claimed (used by user to update password)
+     * Since a user could have requested password multiple times, multiple tokens
+     * would be generated. Hence, we need to invalidate all the existing password
+     * reset tokens prior to changing the user password.
+     */
+    public PasswordResetToken claimToken(PasswordResetToken token) {
+        User user = token.getUser();
+        token.setClaimed(true);
+
+        CollectionUtils.emptyIfNull(repository.findActiveTokensForUser(user))
+                .forEach(t -> t.setActive(false));
+
+        return token;
     }
 
     /**
@@ -97,22 +113,4 @@ public class PasswordResetTokenService {
                     "Token is invalid for the given user " + requestEmail);
         }
     }
-
-    /**
-     * Mark this password reset token as claimed (used by user to update password)
-     * Since a user could have requested password multiple times, multiple tokens
-     * would be generated. Hence, we need to invalidate all the existing password
-     * reset tokens prior to changing the user password.
-     */
-    public PasswordResetToken claimToken(PasswordResetToken token) {
-        String userId = token.getUser().getEmail();
-        List<PasswordResetToken> allPasswordResetTokens = passwordResetTokenRepository.findActiveTokensForUser(userId);
-
-        CollectionUtils.emptyIfNull(allPasswordResetTokens)
-                .forEach(t -> t.setActive(false));
-
-        token.setClaimed(true);
-        return token;
-    }
 }
-

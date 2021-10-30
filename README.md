@@ -4,16 +4,17 @@
 ![GitHub](https://img.shields.io/github/license/isopropylcyanide/Jwt-Spring-Security-JPA?color=blue)
 
 #### A demo project explaining the backend authentication using JWT (Json Web Token) authentication using Spring Security &amp; MySQL JPA.
+
 There's support for the following features:
 
-* Conventional email/username based registration with admin support
-* Conventional Login using Spring Security and generation of JWT token
-* Multiple device login and logout support
+* Conventional email/username based registration with admin support.
+* Conventional Login using Spring Security and generation of JWT token.
+* Multiple device login and logout support.
 * In memory store for blacklisting JWT tokens upon user logout.
-* Support for expiration bases email verification. Mail is sent upon registration. 
-* Resend the email confirmation email if old one expires
-* Support for forgot-password functionality with password reset token sent to mail.
-* Supports admin protected urls leveraging Spring security
+* Expiration bases email verification. Mail is sent upon registration.
+* Resend the email confirmation email if old one expires.
+* Forgot-password functionality with password reset token validations.
+* Admin protected urls leveraging Spring security.
 * Refresh JWT tokens once the temporary JWT expires.
 * Check availability of username/email during registration.
 
@@ -22,11 +23,13 @@ There's support for the following features:
 ---
 
 ## JWT ##
+
 JSON Web Tokens are an open, industry standard RFC 7519 method for representing claims securely between two parties.
 
 ---
 
 ## Swagger Docs ##
+
 The project has been configured with a Swagger docket that exposes the APIs with the schema
 
 Accessible at `http://localhost:9004/swagger-ui.html` once the app is running.
@@ -36,8 +39,10 @@ Accessible at `http://localhost:9004/swagger-ui.html` once the app is running.
 ---
 
 ## Exception Handling ##
- * The app throws custom exceptions wherever necessary which are captured through a controller advice. It then returns the appropriate error response to the caller
- * Moreover, entities are validated using JSR-303 Validation constraints. 
+
+* The app throws custom exceptions wherever necessary which are captured through a controller advice. It then returns
+  the appropriate error response to the caller
+* Moreover, entities are validated using JSR-303 Validation constraints.
 
 ---
 
@@ -58,9 +63,10 @@ $ create database login_db
 
 <h4> Change MySQL username and password as per your MySQL installation </h4>
 
- - Edit `spring.datasource.username` and `spring.datasource.password` properties as per your mysql installation in `src/main/resources/application.properties`
- - Edit `spring.mail.username` and `spring.mail.password` properties as per your mail server `src/main/resources/mail.properties`
-
+- Edit `spring.datasource.username` and `spring.datasource.password` properties as per your mysql installation
+  in `src/main/resources/application.properties`
+- Edit `spring.mail.username` and `spring.mail.password` properties as per your mail
+  server `src/main/resources/mail.properties`
 
 <h4> Run the app </h4>
 
@@ -69,8 +75,8 @@ $ create database login_db
 mvnw.cmd spring-boot:run # For Windows based operating systems
 ```
 
- - The server will start on `server.port:9004` and will create the tables for you.
- - Every run of the app will reset your state. To not do that, modify `spring.jpa.hibernate.ddl-auto: update`
+- The server will start on `server.port:9004` and will create the tables for you.
+- Every run of the app will reset your state. To not do that, modify `spring.jpa.hibernate.ddl-auto: update`
 
 ---
 
@@ -88,10 +94,11 @@ curl --location --request POST 'localhost:9004/api/auth/register' \
     "registerAsAdmin": true
 }'
 ```
+
 ![image](https://user-images.githubusercontent.com/12872673/139542127-126c70d7-8d94-49a9-9dc6-2c3b127d8844.png)
 
 > ⚠️ If you re-register an email twice, you'll get the "email in use" error
- 
+
 </details>
 
 ---
@@ -112,6 +119,7 @@ curl --location --request POST 'localhost:9004/api/auth/login' \
     }
 }'
 ```
+
 ![image](https://user-images.githubusercontent.com/12872673/139542083-a9df7f31-16d8-4d1c-8187-3e52a8d9d1e6.png)
 
 </details>
@@ -134,12 +142,13 @@ curl --location --request GET 'localhost:9004/api/auth/registrationConfirmation?
     }
 }'
 ```
+
 ![image](https://user-images.githubusercontent.com/12872673/139542456-99cde036-acfe-48db-8bf7-8c86bde18b13.png)
 
 > ⚠️ If you pass the incorrect token you will get a "Token Mismatch error"
- 
+
 > ❔ **Don't know the token?**: Check your email in `mail.properties`
- 
+
 > ❔ **Still didn't get it?**: Look inside the database `email_verification_token#token`
 
 </details>
@@ -188,12 +197,12 @@ curl --location --request GET 'localhost:9004/api/user/me' \
 > ⚠️ If you enter an invalid token (obtained post login), you will get an "Incorrect JWT Signature" error.
 
 > ⚠️ If you enter a malformed JWT token, you will get a "Malformed JWT Signature" error.
- 
+
 > ⚠️ If you enter an expired JWT token (default: `app.jwt.expiration`, you will get an "Expired JWT Signature" error and clients should refresh the JWT token.
 
 ![image](https://user-images.githubusercontent.com/12872673/139553744-9b3de48f-4974-47b1-9572-6ad767f46fc7.png)
 
- 
+
 </details>
 
 
@@ -236,7 +245,7 @@ curl --location --request POST 'localhost:9004/api/user/logout' \
 
 ![image](https://user-images.githubusercontent.com/12872673/139543370-9a2b7126-2342-41e5-88ef-4607cd4489a5.png)
 
->❔ Logging out also deletes the refresh token associated with the device. In real production, this token should be specifically invalidated.
+> ❔ Logging out also deletes the refresh token associated with the device. In real production, this token should be specifically invalidated.
 
 > ⚠️ If the JWT isn't passed then you will get an "Unauthorized" error.
 
@@ -284,19 +293,26 @@ curl --location --request POST 'localhost:9004/api/auth/password/resetlink' \
 curl --location --request POST 'localhost:9004/api/auth/password/reset' \
 --header 'Content-Type: application/json' \
 --data-raw '{
+    "email": "amangarg1995sep@gmail.com",
     "password": "P1",
     "confirmPassword": "P1",
-    "token": "63b047b9-e53c-4246-916e-2093e9b104e8"
+    "token": "880ab6f1-4b4b-4d04-92bd-8995b4063205"
 }'
 ```
 
-![image](https://user-images.githubusercontent.com/12872673/139546934-c9cf6621-094f-4a53-abc4-24e589d69076.png)
+![image](https://user-images.githubusercontent.com/12872673/139558080-cc69c43d-eff3-4316-9834-170f3f496c06.png)
+
 
 > ⚠️ If your new passwords do not match, there will be an error
 
-> ⚠️ If your password reset token is not valid, you'll get a "Password Reset Token Not Found" error.
+> ⚠️ If your password reset token is not valid or is for some other user, you'll get a "Password Reset Token Not Found" error.
 
 ![image](https://user-images.githubusercontent.com/12872673/139545592-7076ccef-c23e-4a6b-90ec-de157b4e4d67.png)
+
+> ⚠️ If you try to use a password reset token twice, you will get a "Token Inactive" error
+![image](https://user-images.githubusercontent.com/12872673/139558023-f26a60f8-affe-4c39-a998-b264064be4f1.png)
+
+
 
 </details>
 
@@ -352,15 +368,18 @@ curl --location --request GET 'localhost:9004/api/auth/checkEmailInUse?email=ama
 - The spring boot app uses role based authorization powered by spring security
 - Tables and role data should have been created by default upon the first startup.
 - Any new user who signs up to the app is assigned the `ROLE_USER` by default.
-- In case the role entries aren't created, please execute the following sql queries in the database to insert the `USER` and `ADMIN` roles.
+- In case the role entries aren't created, please execute the following sql queries in the database to insert the `USER`
+  and `ADMIN` roles.
 
 ```sql
-INSERT INTO `login_db.role` (ROLE_NAME) VALUES ('ROLE_USER');
-INSERT INTO `login_db.role` (ROLE_NAME) VALUES ('ROLE_ADMIN');
+INSERT INTO `login_db.role` (ROLE_NAME)
+VALUES ('ROLE_USER');
+INSERT INTO `login_db.role` (ROLE_NAME)
+VALUES ('ROLE_ADMIN');
 ```
 
-
 ### Contribution ###
+
 * Remember, the project is a demo and should not be used into production directly.
 * Please fork the project and adapt it to your use case.
 * Submit a pull request with proper motivation and test plan.
