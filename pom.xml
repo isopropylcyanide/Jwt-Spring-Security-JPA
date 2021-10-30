@@ -62,7 +62,7 @@
         <freemarker.version>2.3.28</freemarker.version>
         <swagger.version>2.9.2</swagger.version>
         <expiring.map.version>0.5.9</expiring.map.version>
-        <junit.version>5.7.1</junit.version>
+        <junit5.version>5.8.1</junit5.version>
 
         <!--Sonar / Code Coverage-->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -174,11 +174,19 @@
             <version>${expiring.map.version}</version>
         </dependency>
 
+        <!--jUnit5-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.8.1</version>
+            <version>${junit5.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!--commons-collections4 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.4</version>
         </dependency>
 
     </dependencies>
