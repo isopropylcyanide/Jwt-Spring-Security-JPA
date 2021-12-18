@@ -124,11 +124,11 @@ public class UserService {
 
     /**
      * Log the given user out and delete the refresh token associated with it. If no device
-     * id is found matching the database for the given user, throw a log out exception.
+     * id is found matching the database for this user, throw a log out exception.
      */
     public void logoutUser(@CurrentUser CustomUserDetails currentUser, LogOutRequest logOutRequest) {
         String deviceId = logOutRequest.getDeviceInfo().getDeviceId();
-        UserDevice userDevice = userDeviceService.findByUserId(currentUser.getId())
+        UserDevice userDevice = userDeviceService.findDeviceByUserId(currentUser.getId(), deviceId)
                 .filter(device -> device.getDeviceId().equals(deviceId))
                 .orElseThrow(() -> new UserLogoutException(logOutRequest.getDeviceInfo().getDeviceId(), "Invalid device Id supplied. No matching device found for the given user "));
 

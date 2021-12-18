@@ -189,13 +189,13 @@ public class AuthService {
 
     /**
      * Creates and persists the refresh token for the user device. If device exists
-     * already, we don't care. Unused devices with expired tokens should be cleaned
-     * with a cron job. The generated token would be encapsulated within the jwt.
-     * Remove the existing refresh token as the old one should not remain valid.
+     * already, we recreate the refresh token. Unused devices with expired tokens
+     * should be cleaned externally.
      */
     public Optional<RefreshToken> createAndPersistRefreshTokenForDevice(Authentication authentication, LoginRequest loginRequest) {
         User currentUser = (User) authentication.getPrincipal();
-        userDeviceService.findByUserId(currentUser.getId())
+        String deviceId = loginRequest.getDeviceInfo().getDeviceId();
+        userDeviceService.findDeviceByUserId(currentUser.getId(), deviceId)
                 .map(UserDevice::getRefreshToken)
                 .map(RefreshToken::getId)
                 .ifPresent(refreshTokenService::deleteById);
