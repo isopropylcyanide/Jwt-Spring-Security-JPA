@@ -150,7 +150,7 @@ public class AuthController {
 
         return authService.generatePasswordResetToken(passwordResetLinkRequest)
                 .map(passwordResetToken -> {
-                    UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/password/reset");
+                    UriComponentsBuilder urlBuilder = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/auth/password/reset");
                     OnGenerateResetLinkEvent generateResetLinkMailEvent = new OnGenerateResetLinkEvent(passwordResetToken,
                             urlBuilder);
                     applicationEventPublisher.publishEvent(generateResetLinkMailEvent);
