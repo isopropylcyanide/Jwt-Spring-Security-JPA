@@ -23,12 +23,12 @@ import com.accolite.pru.health.AuthApp.model.payload.LogOutRequest;
 import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.service.AuthService;
 import com.accolite.pru.health.AuthApp.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +42,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/user")
-@Api(value = "User Rest API", description = "Defines endpoints for the logged in user. It's secured by default")
+@Tag(name = "User Rest API", description = "Defines endpoints for the logged in user. It's secured by default")
 
 public class UserController {
 
@@ -66,7 +66,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "Returns the current user profile")
+    @Operation(summary = "Returns the current user profile")
     public ResponseEntity getUserProfile(@CurrentUser CustomUserDetails currentUser) {
         logger.info(currentUser.getEmail() + " has role: " + currentUser.getRoles());
         return ResponseEntity.ok("Hello. This is about me");
@@ -77,7 +77,7 @@ public class UserController {
      */
     @GetMapping("/admins")
     @PreAuthorize("hasRole('ADMIN')")
-    @ApiOperation(value = "Returns the list of configured admins. Requires ADMIN Access")
+    @Operation(summary = "Returns the list of configured admins. Requires ADMIN Access")
     public ResponseEntity getAllAdmins() {
         logger.info("Inside secured resource with admin");
         return ResponseEntity.ok("Hello. This is about admins");
@@ -88,14 +88,15 @@ public class UserController {
      */
     @PostMapping("/password/update")
     @PreAuthorize("hasRole('USER')")
-    @ApiOperation(value = "Allows the user to change his password once logged in by supplying the correct current " +
+    @Operation(summary = "Allows the user to change his password once logged in by supplying the correct current " +
             "password")
     public ResponseEntity updateUserPassword(@CurrentUser CustomUserDetails customUserDetails,
-                                             @ApiParam(value = "The UpdatePasswordRequest payload") @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
+                                             @Param(value = "The UpdatePasswordRequest payload") @Valid @RequestBody UpdatePasswordRequest updatePasswordRequest) {
 
         return authService.updatePassword(customUserDetails, updatePasswordRequest)
                 .map(updatedUser -> {
-                    OnUserAccountChangeEvent onUserPasswordChangeEvent = new OnUserAccountChangeEvent(updatedUser, "Update Password", "Change successful");
+                    OnUserAccountChangeEvent onUserPasswordChangeEvent = new OnUserAccountChangeEvent(updatedUser,
+                            "Update Password", "Change successful");
                     applicationEventPublisher.publishEvent(onUserPasswordChangeEvent);
                     return ResponseEntity.ok(new ApiResponse(true, "Password changed successfully"));
                 })
@@ -107,13 +108,14 @@ public class UserController {
      * user device.
      */
     @PostMapping("/logout")
-    @ApiOperation(value = "Logs the specified user device and clears the refresh tokens associated with it")
+    @Operation(summary = "Logs the specified user device and clears the refresh tokens associated with it")
     public ResponseEntity logoutUser(@CurrentUser CustomUserDetails customUserDetails,
-                                     @ApiParam(value = "The LogOutRequest payload") @Valid @RequestBody LogOutRequest logOutRequest) {
+                                     @Param(value = "The LogOutRequest payload") @Valid @RequestBody LogOutRequest logOutRequest) {
         userService.logoutUser(customUserDetails, logOutRequest);
         Object credentials = SecurityContextHolder.getContext().getAuthentication().getCredentials();
 
-        OnUserLogoutSuccessEvent logoutSuccessEvent = new OnUserLogoutSuccessEvent(customUserDetails.getEmail(), credentials.toString(), logOutRequest);
+        OnUserLogoutSuccessEvent logoutSuccessEvent = new OnUserLogoutSuccessEvent(customUserDetails.getEmail(),
+                credentials.toString(), logOutRequest);
         applicationEventPublisher.publishEvent(logoutSuccessEvent);
         return ResponseEntity.ok(new ApiResponse(true, "Log out successful"));
     }
