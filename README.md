@@ -32,7 +32,7 @@ JSON Web Tokens are an open, industry standard RFC 7519 method for representing 
 
 The project has been configured with a Swagger docket that exposes the APIs with the schema
 
-Accessible at `http://localhost:9004/swagger-ui.html` once the app is running.
+Accessible at `http://localhost:9004/swagger-ui` once the app is running.
 
 ![image](https://user-images.githubusercontent.com/12872673/139554260-cc570c43-953a-46d1-a4c4-305ff3807ffb.png)
 

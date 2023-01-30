@@ -156,19 +156,7 @@
             <version>${freemarker.version}</version>
         </dependency>
 
-        <!--Swagger UI-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.springfox</groupId>-->
-        <!--            <artifactId>springfox-swagger-ui</artifactId>-->
-        <!--            <version>${swagger.version}</version>-->
-        <!--        </dependency>-->
-
-        <!--Swagger 2-->
-        <!--        <dependency>-->
-        <!--            <groupId>io.springfox</groupId>-->
-        <!--            <artifactId>springfox-swagger2</artifactId>-->
-        <!--            <version>${swagger.version}</version>-->
-        <!--        </dependency>-->
+        <!--SpringDoc Swagger UI-->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
@@ -201,9 +189,6 @@
             <artifactId>guava</artifactId>
             <version>23.0</version>
         </dependency>
-        <!-- Thanks for using https://jar-download.com -->
-
-
     </dependencies>
 
     <build>
