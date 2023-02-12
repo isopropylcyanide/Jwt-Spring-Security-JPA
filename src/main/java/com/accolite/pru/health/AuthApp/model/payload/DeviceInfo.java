@@ -15,7 +15,7 @@ package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.model.DeviceType;
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -23,16 +23,16 @@ import javax.validation.constraints.NotNull;
 public class DeviceInfo {
 
     @NotBlank(message = "Device id cannot be blank")
-    @ApiModelProperty(value = "Device Id", required = true, dataType = "string", allowableValues = "Non empty string")
+    @Schema(name = "Device Id", required = true, type = "string", allowableValues = "Non empty string")
     private String deviceId;
 
     @NotNull(message = "Device type cannot be null")
-    @ApiModelProperty(value = "Device type Android/iOS", required = true, dataType = "string", allowableValues =
+    @Schema(name = "Device type Android/iOS", required = true, type = "string", allowableValues =
             "DEVICE_TYPE_ANDROID, DEVICE_TYPE_IOS")
     private DeviceType deviceType;
 
     @NullOrNotBlank(message = "Device notification token can be null but not blank")
-    @ApiModelProperty(value = "Device notification id", dataType = "string", allowableValues = "Non empty string")
+    @Schema(name = "Device notification id", type = "string", allowableValues = "Non empty string")
     private String notificationToken;
 
     public DeviceInfo() {

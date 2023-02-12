@@ -13,16 +13,15 @@
  */
 package com.accolite.pru.health.AuthApp.model.payload;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import javax.validation.constraints.NotBlank;
 
-@ApiModel(value = "Password reset link request", description = "The password reset link payload")
+@Schema(name = "Password reset link request", description = "The password reset link payload")
 public class PasswordResetLinkRequest {
 
     @NotBlank(message = "Email cannot be blank")
-    @ApiModelProperty(value = "User registered email", required = true, allowableValues = "NonEmpty String")
+    @Schema(name = "User registered email", required = true, allowableValues = "NonEmpty String")
     private String email;
 
     public PasswordResetLinkRequest(String email) {

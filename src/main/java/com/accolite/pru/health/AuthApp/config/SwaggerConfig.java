@@ -13,38 +13,35 @@
  */
 package com.accolite.pru.health.AuthApp.config;
 
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
+import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-import com.accolite.pru.health.AuthApp.annotation.CurrentUser;
 
-@EnableSwagger2
 @Configuration
 public class SwaggerConfig {
 
     @Bean
-    public Docket productApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .ignoredParameterTypes(CurrentUser.class)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.accolite.pru.health.AuthApp"))
-                .paths(PathSelectors.regex("/api.*"))
-                .build()
-                .apiInfo(metaInfo());
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("com.accolite.pru.health.AuthApp")
+                .pathsToMatch("/api/**")
+                .build();
     }
 
-    private ApiInfo metaInfo() {
-        return new ApiInfoBuilder()
-                .description("Backend API For the Auth/User Service")
-                .title("Auth/User API")
-                .version("Unreleased [WIP]")
-                .build();
+    @Bean
+    public OpenAPI metaInfo() {
+        return new OpenAPI()
+                .info(new Info().title("Backend API For the Auth/User Service")
+                        .description("Backend API For the Auth/User Service")
+                        .version("v0.0.1")
+                        .license(new License().name("Apache 2.0").url("http://springdoc.org")))
+                .externalDocs(new ExternalDocumentation()
+                        .description("Backend API Wiki Documentation")
+                        .url("https://Backend API.wiki.github.org/docs"));
     }
 
 }
