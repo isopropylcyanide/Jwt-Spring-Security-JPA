@@ -19,13 +19,13 @@ import com.accolite.pru.health.AuthApp.model.User;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.service.MailService;
 import freemarker.template.TemplateException;
+import jakarta.mail.MessagingException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import javax.mail.MessagingException;
 import java.io.IOException;
 
 @Component

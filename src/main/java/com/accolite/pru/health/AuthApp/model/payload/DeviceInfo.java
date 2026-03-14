@@ -16,9 +16,8 @@ package com.accolite.pru.health.AuthApp.model.payload;
 import com.accolite.pru.health.AuthApp.model.DeviceType;
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class DeviceInfo {
 

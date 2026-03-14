@@ -14,9 +14,8 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "Logout request", description = "The logout request payload")
 public class LogOutRequest {

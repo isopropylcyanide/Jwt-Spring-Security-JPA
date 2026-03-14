@@ -14,9 +14,8 @@
 package com.accolite.pru.health.AuthApp.validation.validator;
 
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class NullOrNotBlankValidator implements ConstraintValidator<NullOrNotBlank, String> {
 

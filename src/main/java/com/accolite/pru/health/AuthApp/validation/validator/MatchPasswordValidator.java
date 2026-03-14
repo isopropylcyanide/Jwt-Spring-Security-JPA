@@ -15,9 +15,8 @@ package com.accolite.pru.health.AuthApp.validation.validator;
 
 import com.accolite.pru.health.AuthApp.model.payload.PasswordResetRequest;
 import com.accolite.pru.health.AuthApp.validation.annotation.MatchPassword;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class MatchPasswordValidator implements ConstraintValidator<MatchPassword, PasswordResetRequest> {
 

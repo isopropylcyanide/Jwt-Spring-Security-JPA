@@ -15,8 +15,7 @@ package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.validation.annotation.NullOrNotBlank;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "Registration Request", description = "The registration request payload")
 public class RegistrationRequest {

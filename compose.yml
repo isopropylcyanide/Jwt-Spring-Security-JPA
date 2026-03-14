@@ -1,0 +1,48 @@
+services:
+  #  mysql:
+  #    image: mysql:9.3.0
+  #    container_name: Spring-JWT-Auth
+  #    environment:
+  #      MYSQL_ROOT_PASSWORD: yu71
+  #      MYSQL_DATABASE: login_db
+  #      MYSQL_USER: yu71
+  #      MYSQL_PASSWORD: 53cret
+  #    ports:
+  #      - "3309:3306"
+  #    volumes:
+  #      - ./mysql_data:/var/lib/mysql
+  #    command: --default-authentication-plugin=mysql_native_password
+  #    healthcheck:
+  #      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+  #      interval: 10s
+  #      timeout: 5s
+  #      retries: 5
+
+  postgres:
+    image: postgres:17.5-alpine3.22
+    container_name: postgres175
+    environment:
+      POSTGRES_DB: login_db
+      POSTGRES_USER: yu71
+      POSTGRES_PASSWORD: 53cret
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    #    healthcheck:
+    #      test: ["CMD-SHELL", "pg_isready -U postgres"]
+    #      interval: 10s
+    #      timeout: 5s
+    #      retries: 5
+    networks:
+      - auth-network
+
+volumes:
+  #  mysql_data:
+  postgres_data:
+
+networks:
+  auth-network:
+    name: auth-network
+    driver: bridge
+

@@ -16,99 +16,92 @@ package com.accolite.pru.health.AuthApp.config;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationEntryPoint;
 import com.accolite.pru.health.AuthApp.security.JwtAuthenticationFilter;
 import com.accolite.pru.health.AuthApp.service.CustomUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Profile("!dev")
+import java.util.Arrays;
+
+@Slf4j
 @Configuration
 @EnableWebSecurity(debug = true)
-@EnableJpaRepositories(basePackages = "com.accolite.pru.health.AuthApp.repository")
-@EnableGlobalMethodSecurity(
+@EnableMethodSecurity(
         securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+        jsr250Enabled = true)
+@RequiredArgsConstructor
+public class WebSecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
-
     private final JwtAuthenticationEntryPoint jwtEntryPoint;
-
-    @Autowired
-    public WebSecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthenticationEntryPoint jwtEntryPoint) {
-        this.userDetailsService = userDetailsService;
-        this.jwtEntryPoint = jwtEntryPoint;
-    }
-
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
-    }
+    private final Environment environment;
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter();
     }
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // Check if we're running in a dev profile
+        boolean isDevProfile = isDevProfile();
+
+        if (isDevProfile) {
+            // Development configuration - permit all requests
+            if (Arrays.asList(environment.getActiveProfiles()).contains("postgresql")) {
+                log.info("Loaded inside postgresql profile");
+            } else {
+                log.info("Loaded inside a dev only");
+            }
+
+            http.authorizeHttpRequests(authorizeRequests ->
+                    authorizeRequests.anyRequest().permitAll()
+            );
+        } else {
+            // Production configuration with JWT security
+            http
+                    .cors(cors -> cors.configure(http))
+                    .csrf(AbstractHttpConfigurer::disable)
+                    .exceptionHandling(exceptionHandling ->
+                            exceptionHandling.authenticationEntryPoint(jwtEntryPoint)
+                    )
+                    .sessionManagement(sessionManagement ->
+                            sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    )
+                    .authorizeHttpRequests(authorizeRequests ->
+                            authorizeRequests
+                                    .requestMatchers("/api/auth/**").permitAll()
+                                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui", "/v3/api-docs").permitAll()
+                                    .anyRequest().authenticated()
+                    );
+
+            http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        }
+
+        return http.build();
     }
 
-    @Override
-    public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/v3/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**",
-                "/swagger-ui/**", "/webjars/**");
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.cors()
-                .and()
-                .csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(jwtEntryPoint)
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/",
-                		"/favicon.ico",
-                        "/**/*.json",
-                        "/**/*.xml",
-                        "/**/*.properties",
-                        "/**/*.woff2",
-                        "/**/*.woff",
-                        "/**/*.ttf",
-                        "/**/*.ttc",
-                        "/**/*.ico",
-                        "/**/*.bmp",
-                        "/**/*.png",
-                        "/**/*.gif",
-                        "/**/*.svg",
-                        "/**/*.jpg",
-                        "/**/*.jpeg",
-                        "/**/*.html",
-                        "/**/*.css",
-                        "/**/*.js").permitAll()
-                .antMatchers("/**/api/auth/**").permitAll()
-                .antMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                .anyRequest().authenticated();
-
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+    private boolean isDevProfile() {
+        String[] activeProfiles = environment.getActiveProfiles();
+        return Arrays.stream(activeProfiles)
+                .anyMatch(profile -> profile.startsWith("dev"));
     }
 
     @Bean

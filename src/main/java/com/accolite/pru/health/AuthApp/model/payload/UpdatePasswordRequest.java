@@ -14,8 +14,7 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(name = "Update password Request", description = "The update password request payload")
 public class UpdatePasswordRequest {

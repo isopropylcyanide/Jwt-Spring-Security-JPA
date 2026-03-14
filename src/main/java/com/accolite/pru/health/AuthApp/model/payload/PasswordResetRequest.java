@@ -15,8 +15,7 @@ package com.accolite.pru.health.AuthApp.model.payload;
 
 import com.accolite.pru.health.AuthApp.validation.annotation.MatchPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @MatchPassword
 @Schema(name = "Password reset Request", description = "The password reset request payload")

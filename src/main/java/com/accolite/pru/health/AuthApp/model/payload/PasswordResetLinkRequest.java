@@ -14,8 +14,7 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(name = "Password reset link request", description = "The password reset link payload")
 public class PasswordResetLinkRequest {

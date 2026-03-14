@@ -31,8 +31,8 @@ import com.accolite.pru.health.AuthApp.model.payload.UpdatePasswordRequest;
 import com.accolite.pru.health.AuthApp.model.token.EmailVerificationToken;
 import com.accolite.pru.health.AuthApp.model.token.RefreshToken;
 import com.accolite.pru.health.AuthApp.security.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private static final Logger logger = Logger.getLogger(AuthService.class);
@@ -53,18 +54,6 @@ public class AuthService {
     private final EmailVerificationTokenService emailVerificationTokenService;
     private final UserDeviceService userDeviceService;
     private final PasswordResetTokenService passwordResetService;
-
-    @Autowired
-    public AuthService(UserService userService, JwtTokenProvider tokenProvider, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, EmailVerificationTokenService emailVerificationTokenService, UserDeviceService userDeviceService, PasswordResetTokenService passwordResetService) {
-        this.userService = userService;
-        this.tokenProvider = tokenProvider;
-        this.refreshTokenService = refreshTokenService;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.emailVerificationTokenService = emailVerificationTokenService;
-        this.userDeviceService = userDeviceService;
-        this.passwordResetService = passwordResetService;
-    }
 
     /**
      * Registers a new user in the database by performing a series of quick checks.

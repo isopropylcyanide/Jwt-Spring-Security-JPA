@@ -14,8 +14,7 @@
 package com.accolite.pru.health.AuthApp.model.payload;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema(name = "Token refresh Request", description = "The jwt token refresh request payload")
 public class TokenRefreshRequest {
